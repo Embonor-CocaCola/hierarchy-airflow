@@ -1,0 +1,21 @@
+FROM reigncl/airflow:2.2.1-python3.9-onbuild
+
+USER root
+
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends less unzip wget vim zip \
+  && apt-get autoremove -yqq --purge \
+  && apt-get clean \
+  && rm -rf /var/lib/apt/lists/*
+
+USER airflow
+
+COPY ./dags ${AIRFLOW_HOME}/dags
+COPY ./include ${AIRFLOW_HOME}/include
+COPY ./plugins ${AIRFLOW_HOME}/plugins
+COPY ./requirements*.txt ./
+
+RUN pip install --upgrade pip \
+    && pip install --no-cache-dir \
+      -r requirements.txt \
+      -r requirements-dev.txt

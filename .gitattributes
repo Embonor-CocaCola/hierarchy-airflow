@@ -1,0 +1,3 @@
+* text=auto
+/dags/* text eol=lf
+/plugins/* text eol=lf
