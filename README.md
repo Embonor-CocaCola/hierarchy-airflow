@@ -1,4 +1,4 @@
-# GAC Airflow Service
+# Airflow Service
 
 ## Requirements
 
@@ -7,6 +7,7 @@
 
 
 ## Development configuration (on Mac M1)
+* change proyect name from "gac" to <your_project>
 
 ### Install
 * Install pyenv
@@ -68,8 +69,8 @@ docker-compose up postgres
 
 4. Create database and schema:
 ```postgresql
-CREATE DATABASE gac;
--- now, change to gac database and create schema airflow
+CREATE DATABASE <database_name>;
+-- now, change to <database_name> database and create schema airflow
 CREATE SCHEMA airflow;
 ```
 

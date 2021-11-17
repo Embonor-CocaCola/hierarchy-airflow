@@ -1,8 +1,10 @@
 import json
 
 from airflow.models import BaseOperator
+from airflow.models.param import ParamsDict
 from airflow.plugins_manager import AirflowPlugin
 from airflow.providers.postgres.hooks.postgres import PostgresHook
+from typing import Dict
 
 
 class PostgresOperatorWithParams(BaseOperator):
@@ -20,14 +22,14 @@ class PostgresOperatorWithParams(BaseOperator):
     template_ext = ('.sql',)
     ui_color = '#ededed'
 
-    def __init__(self, sql, postgres_conn_id, parameters=None, autocommit=False, *args, **kwargs):
+    def __init__(self, sql, postgres_conn_id, parameters: Dict = None, autocommit=False, *args, **kwargs):
         super(PostgresOperatorWithParams, self).__init__(*args, **kwargs)
 
         self.sql = sql
         self.postgres_conn_id = postgres_conn_id
         self.autocommit = autocommit
         self.parameters = parameters
-        self.params = parameters
+        self.params = ParamsDict(parameters)
 
     def execute(self, context):
         if isinstance(self.parameters, str):
