@@ -1,6 +1,8 @@
 from airflow.models import BaseOperator
+from airflow.models.param import ParamsDict
 from airflow.plugins_manager import AirflowPlugin
 from airflow.providers.postgres.hooks.postgres import PostgresHook
+from typing import Dict
 
 
 class PostgresOperatorDumpExpert(BaseOperator):
@@ -8,14 +10,14 @@ class PostgresOperatorDumpExpert(BaseOperator):
     template_fields = ('csv_path', 'parameters')
     template_ext = ('.sql',)
 
-    def __init__(self, sql_path, postgres_conn_id, csv_path, parameters=None, include_headers=True, *args, **kwargs):
+    def __init__(self, sql_path, postgres_conn_id, csv_path, parameters: Dict = None, include_headers=True, *args, **kwargs):
         super(PostgresOperatorDumpExpert, self).__init__(*args, **kwargs)
 
         self.sql_path = sql_path
         self.postgres_conn_id = postgres_conn_id
         self.csv_path = csv_path
         self.parameters = parameters
-        self.params = parameters
+        self.params = ParamsDict(parameters)
         self.include_headers = include_headers
 
     def execute(self, context):
