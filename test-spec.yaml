@@ -1,0 +1,15 @@
+version: 0.2
+phases:
+  install:
+    commands:
+      - echo Installing dependencies
+  build:
+    commands:
+      - echo Running test
+  post_build:
+    commands:
+      - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
+      - IMAGE_TAG=${COMMIT_HASH:=latest}
+      - TYPE=Testing
+      - if [ "$CODEBUILD_BUILD_SUCCEEDING" = 1 ]; then STATE=passed; COLOR=32CD32; EMOJI=:female-scientist::skin-tone-4:; else STATE=failed; EMOJI=:woman-gesturing-no::skin-tone-4:;COLOR=FF0000; fi
+      - curl -X POST -H 'Content-type:application/json' --data '{"attachments":[{"text":"`'"$IMAGE_TAG"'` '"$EMOJI"' '"$TYPE"' *'"$STATE"'* | _'"$GIT_BRANCH"'/'"$APPLICATION_NAME"'_","color":"#'"$COLOR"'"}]}' $SLACK_WEBHOOK

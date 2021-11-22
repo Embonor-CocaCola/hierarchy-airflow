@@ -1,0 +1,19 @@
+env: production
+
+hpa:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 4
+  metrics:
+    cpu:
+      targetAverageUtilization: 40
+    memory:
+      targetAverageUtilization: 70
+
+ingress:
+  hosts:
+    - airflow2.production.embonorservices.cl
+
+envVars:
+  - name: NODE_ENV
+    value: production

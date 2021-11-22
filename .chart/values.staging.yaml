@@ -1,0 +1,4 @@
+ingress:
+  web:
+    hosts:
+      - airflow2.develop.embonorservices.cl
