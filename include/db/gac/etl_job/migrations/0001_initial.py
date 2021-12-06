@@ -25,6 +25,7 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        migrations.RunSQL(sql='CREATE SCHEMA IF NOT EXISTS airflow;'),
         migrations.CreateModel(
             name='EtlJob',
             fields=[
