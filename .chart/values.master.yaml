@@ -17,3 +17,8 @@ ingress:
 envVars:
   - name: NODE_ENV
     value: production
+
+extraEnvFrom: |
+  - secretRef:
+      name: 'airflow-envars'
+      namespace: 'airflow'

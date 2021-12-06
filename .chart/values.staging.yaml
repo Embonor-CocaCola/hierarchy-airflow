@@ -2,3 +2,8 @@ ingress:
   web:
     hosts:
       - airflow2.develop.embonorservices.cl
+
+extraEnvFrom: |
+  - secretRef:
+      name: 'airflow-envars'
+      namespace: 'airflow'

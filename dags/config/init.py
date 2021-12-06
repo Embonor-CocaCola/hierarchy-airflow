@@ -4,6 +4,8 @@ from airflow import models
 from airflow.settings import Session
 from airflow.utils.session import provide_session
 
+import expos_service.settings as es_config
+
 
 @provide_session
 def _create_connection(conn_id: str = None, uri: str = None, conn_type: str = None, host: str = None,
@@ -102,6 +104,27 @@ if __name__ == '__main__':
     _db_config = {
     }
     _conn_config = {
+        es_config.ES_EMBONOR_SERVICES_BASE_URL_CONN_ID: {
+            'conn_id': es_config.ES_EMBONOR_SERVICES_BASE_URL_CONN_ID,
+            'conn_type': 'http',
+            'conn_host': es_config.ES_EMBONOR_SERVICES_BASE_URL,
+        },
+        es_config.ES_EMBONOR_PG_CONN_ID: {
+            'conn_id': es_config.ES_EMBONOR_PG_CONN_ID,
+            'conn_uri': es_config.ES_EMBONOR_PG_CONN_URI,
+        },
+        es_config.ES_AIRFLOW_DATABASE_CONN_ID: {
+            'conn_id': es_config.ES_AIRFLOW_DATABASE_CONN_ID,
+            'conn_uri': es_config.ES_AIRFLOW_DATABASE_CONN_URI,
+        },
+        es_config.ES_SSH_CONN_ID: {
+            'conn_id': es_config.ES_SSH_CONN_ID,
+            'conn_uri': es_config.ES_SSH_CONN_URI,
+        },
+        es_config.ES_EMBONOR_MONGO_CONN_ID: {
+            'conn_id': es_config.ES_EMBONOR_MONGO_CONN_ID,
+            'conn_uri': es_config.ES_EMBONOR_MONGO_CONN_URI,
+        },
     }
     _variable_config = {
     }
