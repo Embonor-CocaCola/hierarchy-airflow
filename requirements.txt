@@ -1,4 +1,4 @@
-apache-airflow[aws,crypto,password,postgres]==2.2.1
+apache-airflow[aws,crypto,password,postgres,mongo,ssh]==2.2.1
 Django==3.2.9
 dj-database-url==0.5.0
 python-dotenv==0.19.1
