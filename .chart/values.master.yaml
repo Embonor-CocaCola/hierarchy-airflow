@@ -18,7 +18,22 @@ envVars:
   - name: NODE_ENV
     value: production
 
-extraEnvFrom: |
-  - secretRef:
-      name: 'airflow-envars'
-      namespace: 'airflow'
+secret:
+  - envName: "GAC_SQL_CONN_URI"
+    secretName: "airflow-envars"
+    secretKey: "GAC_SQL_CONN_URI"
+  - envName: "EMBONOR_SERVICES_BASE_URL"
+    secretName: "airflow-envars"
+    secretKey: "EMBONOR_SERVICES_BASE_URL"
+  - envName: "EMBONOR_PG_CONN_URI"
+    secretName: "airflow-envars"
+    secretKey: "EMBONOR_PG_CONN_URI"
+  - envName: "EMBONOR_MONGO_CONN_URI"
+    secretName: "airflow-envars"
+    secretKey: "EMBONOR_MONGO_CONN_URI"
+  - envName: "AIRFLOW__CORE__SQL_ALCHEMY_CONN"
+    secretName: "airflow-envars"
+    secretKey: "AIRFLOW__CORE__SQL_ALCHEMY_CONN"
+  - envName: "AIRFLOW__CELERY__RESULT_BACKEND"
+    secretName: "airflow-envars"
+    secretKey: "AIRFLOW__CELERY__RESULT_BACKEND"
