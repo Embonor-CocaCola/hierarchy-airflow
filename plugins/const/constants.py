@@ -1,0 +1,5 @@
+RAW_SUFFIX = '_raw'
+TYPED_SUFFIX = '_typed'
+CONFORM_SUFFIX = '_conform'
+STAGED_SUFFIX = '_staged'
+TMP_PREFIX = 'tmp_'
