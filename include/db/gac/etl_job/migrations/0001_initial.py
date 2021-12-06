@@ -43,4 +43,7 @@ class Migration(migrations.Migration):
             constraint=models.UniqueConstraint(fields=('dag_run_id', 'attempt'), name='etljob_airflow_uidx'),
         ),
         migrations.RunSQL(create_slugify(), drop_slugify()),
+        migrations.RunSQL(
+            sql='CREATE EXTENSION IF NOT EXISTS "uuid-ossp";',
+            reverse_sql='DROP EXTENSION "uuid-ossp";'),
     ]

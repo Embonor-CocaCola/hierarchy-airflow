@@ -34,14 +34,21 @@ ALLOWED_HOSTS = []
 
 # Application definition
 INSTALLED_APPS = [
-    # 'django.contrib.admin',
-    # 'django.contrib.auth',
-    # 'django.contrib.contenttypes',
-    # 'django.contrib.sessions',
-    # 'django.contrib.messages',
-    # 'django.contrib.staticfiles',
+    'answer',
+    'branch_office',
+    'customer',
     'etl_job',
+    'plant',
+    'question',
+    'supervisor_plant',
+    'survey',
+    'vendor',
+    'vendor_customer',
+    'vendor_plant',
+    'vendor_type',
+    'chief_plant',
 ]
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',

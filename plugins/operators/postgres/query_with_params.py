@@ -22,7 +22,15 @@ class PostgresOperatorWithParams(BaseOperator):
     template_ext = ('.sql',)
     ui_color = '#ededed'
 
-    def __init__(self, sql, postgres_conn_id, parameters: Dict = None, autocommit=False, *args, **kwargs):
+    def __init__(
+            self,
+            sql: object,
+            postgres_conn_id: object,
+            parameters: Dict = None,
+            autocommit: object = False,
+            *args: object,
+            **kwargs: object,
+    ) -> object:
         super(PostgresOperatorWithParams, self).__init__(*args, **kwargs)
 
         self.sql = sql
