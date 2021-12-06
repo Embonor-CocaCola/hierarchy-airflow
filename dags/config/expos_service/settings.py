@@ -14,11 +14,11 @@ ES_EMBONOR_MONGO_CONN_ID = 'mongo_default'  # this is mandatory because mongo ho
 ES_EMBONOR_MONGO_CONN_URI = os.environ.get('EMBONOR_MONGO_CONN_URI')
 ES_EMBONOR_MONGO_DB_NAME = 'embonor-surveys'
 
-ES_REMOTE_RDS_HOST = 'embonorstagingrds.c95d90uys8a7.us-east-1.rds.amazonaws.com'
-ES_REMOTE_RDS_PORT = 5432
+ES_REMOTE_RDS_HOST = os.environ.get('EMBONOR_RDS_HOST')
+ES_REMOTE_RDS_PORT = os.environ.get('EMBONOR_RDS_PORT', 5432)
 
-ES_REMOTE_MONGO_HOST = 'mongo-staging.cluster-c95d90uys8a7.us-east-1.docdb.amazonaws.com'
-ES_REMOTE_MONGO_PORT = 27017
+ES_REMOTE_MONGO_HOST = os.environ.get('EMBONOR_MONGO_HOST')
+ES_REMOTE_MONGO_PORT = os.environ.get('EMBONOR_MONGO_PORT', 27017)
 
 ES_REMOTE_RDS_USER = os.environ.get('EMBONOR_RDS_USER')
 ES_REMOTE_RDS_PASS = os.environ.get('EMBONOR_RDS_PASS')
