@@ -1,17 +1,5 @@
 from const.constants import RAW_SUFFIX, TMP_PREFIX
 from const.table_name_maps import original_table_name_to_new_name_map
-if False:  # TYPE_CHECKING
-    from typing import TypedDict
-
-
-class TableNameVariations(TypedDict, total=False):
-    original: str
-    normalized: str
-    raw: str
-    tmp: str
-
-
-NamesWithVariationsDict = dict[str, TableNameVariations]
 
 
 class TableNameManager:
@@ -20,12 +8,12 @@ class TableNameManager:
             raise ValueError('Missing parameter original_names')
 
         self.__original_names = original_names
-        self.__table_names: NamesWithVariationsDict = {}
+        self.__table_names = {}
 
         for name in original_names:
             self.__table_names[name] = {'original': name, 'normalized': None, 'raw': None, 'tmp': None}
 
-    def get_variations(self, table_name: str) -> TableNameVariations:
+    def get_variations(self, table_name: str):
         self.__load_name_variants(table_name)
         return self.__table_names[table_name]
 
