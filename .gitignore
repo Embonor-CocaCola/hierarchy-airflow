@@ -147,6 +147,6 @@ dmypy.json
 
 ### Project ###
 # ETL
-data/*.csv
+include/data/*.csv
 logs/
 tmp/

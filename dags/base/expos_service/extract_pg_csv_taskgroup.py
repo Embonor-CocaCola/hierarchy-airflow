@@ -36,7 +36,7 @@ class ExtractPostgresCsvTaskGroup:
                                    schema='embonor')
             conn = pg_hook.get_conn()
             cursor = conn.cursor()
-            with open(f'/opt/airflow/data/{table_name}.csv', 'w') as file:
+            with open(f'/opt/airflow/include/data/{table_name}.csv', 'w') as file:
                 cursor.copy_expert(
                     f'COPY "{table_name}" TO STDOUT WITH CSV HEADER', file)
             cursor.close()

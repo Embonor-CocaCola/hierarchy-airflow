@@ -74,6 +74,6 @@ class ExtractMongoCsvTaskGroup:
             docs = docs.apply(lambda row: list(map(lambda field: self.convert_fields_to_json(field), row)))
 
             # noinspection PyTypeChecker
-            docs.to_csv(f'/opt/airflow/data/{collection_name}.csv', index=False)
+            docs.to_csv(f'/opt/airflow/include/data/{collection_name}.csv', index=False)
 
             info(f"Collection '{collection_name}' extracted successfully!")
