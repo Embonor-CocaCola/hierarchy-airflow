@@ -22,6 +22,7 @@ webserver:
     firstName: admin
     lastName: user
     password: admin
+  args: ["bash", "-c", "sh /opt/airflow/include/db/init.sh && python /opt/airflow/dags/config/init.py && airflow webserver"]
 ingress:
   enabled: true
   web:
