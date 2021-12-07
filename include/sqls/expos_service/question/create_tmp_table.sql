@@ -6,6 +6,7 @@ CREATE TABLE airflow.tmp_question (
    type TEXT,
    subType TEXT,
    options TEXT,
+   observation TEXT,
    inputExpirationDays TEXT,
    heading TEXT,
    createdAt TEXT,
