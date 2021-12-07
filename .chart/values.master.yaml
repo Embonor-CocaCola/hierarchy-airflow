@@ -34,6 +34,3 @@ secret:
   - envName: "AIRFLOW__CORE__SQL_ALCHEMY_CONN"
     secretName: "airflow-envars"
     secretKey: "AIRFLOW__CORE__SQL_ALCHEMY_CONN"
-  - envName: "AIRFLOW__CELERY__RESULT_BACKEND"
-    secretName: "airflow-envars"
-    secretKey: "AIRFLOW__CELERY__RESULT_BACKEND"
