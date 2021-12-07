@@ -66,7 +66,7 @@ class ExtractMongoCsvTaskGroup:
             )
             collection = mongo_hook.get_collection(
                 mongo_collection=collection_name, mongo_db=ES_EMBONOR_MONGO_DB_NAME)
-            cursor = collection.find(manipulate=False)
+            cursor = collection.find()
 
             jsondocs = json.dumps(list(cursor), default=json_util.default, ensure_ascii=False)
             docs = pandas.read_json(StringIO(jsondocs))
