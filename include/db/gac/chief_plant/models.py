@@ -2,6 +2,7 @@ from django.db import models
 from gac.models import DateTimeWithoutTZField, AutoUUIDField
 from datetime import datetime
 from etl_job.models import EtlJob
+from plant.models import PlantStaged
 
 
 class ChiefPlantRaw(models.Model):
@@ -80,3 +81,29 @@ class ChiefConform(models.Model):
     class Meta:
         managed = True
         db_table = 'airflow\".\"chief_conform'
+
+
+class ChiefStaged(models.Model):
+    source_id = models.IntegerField()
+    code = models.TextField(blank=True, null=True)
+    name = models.TextField()
+    location = models.TextField(blank=True, null=True)
+    rut = models.TextField()
+    plant_id = models.ForeignKey(PlantStaged, on_delete=models.CASCADE, db_column='plant_id', db_constraint=False)
+    role = models.TextField(blank=True, null=True)
+    unit = models.TextField(blank=True, null=True)
+
+    job_id = models.ForeignKey(
+        EtlJob,
+        on_delete=models.CASCADE,
+        db_column='job_id',
+    )
+
+    created_at = DateTimeWithoutTZField(default=datetime.now)
+    updated_at = DateTimeWithoutTZField(default=datetime.now)
+
+    id = models.UUIDField(primary_key=True, editable=False)
+
+    class Meta:
+        managed = True
+        db_table = 'airflow\".\"chief_staged'

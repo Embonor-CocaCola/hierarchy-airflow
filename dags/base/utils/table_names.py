@@ -20,6 +20,9 @@ class TableNameManager:
     def get_original_names(self) -> list:
         return self.__original_names
 
+    def get_normalized_names(self) -> list:
+        return list(map(lambda orig_name: self.__normalized(orig_name), self.__original_names))
+
     @staticmethod
     def append(table_name: str, suffix: str) -> str:
         return f'{table_name}{suffix}'

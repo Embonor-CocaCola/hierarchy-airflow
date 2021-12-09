@@ -60,3 +60,23 @@ class PlantConform(models.Model):
     class Meta:
         managed = True
         db_table = 'airflow\".\"plant_conform'
+
+
+class PlantStaged(models.Model):
+    source_id = models.IntegerField()
+    name = models.TextField()
+
+    job_id = models.ForeignKey(
+        EtlJob,
+        on_delete=models.CASCADE,
+        db_column='job_id',
+    )
+
+    created_at = DateTimeWithoutTZField(default=datetime.now)
+    updated_at = DateTimeWithoutTZField(default=datetime.now)
+
+    id = models.UUIDField(primary_key=True)
+
+    class Meta:
+        managed = True
+        db_table = 'airflow\".\"plant_staged'

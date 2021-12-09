@@ -1,7 +1,11 @@
 from django.db import models
+
+from branch_office.models import BranchOfficeStaged
 from gac.models import DateTimeWithoutTZField, AutoUUIDField
 from datetime import datetime
 from etl_job.models import EtlJob
+from plant.models import PlantStaged
+from supervisor_plant.models import SupervisorStaged
 
 
 class VendorRaw(models.Model):
@@ -84,3 +88,41 @@ class VendorConform(models.Model):
     class Meta:
         managed = True
         db_table = 'airflow\".\"vendor_conform'
+
+
+class VendorStaged(models.Model):
+    source_id = models.IntegerField()
+    name = models.TextField()
+    rut = models.TextField(blank=True, null=True)
+    email = models.TextField(blank=True, null=True)
+    phone = models.TextField(blank=True, null=True)
+    branch_office_id = models.ForeignKey(
+        BranchOfficeStaged,
+        on_delete=models.CASCADE,
+        db_column='branch_office_id',
+        db_constraint=False,
+    )
+    vendor_type = models.TextField()
+    plant_id = models.ForeignKey(PlantStaged, on_delete=models.CASCADE, db_column='plant_id', db_constraint=False)
+    supervisor_id = models.ForeignKey(
+        SupervisorStaged,
+        on_delete=models.CASCADE,
+        db_column='supervisor_id',
+        db_constraint=False,
+    )
+    deleted_at = models.DateField(null=True)
+
+    job_id = models.ForeignKey(
+        EtlJob,
+        on_delete=models.CASCADE,
+        db_column='job_id',
+    )
+
+    created_at = DateTimeWithoutTZField(default=datetime.now)
+    updated_at = DateTimeWithoutTZField(default=datetime.now)
+
+    id = AutoUUIDField(primary_key=True, editable=False)
+
+    class Meta:
+        managed = True
+        db_table = 'airflow\".\"vendor_staged'

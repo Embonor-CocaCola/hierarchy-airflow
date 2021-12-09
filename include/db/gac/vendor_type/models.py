@@ -25,7 +25,7 @@ class VendorTypeRaw(models.Model):
 
 
 class VendorTypeTyped(models.Model):
-    source_id = models.TextField()
+    source_id = models.IntegerField()
     name = models.TextField()
 
     job_id = models.ForeignKey(
@@ -45,7 +45,7 @@ class VendorTypeTyped(models.Model):
 
 
 class VendorTypeConform(models.Model):
-    source_id = models.TextField()
+    source_id = models.IntegerField()
     name = models.TextField()
 
     job_id = models.ForeignKey(

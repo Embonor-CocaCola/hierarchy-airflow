@@ -49,3 +49,10 @@ ES_ETL_CONFORM_OPERATIONS_ORDER = os.environ.get(
     'ES_ETL_CONFORM_OPERATIONS_ORDER',
     'plant,branch_office,chief,supervisor,vendor_type,vendor_plant,vendor,customer,vendor_customer,question,self_evaluation,answer',  # noqa: E501
 ).split(',')
+
+ES_ETL_STAGED_OPERATIONS_ORDER = os.environ.get(
+    'ES_ETL_STAGED_OPERATIONS_ORDER',
+    'plant,branch_office,chief,supervisor,vendor,customer,vendor_customer,question,self_evaluation,answer',
+).split(',')
+
+ES_STAGE = os.environ.get('STAGE', 'development')

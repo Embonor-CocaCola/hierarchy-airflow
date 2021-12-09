@@ -1,8 +1,12 @@
 from django.db import models
 from django.contrib.postgres.fields import ArrayField
+
+from customer.models import CustomerStaged
 from gac.models import DateTimeWithoutTZField, AutoUUIDField
 from datetime import datetime
 from etl_job.models import EtlJob
+from question.models import QuestionStaged
+from vendor.models import VendorStaged
 
 
 class AnswerRaw(models.Model):
@@ -82,6 +86,34 @@ class SelfEvaluationConform(models.Model):
         db_table = 'airflow\".\"self_evaluation_conform'
 
 
+class SelfEvaluationStaged(models.Model):
+    source_id = models.TextField()
+    skips_survey = models.BooleanField()
+    vendor_id = models.ForeignKey(VendorStaged, on_delete=models.CASCADE, db_column='vendor_id', db_constraint=False)
+    customer_id = models.ForeignKey(
+        CustomerStaged,
+        on_delete=models.CASCADE,
+        db_column='customer_id',
+        db_constraint=False,
+    )
+    external_created_at = DateTimeWithoutTZField()
+
+    job_id = models.ForeignKey(
+        EtlJob,
+        on_delete=models.CASCADE,
+        db_column='job_id',
+    )
+
+    created_at = DateTimeWithoutTZField(default=datetime.now)
+    updated_at = DateTimeWithoutTZField(default=datetime.now)
+
+    id = AutoUUIDField(primary_key=True, editable=False)
+
+    class Meta:
+        managed = True
+        db_table = 'airflow\".\"self_evaluation_staged'
+
+
 class AnswerConform(models.Model):
     source_id = models.TextField()
     values = models.JSONField()
@@ -104,3 +136,32 @@ class AnswerConform(models.Model):
     class Meta:
         managed = True
         db_table = 'airflow\".\"answer_conform'
+
+
+class AnswerStaged(models.Model):
+    source_id = models.TextField()
+    values = models.JSONField()
+    attachments = ArrayField(models.TextField())
+    observations = models.TextField(null=True)
+    self_evaluation_id = models.UUIDField()
+    question_id = models.ForeignKey(
+        QuestionStaged,
+        on_delete=models.CASCADE,
+        db_column='question_id',
+        db_constraint=False,
+    )
+
+    job_id = models.ForeignKey(
+        EtlJob,
+        on_delete=models.CASCADE,
+        db_column='job_id',
+    )
+
+    created_at = DateTimeWithoutTZField(default=datetime.now)
+    updated_at = DateTimeWithoutTZField(default=datetime.now)
+
+    id = AutoUUIDField(primary_key=True, editable=False)
+
+    class Meta:
+        managed = True
+        db_table = 'airflow\".\"answer_staged'

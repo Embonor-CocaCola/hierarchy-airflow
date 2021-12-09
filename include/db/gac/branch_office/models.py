@@ -2,6 +2,7 @@ from django.db import models
 from gac.models import DateTimeWithoutTZField, AutoUUIDField
 from datetime import datetime
 from etl_job.models import EtlJob
+from plant.models import PlantStaged
 
 
 class BranchOfficeRaw(models.Model):
@@ -59,3 +60,22 @@ class BranchOfficeConform(models.Model):
     class Meta:
         managed = True
         db_table = 'airflow\".\"branch_office_conform'
+
+
+class BranchOfficeStaged(models.Model):
+    source_id = models.IntegerField()
+    name = models.TextField()
+    job_id = models.ForeignKey(
+        EtlJob,
+        on_delete=models.CASCADE,
+        db_column='job_id',
+    )
+    plant_id = models.ForeignKey(PlantStaged, on_delete=models.CASCADE, db_column='plant_id', db_constraint=False)
+    created_at = DateTimeWithoutTZField(default=datetime.now)
+    updated_at = DateTimeWithoutTZField(default=datetime.now)
+
+    id = AutoUUIDField(primary_key=True)
+
+    class Meta:
+        managed = True
+        db_table = 'airflow\".\"branch_office_staged'

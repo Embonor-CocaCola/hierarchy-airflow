@@ -2,14 +2,14 @@ from datetime import datetime
 
 from airflow.models import DAG
 
-from base.expos_service.conform_tables_insert_taskgroup import ConformTablesInsertTaskGroup
+from base.expos_service.load_csv_into_temp_tables_taskgroup import LoadCsvIntoTempTablesTaskGroup
+from base.expos_service.tables_insert_taskgroup import TablesInsertTaskGroup
 from base.expos_service.extract_mongo_csv_taskgroup import \
     ExtractMongoCsvTaskGroup
 from base.expos_service.extract_pg_csv_taskgroup import \
     ExtractPostgresCsvTaskGroup
 from base.expos_service.health_checks_taskgroup import HealthChecksTaskGroup
-from base.expos_service.raw_tables_insert_taskgroup import RawTablesInsertTaskGroup
-from base.expos_service.typed_tables_insert_taskgroup import TypedTablesInsertTaskGroup
+from base.utils.table_names import TableNameManager
 from base.utils.tunneler import Tunneler
 from config.expos_service.settings import (
     ES_AIRFLOW_DATABASE_CONN_ID,
@@ -23,7 +23,7 @@ from config.expos_service.settings import (
     IS_LOCAL_RUN,
     ES_MONGO_COLLECTIONS_TO_EXTRACT,
     ES_PG_TABLES_TO_EXTRACT,
-    ES_ETL_CONFORM_OPERATIONS_ORDER,
+    ES_ETL_CONFORM_OPERATIONS_ORDER, ES_ETL_STAGED_OPERATIONS_ORDER,
 )
 from operators.postgres.create_job import PostgresOperatorCreateJob
 
@@ -44,6 +44,8 @@ class EtlDagFactory:
         _mongo_collection_list = ES_MONGO_COLLECTIONS_TO_EXTRACT
         _tables_to_insert = _pg_table_list + _mongo_collection_list
         _conform_operations = ES_ETL_CONFORM_OPERATIONS_ORDER
+        _staged_operations = ES_ETL_STAGED_OPERATIONS_ORDER
+        _table_manager = TableNameManager(_tables_to_insert)
 
         pg_tunnel = Tunneler(
             ES_REMOTE_RDS_PORT, ES_REMOTE_RDS_HOST, 5433) if IS_LOCAL_RUN else None
@@ -80,25 +82,39 @@ class EtlDagFactory:
                 collection_list=_mongo_collection_list,
             ).build()
 
-            raw_tables_insert = RawTablesInsertTaskGroup(
+            load_into_tmp_tables = LoadCsvIntoTempTablesTaskGroup(
                 tables_to_insert=_tables_to_insert,
-                task_group_id='raw_tables_insert',
+                task_group_id='create_and_load_tmp_tables_from_csv',
+            ).build()
+
+            raw_tables_insert = TablesInsertTaskGroup(
+                tables_to_insert=_table_manager.get_normalized_names(),
+                stage='raw',
                 job_id=_job_id,
             ).build()
 
-            typed_tables_insert = TypedTablesInsertTaskGroup(
-                tables_to_insert=_tables_to_insert,
-                task_group_id='typed_tables_insert',
+            typed_tables_insert = TablesInsertTaskGroup(
+                tables_to_insert=_table_manager.get_normalized_names(),
+                stage='typed',
                 job_id=_job_id,
             ).build()
 
-            conform_tables_insert = ConformTablesInsertTaskGroup(
+            conform_tables_insert = TablesInsertTaskGroup(
                 tables_to_insert=_conform_operations,
-                task_group_id='conform_tables_insert',
+                stage='conform',
+                sequential=True,
                 job_id=_job_id,
             ).build()
 
-            create_job_task >> health_checks_task >> [extract_from_pg, extract_from_mongo] >> raw_tables_insert
-            raw_tables_insert >> typed_tables_insert >> conform_tables_insert
+            staged_tables_insert = TablesInsertTaskGroup(
+                tables_to_insert=_staged_operations,
+                stage='staged',
+                sequential=True,
+                job_id=_job_id,
+            ).build()
+
+            create_job_task >> health_checks_task >> [extract_from_pg, extract_from_mongo] >> load_into_tmp_tables
+            load_into_tmp_tables >> raw_tables_insert >> typed_tables_insert >> conform_tables_insert
+            conform_tables_insert >> staged_tables_insert
 
         return _dag

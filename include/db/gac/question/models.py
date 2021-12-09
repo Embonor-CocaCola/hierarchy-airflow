@@ -80,3 +80,28 @@ class QuestionConform(models.Model):
     class Meta:
         managed = True
         db_table = 'airflow\".\"question_conform'
+
+
+class QuestionStaged(models.Model):
+    source_id = models.TextField()
+    heading = models.TextField()
+    options = models.JSONField()
+    type = models.TextField()
+    sub_type = models.TextField()
+    external_created_at = DateTimeWithoutTZField()
+    external_updated_at = DateTimeWithoutTZField()
+
+    job_id = models.ForeignKey(
+        EtlJob,
+        on_delete=models.CASCADE,
+        db_column='job_id',
+    )
+
+    created_at = DateTimeWithoutTZField(default=datetime.now)
+    updated_at = DateTimeWithoutTZField(default=datetime.now)
+
+    id = AutoUUIDField(primary_key=True, editable=False)
+
+    class Meta:
+        managed = True
+        db_table = 'airflow\".\"question_staged'
