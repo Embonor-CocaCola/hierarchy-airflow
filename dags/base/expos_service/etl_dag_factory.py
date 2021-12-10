@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from airflow.models import DAG
 
@@ -37,6 +37,7 @@ class EtlDagFactory:
             'owner': 'airflow',
             'start_date': _start_date,
             'provide_context': True,
+            'execution_timeout': timedelta(seconds=60),
             'retries': 0,
             'retry_delay': 0,
         }

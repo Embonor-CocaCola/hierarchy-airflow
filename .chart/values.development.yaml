@@ -4,9 +4,6 @@ ingress:
       - airflow2.develop.embonorservices.cl
 
 secret:
-  - envName: "AIRFLOW__CORE__SQL_ALCHEMY_CONN"
-    secretName: "airflow-envars"
-    secretKey: "AIRFLOW__CORE__SQL_ALCHEMY_CONN"
   - envName: "EMBONOR_MONGO_CONN_URI"
     secretName: "airflow-envars"
     secretKey: "EMBONOR_MONGO_CONN_URI"

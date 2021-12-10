@@ -31,6 +31,3 @@ secret:
   - envName: "EMBONOR_MONGO_CONN_URI"
     secretName: "airflow-envars"
     secretKey: "EMBONOR_MONGO_CONN_URI"
-  - envName: "AIRFLOW__CORE__SQL_ALCHEMY_CONN"
-    secretName: "airflow-envars"
-    secretKey: "AIRFLOW__CORE__SQL_ALCHEMY_CONN"
