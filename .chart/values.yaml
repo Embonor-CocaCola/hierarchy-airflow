@@ -23,6 +23,18 @@ webserver:
     lastName: user
     password: admin
   args: ["bash", "-c", "sh /opt/airflow/include/db/init.sh && python /opt/airflow/dags/config/init.py && airflow webserver"]
+workers:
+  persistence:
+    # Enable persistent volumes
+    enabled: true
+    # Volume size for worker StatefulSet
+    size: 100Gi
+    # If using a custom storageClass, pass name ref to all statefulSets here
+    storageClassName:
+    # Execute init container to chown log directory.
+    # This is currently only needed in kind, due to usage
+    # of local-path provisioner.
+    fixPermissions: true
 ingress:
   enabled: true
   web:
@@ -34,3 +46,5 @@ ingress:
 config:
   api:
     auth_backend: airflow.api.auth.backend.basic_auth
+statsd:
+  enabled: false
