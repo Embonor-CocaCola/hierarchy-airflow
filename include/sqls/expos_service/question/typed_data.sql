@@ -25,8 +25,8 @@ SELECT
     trim(options) :: jsonb,
     trim(type),
     trim(sub_type),
-    to_timestamp(((external_created_at :: jsonb)->>'$date') :: BIGINT),
-    to_timestamp(((external_updated_at :: jsonb)->>'$date') :: BIGINT),
+    to_timestamp(((external_created_at :: jsonb)->>'$date') {{ params.date_cast }}),
+    to_timestamp(((external_updated_at :: jsonb)->>'$date') {{ params.date_cast }}),
 
     now(),
     now(),

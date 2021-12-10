@@ -23,7 +23,7 @@ class LoadCsvIntoTempTablesTaskGroup:
         table_names = self.table_name_manager.get_variations(original_table_name)
         task_group = TaskGroup(group_id=f'insert_{table_names["raw"]}')
         csv_path = os.path.join(airflow_root_dir, 'data', f'{original_table_name}.csv')
-        params_key = '.'.join([ES_STAGE, original_table_name, 'temp'])
+        params_key = self.create_params_key(original_table_name)
 
         create_temp_table_task = PostgresOperatorWithParams(
             postgres_conn_id=ES_AIRFLOW_DATABASE_CONN_ID,
@@ -46,6 +46,9 @@ class LoadCsvIntoTempTablesTaskGroup:
         create_temp_table_task >> insert_tmp_task
 
         return task_group
+
+    def create_params_key(self, original_table_name):
+        return '.'.join([ES_STAGE, original_table_name, 'temp'])
 
     def build(self):
         with self.task_group as tg:

@@ -30,7 +30,7 @@ SELECT
         END,
     trim(pollster_id) :: INTEGER,
     trim(surveyed_id) :: INTEGER,
-    to_timestamp(((external_created_at :: jsonb)->>'$date') :: BIGINT),
+    to_timestamp(((external_created_at :: jsonb)->>'$date') {{ params.date_cast }}),
     clean_answer_collection_ids(trim(answers) :: jsonb),
 
     now(),
