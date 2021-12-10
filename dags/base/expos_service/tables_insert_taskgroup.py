@@ -21,7 +21,7 @@ class TablesInsertTaskGroup:
 
     def create_insert_task(self, table_name: str):
         params_key = self.create_params_key(table_name)
-        parameters = {'job_id': self.job_id}.update(additional_params.get(params_key, {}))
+        parameters = {'job_id': self.job_id} | additional_params.get(params_key, {})
         return PostgresOperatorWithParams(
             postgres_conn_id=ES_AIRFLOW_DATABASE_CONN_ID,
             task_id=f'insert_{self.stage}_{table_name}',
