@@ -4,7 +4,6 @@ executor: "CeleryExecutor"
 data:
   metadataSecretName: airflow-metadata
   resultBackendSecretName: airflow-result-backend
-  brokerUrlSecretName: airflow-broker-url
 dags:
   gitSync:
     enabled: false
@@ -35,6 +34,3 @@ ingress:
 config:
   api:
     auth_backend: airflow.api.auth.backend.basic_auth
-  celery:
-    worker_concurrency: 20
-webserverSecretKey: "somesecretkey"
