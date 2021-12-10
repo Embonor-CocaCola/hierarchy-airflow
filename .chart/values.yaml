@@ -4,6 +4,7 @@ executor: "CeleryExecutor"
 data:
   metadataSecretName: airflow-metadata
   resultBackendSecretName: airflow-result-backend
+webserverSecretKeySecretName: airflow-webserver-secret-key
 dags:
   gitSync:
     enabled: false

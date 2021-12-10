@@ -4,8 +4,8 @@ from airflow.models import DAG
 
 from base.expos_service.load_csv_into_temp_tables_taskgroup import LoadCsvIntoTempTablesTaskGroup
 from base.expos_service.tables_insert_taskgroup import TablesInsertTaskGroup
-from base.expos_service.extract_mongo_csv_taskgroup import \
-    ExtractMongoCsvTaskGroup
+from base.expos_service.extract_docdb_csv_taskgroup import \
+    ExtractDocumentDbCsvTaskGroup
 from base.expos_service.extract_pg_csv_taskgroup import \
     ExtractPostgresCsvTaskGroup
 from base.expos_service.health_checks_taskgroup import HealthChecksTaskGroup
@@ -38,8 +38,8 @@ class EtlDagFactory:
             'start_date': _start_date,
             'provide_context': True,
             'execution_timeout': timedelta(seconds=60),
-            'retries': 0,
-            'retry_delay': 0,
+            'retries': 2,
+            'retry_delay': timedelta(seconds=5),
         }
         _pg_table_list = ES_PG_TABLES_TO_EXTRACT
         _mongo_collection_list = ES_MONGO_COLLECTIONS_TO_EXTRACT
@@ -76,9 +76,9 @@ class EtlDagFactory:
             extract_from_pg = ExtractPostgresCsvTaskGroup(
                 _dag, group_id='extract_from_pg', pg_tunnel=pg_tunnel, table_list=_pg_table_list).build()
 
-            extract_from_mongo = ExtractMongoCsvTaskGroup(
+            extract_from_mongo = ExtractDocumentDbCsvTaskGroup(
                 _dag,
-                group_id='extract_from_mongo',
+                group_id='extract_from_document_db',
                 mongo_tunnel=mongo_tunnel,
                 collection_list=_mongo_collection_list,
             ).build()

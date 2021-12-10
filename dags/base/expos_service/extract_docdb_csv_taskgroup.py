@@ -19,7 +19,7 @@ from config.expos_service.settings import (
 )
 
 
-class ExtractMongoCsvTaskGroup:
+class ExtractDocumentDbCsvTaskGroup:
     def __init__(self, dag: DAG, group_id: str, mongo_tunnel: Tunneler, collection_list: list) -> None:
         if not group_id:
             raise ValueError('group_id parameter is missing')
@@ -59,7 +59,7 @@ class ExtractMongoCsvTaskGroup:
     def extract_csv(self, collection_name: str):
         with self.mongo_tunnel if IS_LOCAL_RUN else ExitStack():
             info(
-                f'Starting extraction from mongo collection: {collection_name}...')
+                f'Starting extraction from document db collection: {collection_name}...')
 
             mongo_hook = MongoHook(
                 mongo_conn_id=ES_EMBONOR_MONGO_CONN_ID,
