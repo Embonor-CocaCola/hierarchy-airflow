@@ -9,7 +9,7 @@ additional_params = {
         'additional_columns': '',
     },
     'development.questions.typed': {
-        'date_cast': ", 'YYYY-MM-DD HH24:MI:SS'",
+        'date_cast': ', \'YYYY-MM-DD"T"HH24:MI:SS"Z"\'',
     },
     'staging.questions.typed': {
         'date_cast': ':: BIGINT',
@@ -18,7 +18,7 @@ additional_params = {
         'date_cast': ':: BIGINT',
     },
     'development.answer.typed': {
-        'date_cast': ", 'YYYY-MM-DD HH24:MI:SS'",
+        'date_cast': ', \'YYYY-MM-DD"T"HH24:MI:SS"Z"\'',
     },
     'staging.answer.typed': {
         'date_cast': ':: BIGINT',
@@ -27,7 +27,7 @@ additional_params = {
         'date_cast': ':: BIGINT',
     },
     'development.survey.typed': {
-        'date_cast': ", 'YYYY-MM-DD HH24:MI:SS'",
+        'date_cast': ', \'YYYY-MM-DD"T"HH24:MI:SS"Z"\'',
     },
     'staging.survey.typed': {
         'date_cast': ':: BIGINT',
