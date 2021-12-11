@@ -40,12 +40,12 @@ additional_params = {
             answers_goal_number TEXT,
             name TEXT,
             valid_until TEXT,
-            valid_since TEXT
+            valid_since TEXT,
             portals TEXT,
             created_at TEXT,
             updated_at TEXT,
             ver TEXT,
-            paused TEXT,
+            paused TEXT
         """,
     },
     'staging.surveys.temp': {
