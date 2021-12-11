@@ -37,7 +37,6 @@ class PostgresOperatorCopyExpert(BaseOperator):
         self.log.debug(f'Copying data to table {self.table}')
 
         if not os.path.isfile(self.csv_path):
-            os.mkdir(f'/opt/airflow/hereiam_{self.table}')
             raise FileNotFoundError(f'CSV file {self.csv_path} not found')
         hook.copy_expert(
             f"COPY {self.table}{self.enclose(self.columns)} FROM STDIN DELIMITER E',' CSV HEADER",
