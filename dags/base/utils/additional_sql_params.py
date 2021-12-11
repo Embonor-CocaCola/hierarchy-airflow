@@ -8,13 +8,13 @@ additional_params = {
     'production.questions.temp': {
         'additional_columns': '',
     },
-    'development.questions.typed': {
+    'development.question.typed': {
         'date_cast': ', \'YYYY-MM-DD"T"HH24:MI:SS"Z"\'',
     },
-    'staging.questions.typed': {
+    'staging.question.typed': {
         'date_cast': ':: BIGINT',
     },
-    'production.questions.typed': {
+    'production.question.typed': {
         'date_cast': ':: BIGINT',
     },
     'development.answer.typed': {
@@ -34,5 +34,44 @@ additional_params = {
     },
     'production.survey.typed': {
         'date_cast': ':: BIGINT',
+    },
+    'development.survey.temp': {
+        'additional_columns': """
+            answers_goal_number TEXT,
+            name TEXT,
+            valid_until TEXT,
+            valid_since TEXT
+            portals TEXT,
+            created_at TEXT,
+            updated_at TEXT,
+            ver TEXT,
+            paused TEXT,
+        """,
+    },
+    'staging.survey.temp': {
+        'additional_columns': """
+            paused TEXT,
+            answers_goal_number TEXT,
+            name TEXT,
+            portals TEXT,
+            created_at TEXT,
+            updated_at TEXT,
+            ver TEXT,
+            valid_until TEXT,
+            valid_since TEXT
+        """,
+    },
+    'production.survey.temp': {
+        'additional_columns': """
+            paused TEXT,
+            answers_goal_number TEXT,
+            name TEXT,
+            portals TEXT,
+            created_at TEXT,
+            updated_at TEXT,
+            ver TEXT,
+            valid_until TEXT,
+            valid_since TEXT
+        """,
     },
 }
