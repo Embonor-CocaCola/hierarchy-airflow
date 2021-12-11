@@ -35,7 +35,7 @@ additional_params = {
     'production.survey.typed': {
         'date_cast': ':: BIGINT',
     },
-    'development.survey.temp': {
+    'development.surveys.temp': {
         'additional_columns': """
             answers_goal_number TEXT,
             name TEXT,
@@ -48,7 +48,7 @@ additional_params = {
             paused TEXT,
         """,
     },
-    'staging.survey.temp': {
+    'staging.surveys.temp': {
         'additional_columns': """
             paused TEXT,
             answers_goal_number TEXT,
@@ -61,7 +61,7 @@ additional_params = {
             valid_since TEXT
         """,
     },
-    'production.survey.temp': {
+    'production.surveys.temp': {
         'additional_columns': """
             paused TEXT,
             answers_goal_number TEXT,
