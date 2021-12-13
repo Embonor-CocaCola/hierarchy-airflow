@@ -26,6 +26,30 @@ additional_params = {
     'production.answer.typed': {
         'date_cast': ':: BIGINT',
     },
+    'development.surveys.temp': {
+        'additional_columns': """
+            created_at TEXT,
+            name TEXT,
+            paused TEXT,
+            period TEXT,
+        """,
+    },
+    'staging.surveys.temp': {
+        'additional_columns': """
+            answers_goal_number TEXT,
+            created_at TEXT,
+            name TEXT,
+            paused TEXT,
+        """,
+    },
+    'production.surveys.temp': {
+        'additional_columns': """
+            answers_goal_number TEXT,
+            created_at TEXT,
+            name TEXT,
+            paused TEXT,
+        """,
+    },
     'development.survey.typed': {
         'date_cast': ', \'YYYY-MM-DD"T"HH24:MI:SS"Z"\'',
     },
