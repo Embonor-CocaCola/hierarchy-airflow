@@ -73,6 +73,9 @@ class ExtractDocumentDbCsvTaskGroup:
 
             docs = docs.apply(lambda row: list(map(lambda field: self.convert_fields_to_json(field), row)))
 
+            # Document databases do not guarantee order of fields so we need to order them manually for consistency
+            docs.sort_index(axis=1, inplace=True)
+
             # noinspection PyTypeChecker
             docs.to_csv(f'/opt/airflow/data/{collection_name}.csv', index=False)
 

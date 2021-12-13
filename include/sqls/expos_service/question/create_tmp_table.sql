@@ -1,15 +1,15 @@
 DROP TABLE IF EXISTS airflow.tmp_question;
 
 CREATE TABLE airflow.tmp_question (
+   v TEXT,
    id TEXT,
    attach TEXT,
-   type TEXT,
-   subType TEXT,
-   options TEXT,
-   {{ params.additional_columns }}
-   inputExpirationDays TEXT,
-   heading TEXT,
    createdAt TEXT,
-   updatedAt TEXT,
-   v TEXT
+   heading TEXT,
+   inputExpirationDays TEXT,
+   {{ params.additional_columns }}
+   options TEXT,
+   subType TEXT,
+   type TEXT,
+   updatedAt TEXT
 );

@@ -35,43 +35,4 @@ additional_params = {
     'production.survey.typed': {
         'date_cast': ':: BIGINT',
     },
-    'development.surveys.temp': {
-        'additional_columns': """
-            answers_goal_number TEXT,
-            name TEXT,
-            valid_until TEXT,
-            valid_since TEXT,
-            portals TEXT,
-            created_at TEXT,
-            updated_at TEXT,
-            ver TEXT,
-            paused TEXT
-        """,
-    },
-    'staging.surveys.temp': {
-        'additional_columns': """
-            paused TEXT,
-            answers_goal_number TEXT,
-            name TEXT,
-            portals TEXT,
-            created_at TEXT,
-            updated_at TEXT,
-            ver TEXT,
-            valid_until TEXT,
-            valid_since TEXT
-        """,
-    },
-    'production.surveys.temp': {
-        'additional_columns': """
-            paused TEXT,
-            answers_goal_number TEXT,
-            name TEXT,
-            portals TEXT,
-            created_at TEXT,
-            updated_at TEXT,
-            ver TEXT,
-            valid_until TEXT,
-            valid_since TEXT
-        """,
-    },
 }

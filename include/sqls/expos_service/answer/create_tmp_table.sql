@@ -1,15 +1,15 @@
 DROP TABLE IF EXISTS airflow.tmp_answer;
 
 CREATE TABLE airflow.tmp_answer (
+    v TEXT,
     id TEXT,
+    answers TEXT,
+    createdAt TEXT,
     latitude TEXT,
     longitude TEXT,
-    answers TEXT,
     pollsterId TEXT,
+    skipsSurvey TEXT,
     surveyId TEXT,
     surveyedId TEXT,
-    createdAt TEXT,
-    updatedAt TEXT,
-    v TEXT,
-    skipsSurvey TEXT
+    updatedAt TEXT
 );
