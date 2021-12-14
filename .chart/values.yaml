@@ -38,6 +38,3 @@ config:
     auth_backend: airflow.api.auth.backend.basic_auth
 statsd:
   enabled: false
-env:
-  - name: AIRFLOW__CORE__HOSTNAME_CALLABLE
-    value: airflow.utils.net:get_host_ip_address
