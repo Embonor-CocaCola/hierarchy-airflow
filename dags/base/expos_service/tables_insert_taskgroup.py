@@ -14,7 +14,7 @@ class TablesInsertTaskGroup:
         tables_to_insert: list[str],
         stage: str,
         job_id,
-        sequential=False,
+        sequential=True,
         conn_id=ES_AIRFLOW_DATABASE_CONN_ID,
     ):
 
