@@ -9,7 +9,7 @@ from operators.postgres.query_with_params import PostgresOperatorWithParams
 
 
 class TablesInsertTaskGroup:
-    def __init__(self, tables_to_insert: list[str], stage: str, job_id, sequential=False):
+    def __init__(self, tables_to_insert: list[str], stage: str, job_id, sequential=True):
         if not tables_to_insert:
             raise ValueError('missing parameter tables_to_insert')
 

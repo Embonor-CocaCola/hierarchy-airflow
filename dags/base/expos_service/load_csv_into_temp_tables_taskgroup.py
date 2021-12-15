@@ -7,6 +7,7 @@ from airflow.utils.task_group import TaskGroup
 from config.expos_service.settings import ES_AIRFLOW_DATABASE_CONN_ID, ES_STAGE, airflow_root_dir
 from operators.postgres.copy_expert import PostgresOperatorCopyExpert
 from operators.postgres.query_with_params import PostgresOperatorWithParams
+from base.utils.tasks import arrange_task_list_sequentially
 
 
 class LoadCsvIntoTempTablesTaskGroup:
@@ -52,5 +53,7 @@ class LoadCsvIntoTempTablesTaskGroup:
 
     def build(self):
         with self.task_group as tg:
-            list(map(lambda table_name: self.create_insert_task(table_name), self.tables_to_insert))
+            arrange_task_list_sequentially(
+                list(map(lambda table_name: self.create_insert_task(table_name), self.tables_to_insert)),
+            )
             return tg
