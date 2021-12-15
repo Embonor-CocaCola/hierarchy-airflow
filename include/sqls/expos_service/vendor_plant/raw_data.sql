@@ -6,6 +6,7 @@ WHERE
 INSERT INTO airflow.vendor_plant_raw (
     vendor_id,
     supervisor_id,
+    vendor_name,
     chief_rut,
     plant_id,
 
@@ -17,6 +18,7 @@ INSERT INTO airflow.vendor_plant_raw (
 SELECT
     vendorid,
     supervisorid,
+    vendorName,
     chiefrut,
     plantid,
 

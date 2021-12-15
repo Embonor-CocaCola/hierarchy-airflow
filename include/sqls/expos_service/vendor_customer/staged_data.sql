@@ -15,7 +15,7 @@ INSERT INTO airflow.vendor_customer_staged (
     job_id,
     id
 )
-SELECT
+SELECT DISTINCT ON (VEC.id, CUC.id)
     VEC.id,
     CUC.id,
     VCC.start_date,

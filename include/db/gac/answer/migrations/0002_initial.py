@@ -9,24 +9,19 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('plant', '0001_initial'),
+        ('answer', '0001_initial'),
         ('etl_job', '0004_create_find_question_id_from_portals_procedure'),
         ('customer', '0001_initial'),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='customerstaged',
-            name='plant_id',
-            field=models.ForeignKey(db_column='plant_id', db_constraint=False, on_delete=django.db.models.deletion.CASCADE, to='plant.plantstaged'),
+            model_name='selfevaluationstaged',
+            name='customer_id',
+            field=models.ForeignKey(db_column='customer_id', db_constraint=False, on_delete=django.db.models.deletion.CASCADE, to='customer.customerstaged'),
         ),
         migrations.AddField(
-            model_name='customerraw',
-            name='job_id',
-            field=models.ForeignKey(db_column='job_id', on_delete=django.db.models.deletion.CASCADE, to='etl_job.etljob'),
-        ),
-        migrations.AddField(
-            model_name='customerconform',
+            model_name='selfevaluationstaged',
             name='job_id',
             field=models.ForeignKey(db_column='job_id', on_delete=django.db.models.deletion.CASCADE, to='etl_job.etljob'),
         ),

@@ -9,10 +9,19 @@ from operators.postgres.query_with_params import PostgresOperatorWithParams
 
 
 class TablesInsertTaskGroup:
-    def __init__(self, tables_to_insert: list[str], stage: str, job_id, sequential=True):
+    def __init__(
+        self,
+        tables_to_insert: list[str],
+        stage: str,
+        job_id,
+        sequential=False,
+        conn_id=ES_AIRFLOW_DATABASE_CONN_ID,
+    ):
+
         if not tables_to_insert:
             raise ValueError('missing parameter tables_to_insert')
 
+        self.conn_id = conn_id
         self.sequential = sequential
         self.stage = stage
         self.tables_to_insert = tables_to_insert
@@ -23,7 +32,7 @@ class TablesInsertTaskGroup:
         params_key = self.create_params_key(table_name)
         parameters = {'job_id': self.job_id} | additional_params.get(params_key, {})
         return PostgresOperatorWithParams(
-            postgres_conn_id=ES_AIRFLOW_DATABASE_CONN_ID,
+            postgres_conn_id=self.conn_id,
             task_id=f'insert_{self.stage}_{table_name}',
             task_group=self.task_group,
             sql=os.path.join(

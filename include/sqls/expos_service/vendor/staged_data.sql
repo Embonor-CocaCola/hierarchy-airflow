@@ -40,7 +40,7 @@ FROM
     airflow.vendor_conform VEC
     INNER JOIN airflow.branch_office_conform BOC ON BOC.source_id = VEC.branch_office_id
     INNER JOIN airflow.vendor_type_conform VTC ON VTC.source_id = VEC.vendor_type_id
-    INNER JOIN airflow.vendor_plant_conform VPC ON VPC.vendor_id = VEC.source_id
+    INNER JOIN airflow.vendor_plant_conform VPC ON substr(VEC.rut, 1, length(COALESCE(NULLIF(VEC.rut, ''), ' '))) = VPC.vendor_id :: TEXT
 WHERE
     VEC.job_id = %(job_id)s :: BIGINT AND
     BOC.job_id = %(job_id)s :: BIGINT AND

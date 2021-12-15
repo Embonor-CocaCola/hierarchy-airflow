@@ -23,7 +23,7 @@ from config.expos_service.settings import (
     IS_LOCAL_RUN,
     ES_MONGO_COLLECTIONS_TO_EXTRACT,
     ES_PG_TABLES_TO_EXTRACT,
-    ES_ETL_CONFORM_OPERATIONS_ORDER, ES_ETL_STAGED_OPERATIONS_ORDER,
+    ES_ETL_CONFORM_OPERATIONS_ORDER, ES_ETL_STAGED_OPERATIONS_ORDER, ES_ETL_TARGET_OPERATIONS_ORDER,
 )
 from operators.postgres.create_job import PostgresOperatorCreateJob
 
@@ -46,6 +46,7 @@ class EtlDagFactory:
         _tables_to_insert = _pg_table_list + _mongo_collection_list
         _conform_operations = ES_ETL_CONFORM_OPERATIONS_ORDER
         _staged_operations = ES_ETL_STAGED_OPERATIONS_ORDER
+        _target_operations = ES_ETL_TARGET_OPERATIONS_ORDER
         _table_manager = TableNameManager(_tables_to_insert)
 
         pg_tunnel = Tunneler(
@@ -114,8 +115,15 @@ class EtlDagFactory:
                 job_id=_job_id,
             ).build()
 
+            target_tables_insert = TablesInsertTaskGroup(
+                tables_to_insert=_target_operations,
+                stage='target',
+                sequential=True,
+                job_id=_job_id,
+            ).build()
+
             create_job_task >> health_checks_task >> [extract_from_pg, extract_from_mongo] >> load_into_tmp_tables
             load_into_tmp_tables >> raw_tables_insert >> typed_tables_insert >> conform_tables_insert
-            conform_tables_insert >> staged_tables_insert
+            conform_tables_insert >> staged_tables_insert >> target_tables_insert
 
         return _dag

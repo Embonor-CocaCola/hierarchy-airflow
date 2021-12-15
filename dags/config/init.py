@@ -125,6 +125,10 @@ if __name__ == '__main__':
             'conn_id': es_config.ES_EMBONOR_MONGO_CONN_ID,
             'conn_uri': es_config.ES_EMBONOR_MONGO_CONN_URI,
         },
+        es_config.ES_EXPOS_DATABASE_CONN_ID: {
+            'conn_id': es_config.ES_EXPOS_DATABASE_CONN_ID,
+            'conn_uri': es_config.ES_EXPOS_DATABASE_CONN_URI,
+        },
     }
     _variable_config = {
     }

@@ -82,8 +82,8 @@ DATABASE_ROUTERS = [
     # 'gac.dbrouters.AuthRouter',
 ]
 DATABASES = {
-    'default': {},
-    'gac': dj_database_url.config(env='GAC_SQL_CONN_URI'),
+    'default': dj_database_url.config(env='GAC_SQL_CONN_URI'),
+    'expos': dj_database_url.config(env='GAC_SQL_CONN_URI'),
 }
 
 options.DEFAULT_NAMES = options.DEFAULT_NAMES + ('db_name',)

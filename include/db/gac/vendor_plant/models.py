@@ -9,6 +9,7 @@ class VendorPlantRaw(models.Model):
     supervisor_id = models.TextField(blank=True, null=True)
     chief_rut = models.TextField(blank=True, null=True)
     plant_id = models.TextField(blank=True, null=True)
+    vendor_name = models.TextField(blank=True, null=True)
 
     job_id = models.ForeignKey(
         EtlJob,
@@ -31,6 +32,7 @@ class VendorPlantTyped(models.Model):
     supervisor_id = models.IntegerField()
     chief_rut = models.TextField()
     plant_id = models.IntegerField()
+    vendor_name = models.TextField(blank=True, null=True)
 
     job_id = models.ForeignKey(
         EtlJob,
@@ -52,6 +54,7 @@ class VendorPlantConform(models.Model):
     vendor_id = models.IntegerField()
     supervisor_id = models.UUIDField()
     plant_id = models.UUIDField()
+    vendor_name = models.TextField(blank=True, null=True)
 
     job_id = models.ForeignKey(
         EtlJob,

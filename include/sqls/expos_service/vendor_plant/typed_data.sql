@@ -8,6 +8,7 @@ INSERT INTO airflow.vendor_plant_typed (
     supervisor_id,
     chief_rut,
     plant_id,
+    vendor_name,
 
     created_at,
     updated_at,
@@ -19,6 +20,7 @@ SELECT
     trim(supervisor_id) :: INTEGER,
     trim(chief_rut),
     trim(plant_id) :: INTEGER,
+    trim(vendor_name),
 
     now(),
     now(),

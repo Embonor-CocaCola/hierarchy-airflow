@@ -7,6 +7,9 @@ ES_EMBONOR_SERVICES_BASE_URL_CONN_ID = 'embonor_services_base_conn'
 ES_AIRFLOW_DATABASE_CONN_ID = 'airflow_db_conn'
 ES_AIRFLOW_DATABASE_CONN_URI = os.environ.get('AIRFLOW__CORE__SQL_ALCHEMY_CONN')
 
+ES_EXPOS_DATABASE_CONN_ID = 'expos_db_conn'
+ES_EXPOS_DATABASE_CONN_URI = os.environ.get('EXPOS_DATABASE_CONN_URI')
+
 ES_EMBONOR_PG_CONN_ID = 'embonor_pg_conn'
 ES_EMBONOR_PG_CONN_URI = os.environ.get('EMBONOR_PG_CONN_URI')
 
@@ -52,6 +55,11 @@ ES_ETL_CONFORM_OPERATIONS_ORDER = os.environ.get(
 
 ES_ETL_STAGED_OPERATIONS_ORDER = os.environ.get(
     'ES_ETL_STAGED_OPERATIONS_ORDER',
+    'plant,branch_office,chief,supervisor,vendor,customer,vendor_customer,question,self_evaluation,answer',
+).split(',')
+
+ES_ETL_TARGET_OPERATIONS_ORDER = os.environ.get(
+    'ES_ETL_TARGET_OPERATIONS_ORDER',
     'plant,branch_office,chief,supervisor,vendor,customer,vendor_customer,question,self_evaluation,answer',
 ).split(',')
 
