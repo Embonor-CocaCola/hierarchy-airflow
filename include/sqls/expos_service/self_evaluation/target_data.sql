@@ -13,6 +13,10 @@ SELECT
     STAGED.id
 FROM
     airflow.self_evaluation_staged STAGED
+-- TODO: Inner Joins below make sure that we don't attempt to insert rows without foreign related rows
+-- Before going into prod, we must add another query to do the inverse and store the
+-- rows with missing relation in an error table to do notifying and other handling logic
+INNER JOIN airflow.vendor_staged VES ON VES.id = STAGED.vendor_id
 LEFT JOIN self_evaluation TARGET ON TARGET.id = STAGED.id
 WHERE STAGED.job_id = %(job_id)s :: BIGINT
     AND TARGET.id IS NULL
