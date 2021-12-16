@@ -3,6 +3,10 @@ ingress:
     hosts:
       - airflow2.staging.embonorservices.cl
 
+envVars:
+  - name: STAGE
+    value: staging
+
 secret:
   - envName: "GAC_SQL_CONN_URI"
     secretName: "airflow-envars"

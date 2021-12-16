@@ -3,6 +3,10 @@ ingress:
     hosts:
       - airflow2.develop.embonorservices.cl
 
+envVars:
+  - name: STAGE
+    value: development
+
 secret:
   - envName: "EMBONOR_MONGO_CONN_URI"
     secretName: "airflow-envars"

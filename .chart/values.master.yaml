@@ -17,6 +17,8 @@ ingress:
 envVars:
   - name: NODE_ENV
     value: production
+  - name: STAGE
+    value: production
 
 secret:
   - envName: "GAC_SQL_CONN_URI"
