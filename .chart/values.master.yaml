@@ -1,5 +1,3 @@
-env: production
-
 hpa:
   enabled: true
   minReplicas: 2
@@ -14,9 +12,7 @@ ingress:
   hosts:
     - airflow2.production.embonorservices.cl
 
-envVars:
-  - name: NODE_ENV
-    value: production
+env:
   - name: STAGE
     value: production
 

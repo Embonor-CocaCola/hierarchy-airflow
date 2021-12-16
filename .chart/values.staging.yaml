@@ -3,7 +3,7 @@ ingress:
     hosts:
       - airflow2.staging.embonorservices.cl
 
-envVars:
+env:
   - name: STAGE
     value: staging
 
