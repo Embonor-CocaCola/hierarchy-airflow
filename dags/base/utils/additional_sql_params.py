@@ -8,26 +8,9 @@ additional_params = {
     'production.questions.temp': {
         'additional_columns': '',
     },
-    'development.question.typed': {
-        'date_cast': ', \'YYYY-MM-DD"T"HH24:MI:SS"Z"\'',
-    },
-    'staging.question.typed': {
-        'date_cast': ':: BIGINT',
-    },
-    'production.question.typed': {
-        'date_cast': ':: BIGINT',
-    },
-    'development.answer.typed': {
-        'date_cast': ', \'YYYY-MM-DD"T"HH24:MI:SS"Z"\'',
-    },
-    'staging.answer.typed': {
-        'date_cast': ':: BIGINT',
-    },
-    'production.answer.typed': {
-        'date_cast': ':: BIGINT',
-    },
     'development.surveys.temp': {
-        'additional_columns': """
+        'additional_columns':
+        """
             created_at TEXT,
             name TEXT,
             paused TEXT,
@@ -35,7 +18,8 @@ additional_params = {
         """,
     },
     'staging.surveys.temp': {
-        'additional_columns': """
+        'additional_columns':
+        """
             answers_goal_number TEXT,
             created_at TEXT,
             name TEXT,
@@ -43,20 +27,12 @@ additional_params = {
         """,
     },
     'production.surveys.temp': {
-        'additional_columns': """
+        'additional_columns':
+        """
             answers_goal_number TEXT,
             created_at TEXT,
             name TEXT,
             paused TEXT,
         """,
-    },
-    'development.survey.typed': {
-        'date_cast': ', \'YYYY-MM-DD"T"HH24:MI:SS"Z"\'',
-    },
-    'staging.survey.typed': {
-        'date_cast': ':: BIGINT',
-    },
-    'production.survey.typed': {
-        'date_cast': ':: BIGINT',
     },
 }

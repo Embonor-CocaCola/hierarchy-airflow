@@ -68,7 +68,9 @@ class ExtractDocumentDbCsvTaskGroup:
                 mongo_collection=collection_name, mongo_db=ES_EMBONOR_MONGO_DB_NAME)
             cursor = collection.find()
 
-            jsondocs = json.dumps(list(cursor), default=json_util.default, ensure_ascii=False)
+            jsondocs = json_util.dumps(
+                list(cursor), ensure_ascii=False, json_options=json_util.JSONOptions(datetime_representation=2),
+            )
             docs = pandas.read_json(StringIO(jsondocs))
 
             docs = docs.apply(lambda row: list(map(lambda field: self.convert_fields_to_json(field), row)))

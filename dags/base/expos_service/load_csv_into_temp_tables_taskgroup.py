@@ -22,7 +22,7 @@ class LoadCsvIntoTempTablesTaskGroup:
 
     def create_insert_task(self, original_table_name: str):
         table_names = self.table_name_manager.get_variations(original_table_name)
-        task_group = TaskGroup(group_id=f'insert_{table_names["raw"]}')
+        task_group = TaskGroup(group_id=f'insert_{table_names["tmp"]}')
         csv_path = os.path.join(airflow_root_dir, 'data', f'{original_table_name}.csv')
         params_key = self.create_params_key(original_table_name)
 
