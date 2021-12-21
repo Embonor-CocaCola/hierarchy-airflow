@@ -25,7 +25,7 @@ SELECT
     now(),
     now(),
     job_id,
-    id
+    CONCAT(vendor_id :: TEXT, customer_id :: TEXT, extract(epoch from start_date) :: TEXT)
 FROM
     airflow.vendor_customer_typed
 WHERE job_id = %(job_id)s :: BIGINT

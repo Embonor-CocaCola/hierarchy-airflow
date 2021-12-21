@@ -21,7 +21,7 @@ SELECT
     STAGED.id
 FROM
     airflow.chief_staged STAGED
-LEFT JOIN chief TARGET ON TARGET.id = STAGED.id
+LEFT JOIN chief TARGET ON TARGET.source_id = STAGED.source_id
 WHERE STAGED.job_id = %(job_id)s :: BIGINT
     AND TARGET.id IS NULL
 ;

@@ -16,8 +16,8 @@ FROM
 -- TODO: Inner Joins below make sure that we don't attempt to insert rows without foreign related rows
 -- Before going into prod, we must add another query to do the inverse and store the
 -- rows with missing relation in an error table to do notifying and other handling logic
-INNER JOIN airflow.vendor_staged VES ON VES.id = STAGED.vendor_id
-LEFT JOIN self_evaluation TARGET ON TARGET.id = STAGED.id
+INNER JOIN vendor VES ON VES.id = STAGED.vendor_id
+LEFT JOIN self_evaluation TARGET ON TARGET.source_id = STAGED.source_id
 WHERE STAGED.job_id = %(job_id)s :: BIGINT
     AND TARGET.id IS NULL
 ;
@@ -30,6 +30,7 @@ SET
     customer_id = STAGED.customer_id
 FROM
     airflow.self_evaluation_staged STAGED
+    INNER JOIN vendor VES ON VES.id = STAGED.vendor_id
 WHERE
     STAGED.source_id = TARGET.source_id
     AND STAGED.job_id = %(job_id)s :: BIGINT

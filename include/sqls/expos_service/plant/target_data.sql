@@ -9,7 +9,7 @@ SELECT
     STAGED.id
 FROM
     airflow.plant_staged STAGED
-LEFT JOIN plant TARGET ON TARGET.id = STAGED.id
+LEFT JOIN plant TARGET ON TARGET.source_id = STAGED.source_id
 WHERE STAGED.job_id = %(job_id)s :: BIGINT
     AND TARGET.id IS NULL
 ;

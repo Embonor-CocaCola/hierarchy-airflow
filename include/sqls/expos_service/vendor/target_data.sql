@@ -25,7 +25,8 @@ SELECT
     STAGED.id
 FROM
     airflow.vendor_staged STAGED
-LEFT JOIN vendor TARGET ON TARGET.id = STAGED.id
+INNER JOIN airflow.supervisor_staged SUS ON SUS.id = STAGED.supervisor_id
+LEFT JOIN vendor TARGET ON TARGET.source_id = STAGED.source_id
 WHERE STAGED.job_id = %(job_id)s :: BIGINT
     AND TARGET.id IS NULL
 ;

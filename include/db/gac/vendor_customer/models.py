@@ -69,7 +69,7 @@ class VendorCustomerConform(models.Model):
     created_at = DateTimeWithoutTZField(default=datetime.now)
     updated_at = DateTimeWithoutTZField(default=datetime.now)
 
-    id = AutoUUIDField(primary_key=True, editable=False)
+    id = models.TextField(primary_key=True)
 
     class Meta:
         managed = True
@@ -97,7 +97,7 @@ class VendorCustomerStaged(models.Model):
     created_at = DateTimeWithoutTZField(default=datetime.now)
     updated_at = DateTimeWithoutTZField(default=datetime.now)
 
-    id = AutoUUIDField(primary_key=True, editable=False)
+    id = models.TextField(primary_key=True)
 
     class Meta:
         managed = True
