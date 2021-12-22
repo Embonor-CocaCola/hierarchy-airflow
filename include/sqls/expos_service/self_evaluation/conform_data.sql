@@ -16,7 +16,7 @@ INSERT INTO airflow.self_evaluation_conform (
     id
 )
 SELECT
-    survey_id,
+    source_id,
     skips_survey,
     pollster_id,
     surveyed_id,

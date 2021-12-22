@@ -32,19 +32,35 @@ SET
     name = STAGED.name,
     code = STAGED.code,
     location = STAGED.location,
-    chief_id = STAGED.chief_id,
+    chief_id = cc.id,
     role = STAGED.role,
-    plant_id = STAGED.plant_id
+    plant_id = pp.id
 FROM
-    airflow.supervisor_staged STAGED
+    airflow.supervisor_staged STAGED,
+    supervisor s,
+    airflow.plant_staged pls,
+    plant p,
+    plant pp,
+    airflow.chief_staged cs,
+    chief c,
+    chief cc
 WHERE
     STAGED.source_id = TARGET.source_id
+    AND s.source_id = STAGED.source_id
+    AND pls.id = STAGED.plant_id
+    AND s.plant_id = p.id
+    AND pls.source_id = pp.source_id
+    AND cs.id = STAGED.chief_id
+    AND s.chief_id = c.id
+    AND  cs.source_id = cc.source_id
     AND STAGED.job_id = %(job_id)s :: BIGINT
+    AND pls.job_id = %(job_id)s :: BIGINT
+    AND cs.job_id = %(job_id)s :: BIGINT
     AND (
-        STAGED.name IS DISTINCT FROM TARGET.name OR
-        STAGED.code IS DISTINCT FROM TARGET.code OR
-        STAGED.location IS DISTINCT FROM TARGET.location OR
-        STAGED.chief_id IS DISTINCT FROM TARGET.chief_id OR
-        STAGED.role IS DISTINCT FROM TARGET.role OR
-        STAGED.plant_id IS DISTINCT FROM TARGET.plant_id)
+        STAGED.name IS DISTINCT FROM s.name OR
+        STAGED.code IS DISTINCT FROM s.code OR
+        STAGED.location IS DISTINCT FROM s.location OR
+        cs.source_id IS DISTINCT FROM c.source_id OR
+        STAGED.role IS DISTINCT FROM s.role OR
+        pls.source_id IS DISTINCT FROM p.source_id)
 ;

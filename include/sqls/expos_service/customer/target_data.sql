@@ -94,7 +94,7 @@ SET
     credit_amount = STAGED.credit_amount,
     credit_balance = STAGED.credit_balance,
     duty_free_price_list = STAGED.duty_free_price_list,
-    plant_id = STAGED.plant_id,
+    plant_id = p.id,
     zone_id = STAGED.zone_id,
     route_id = STAGED.route_id,
     territory_id = STAGED.territory_id,
@@ -104,62 +104,46 @@ SET
     market_group_id = STAGED.market_group_id,
     market_chain_id = STAGED.market_chain_id
 FROM
-    airflow.customer_staged STAGED
+    airflow.customer_staged STAGED,
+    customer c,
+    airflow.plant_staged pls,
+    plant p,
+    plant pp
 WHERE
-    STAGED.source_id = TARGET.source_id
-    AND STAGED.job_id = %(job_id)s :: BIGINT
+    STAGED.job_id = %(job_id)s :: BIGINT
+    AND c.source_id = STAGED.source_id
+    AND pls.id = STAGED.plant_id
+    AND pls.source_id = p.source_id
+    AND pp.id = c.plant_id
+    AND pls.job_id = %(job_id)s :: BIGINT
     AND (
-        STAGED.name IS DISTINCT FROM TARGET.name OR
-        STAGED.email IS DISTINCT FROM TARGET.email OR
-        STAGED.dni IS DISTINCT FROM TARGET.dni OR
-        STAGED.street IS DISTINCT FROM TARGET.street OR
-        STAGED.street_number IS DISTINCT FROM TARGET.street_number OR
-        STAGED.location IS DISTINCT FROM TARGET.location OR
-        STAGED.sub_location IS DISTINCT FROM TARGET.sub_location OR
-        STAGED.phone_number IS DISTINCT FROM TARGET.phone_number OR
-        STAGED.branch_office_id IS DISTINCT FROM TARGET.branch_office_id OR
-        STAGED.business_name IS DISTINCT FROM TARGET.business_name OR
-        STAGED.category_name IS DISTINCT FROM TARGET.category_name OR
-        STAGED.category_id IS DISTINCT FROM TARGET.category_id OR
-        STAGED.main_category_name IS DISTINCT FROM TARGET.main_category_name OR
-        STAGED.main_category_id IS DISTINCT FROM TARGET.main_category_id OR
-        STAGED.latitude IS DISTINCT FROM TARGET.latitude OR
-        STAGED.longitude IS DISTINCT FROM TARGET.longitude OR
-        STAGED.observations IS DISTINCT FROM TARGET.observations OR
-        STAGED.credit_amount IS DISTINCT FROM TARGET.credit_amount OR
-        STAGED.credit_balance IS DISTINCT FROM TARGET.credit_balance OR
-        STAGED.duty_free_price_list IS DISTINCT FROM TARGET.duty_free_price_list OR
-        STAGED.plant_id IS DISTINCT FROM TARGET.plant_id OR
-        STAGED.zone_id IS DISTINCT FROM TARGET.zone_id OR
-        STAGED.route_id IS DISTINCT FROM TARGET.route_id OR
-        STAGED.territory_id IS DISTINCT FROM TARGET.territory_id OR
-        STAGED.channel_mkt IS DISTINCT FROM TARGET.channel_mkt OR
-        STAGED.cluster IS DISTINCT FROM TARGET.cluster OR
-        STAGED.deleted_at IS DISTINCT FROM TARGET.deleted_at OR
-        STAGED.market_group_id IS DISTINCT FROM TARGET.market_group_id OR
-        STAGED.market_chain_id IS DISTINCT FROM TARGET.market_chain_id
+        STAGED.name IS DISTINCT FROM c.name OR
+        STAGED.email IS DISTINCT FROM c.email OR
+        STAGED.dni IS DISTINCT FROM c.dni OR
+        STAGED.street IS DISTINCT FROM c.street OR
+        STAGED.street_number IS DISTINCT FROM c.street_number OR
+        STAGED.location IS DISTINCT FROM c.location OR
+        STAGED.sub_location IS DISTINCT FROM c.sub_location OR
+        STAGED.phone_number IS DISTINCT FROM c.phone_number OR
+        STAGED.branch_office_id IS DISTINCT FROM c.branch_office_id OR
+        STAGED.business_name IS DISTINCT FROM c.business_name OR
+        STAGED.category_name IS DISTINCT FROM c.category_name OR
+        STAGED.category_id IS DISTINCT FROM c.category_id OR
+        STAGED.main_category_name IS DISTINCT FROM c.main_category_name OR
+        STAGED.main_category_id IS DISTINCT FROM c.main_category_id OR
+        STAGED.latitude IS DISTINCT FROM c.latitude OR
+        STAGED.longitude IS DISTINCT FROM c.longitude OR
+        STAGED.observations IS DISTINCT FROM c.observations OR
+        STAGED.credit_amount IS DISTINCT FROM c.credit_amount OR
+        STAGED.credit_balance IS DISTINCT FROM c.credit_balance OR
+        STAGED.duty_free_price_list IS DISTINCT FROM c.duty_free_price_list OR
+        p.id IS DISTINCT FROM pp.id OR
+        STAGED.zone_id IS DISTINCT FROM c.zone_id OR
+        STAGED.route_id IS DISTINCT FROM c.route_id OR
+        STAGED.territory_id IS DISTINCT FROM c.territory_id OR
+        STAGED.channel_mkt IS DISTINCT FROM c.channel_mkt OR
+        STAGED.cluster IS DISTINCT FROM c.cluster OR
+        STAGED.deleted_at IS DISTINCT FROM c.deleted_at OR
+        STAGED.market_group_id IS DISTINCT FROM c.market_group_id OR
+        STAGED.market_chain_id IS DISTINCT FROM c.market_chain_id
 );
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-;

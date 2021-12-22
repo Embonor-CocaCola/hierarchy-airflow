@@ -26,7 +26,7 @@ SELECT
     ANC.job_id
 FROM
     airflow.answer_conform ANC
-    INNER JOIN airflow.question_conform QUC ON QUC.source_id = ANC.question_id
+    INNER JOIN airflow.question_conform QUC ON QUC.id = ANC.question_id :: uuid
 
 WHERE ANC.job_id = %(job_id)s :: BIGINT
     AND QUC.job_id = %(job_id)s :: BIGINT

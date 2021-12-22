@@ -15,7 +15,7 @@ INSERT INTO airflow.vendor_customer_conform (
     job_id,
     id
 )
-SELECT
+(SELECT
     vendor_id,
     customer_id,
     start_date,
@@ -28,5 +28,5 @@ SELECT
     CONCAT(vendor_id :: TEXT, customer_id :: TEXT, extract(epoch from start_date) :: TEXT)
 FROM
     airflow.vendor_customer_typed
-WHERE job_id = %(job_id)s :: BIGINT
-;
+WHERE job_id = %(job_id)s :: BIGINT)
+        ON CONFLICT (id) DO NOTHING ;

@@ -20,13 +20,21 @@ UPDATE
     branch_office TARGET
 SET
     name = STAGED.name,
-    plant_id = STAGED.plant_id
+    plant_id = pp.id
 FROM
-    airflow.branch_office_staged STAGED
+    airflow.branch_office_staged STAGED,
+    branch_office bo,
+    airflow.plant_staged pls,
+    plant p,
+    plant pp
 WHERE
     STAGED.source_id = TARGET.source_id
+    AND STAGED.source_id = bo.source_id
+    AND pls.id = STAGED.plant_id
+    AND bo.plant_id = p.id
+    AND pls.source_id = pp.source_id
     AND STAGED.job_id = %(job_id)s :: BIGINT
     AND (
         STAGED.name IS DISTINCT FROM TARGET.name OR
-        STAGED.plant_id IS DISTINCT FROM TARGET.plant_id
+        p.source_id IS DISTINCT FROM pp.source_id
     );
