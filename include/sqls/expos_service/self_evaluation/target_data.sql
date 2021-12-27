@@ -3,6 +3,7 @@ INSERT INTO self_evaluation (
     skips_survey,
     vendor_id,
     customer_id,
+    created_at,
     id
 )
 SELECT
@@ -10,6 +11,7 @@ SELECT
     STAGED.skips_survey,
     STAGED.vendor_id,
     STAGED.customer_id,
+    STAGED.external_created_at,
     STAGED.id
 FROM
     airflow.self_evaluation_staged STAGED
@@ -32,6 +34,7 @@ UPDATE
     self_evaluation TARGET
 SET
     skips_survey = STAGED.skips_survey,
+    created_at = STAGED.external_created_at,
     vendor_id = v.id,
     customer_id = c.id
 FROM
@@ -55,6 +58,26 @@ WHERE
     AND cs.job_id = %(job_id)s :: BIGINT
     AND (
         STAGED.skips_survey IS DISTINCT FROM TARGET.skips_survey OR
+        STAGED.external_created_at IS DISTINCT FROM TARGET.created_at OR
         v.id IS DISTINCT FROM vv.id OR
         c.id IS DISTINCT FROM cc.id
     );
+
+UPDATE self_evaluation TARGET
+SET
+    skip_reason = CASE
+                    WHEN ans.values->>0 LIKE '%%encuentra con reja' THEN 'gated'
+                    WHEN ans.values->>0 LIKE '%%encuentra cerrado' THEN 'closed'
+                    ELSE 'INVALID_REASON'
+                END,
+    skips_survey = true
+FROM
+    answer ans
+WHERE
+    ans.self_evaluation_id = TARGET.id
+    AND TARGET.skip_reason IS NULL
+    AND (
+        ans.values->>0 LIKE '%%encuentra con reja' OR
+        ans.values->>0 LIKE '%%encuentra cerrado'
+    )
+;
