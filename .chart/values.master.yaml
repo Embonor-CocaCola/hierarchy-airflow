@@ -1,16 +1,7 @@
-hpa:
-  enabled: true
-  minReplicas: 2
-  maxReplicas: 4
-  metrics:
-    cpu:
-      targetAverageUtilization: 40
-    memory:
-      targetAverageUtilization: 70
-
 ingress:
-  hosts:
-    - airflow2.production.embonorservices.cl
+  web:
+    hosts:
+      - airflow2.staging.embonorservices.cl
 
 env:
   - name: STAGE
