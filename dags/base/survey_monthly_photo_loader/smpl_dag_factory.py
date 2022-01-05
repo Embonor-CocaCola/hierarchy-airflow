@@ -1,7 +1,7 @@
 import json
 import os
+from pathlib import Path
 from datetime import timedelta
-import requests
 import shutil
 import urllib.request
 from functools import reduce
@@ -9,6 +9,9 @@ from airflow.models import DAG
 from airflow.operators.python import PythonOperator
 from airflow.providers.http.operators.http import SimpleHttpOperator
 from airflow.models import Variable
+import oci
+from oci.object_storage import UploadManager
+from oci.object_storage.transfer.constants import MEBIBYTE
 
 from base.survey_monthly_photo_loader.health_checks_taskgroup import SmplHealthChecksTaskGroup
 from config.expos_service.settings import (
@@ -17,8 +20,28 @@ from config.expos_service.settings import (
     ES_SQL_PATH,
     SMPL_DAG_START_DATE_VALUE,
     ES_EMBONOR_SERVICES_BASE_URL_CONN_ID,
-    PRE_AUTHENTICATED_REQUESTS_URL,
+    OCI_REGION,
+    OCI_KEY,
+    OCI_USER,
+    OCI_TENANCY,
+    OCI_FINGERPRINT,
 )
+
+oci_config = {
+    'user': OCI_USER,
+    'key_content': OCI_KEY,
+    'fingerprint': OCI_FINGERPRINT,
+    'tenancy': OCI_TENANCY,
+    'region': OCI_REGION,
+}
+
+oci.config.validate_config(config=oci_config)
+compartment_id = oci_config['tenancy']
+object_storage = oci.object_storage.ObjectStorageClient(oci_config)
+
+
+def progress_callback(bytes_uploaded):
+    print('{} additional bytes uploaded'.format(bytes_uploaded))
 
 
 class SmplDagFactory:
@@ -74,7 +97,9 @@ class SmplDagFactory:
             )
         except FileNotFoundError as error:
             print(error)
-        os.mkdir('data/survey_photos')
+
+        path = Path(f'{airflow_root_dir}/data/survey_photos')
+        path.mkdir(parents=True, exist_ok=True)
 
         urls = ti.xcom_pull(task_ids=['transform_data'])[0]
         for idx, url in enumerate(urls):
@@ -86,9 +111,19 @@ class SmplDagFactory:
         shutil.make_archive(f'{airflow_root_dir}/data/{filename}', 'zip', f'{airflow_root_dir}/data/survey_photos')
 
     def upload(self, file_name):
-        with open(f'{airflow_root_dir}/data/{file_name}', mode='rb') as file:
-            file_content = file.read()
-            requests.put(f'{PRE_AUTHENTICATED_REQUESTS_URL}{file_name}', data=file_content)
+        file_path = f'{airflow_root_dir}/data/{file_name}'
+        part_size = 2 * MEBIBYTE
+        upload_manager = UploadManager(object_storage, allow_parallel_uploads=True, parallel_process_count=3)
+        upload_manager.upload_file(
+            'ax2bop5777vk',
+            'survey-photos',
+            file_name,
+            file_path,
+            part_size=part_size,
+            progress_callback=progress_callback,
+        )
+
+        os.remove(file_path)
 
     def build(self) -> DAG:
         _default_args = {
@@ -134,6 +169,7 @@ class SmplDagFactory:
             transform_data = PythonOperator(
                 task_id='transform_data',
                 python_callable=self.transform_data,
+                execution_timeout=None,
                 do_xcom_push=True,
             )
 
