@@ -131,5 +131,9 @@ if __name__ == '__main__':
         },
     }
     _variable_config = {
+        'smpl_survey_id': es_config.SMPL_SELF_EVALUATION_SURVEY_ID,
+        'smpl_from': '2021-09-09',
+        'smpl_to': '2021-10-09',
+        'smpl_questions': '',  # Set this directly in the UI as a \r\n separated string
     }
     _initialize(_db_config, _conn_config, _variable_config)

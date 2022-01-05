@@ -33,6 +33,7 @@ SELECT
     %(job_id)s :: BIGINT
 FROM
     airflow.tmp_survey
+WHERE name = 'Autoevaluación'
 ;
 
 DROP TABLE IF EXISTS airflow.tmp_survey;

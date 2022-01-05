@@ -4,6 +4,7 @@ INSERT INTO self_evaluation (
     vendor_id,
     customer_id,
     created_at,
+    evaluation_status_id,
     id
 )
 SELECT
@@ -12,6 +13,7 @@ SELECT
     STAGED.vendor_id,
     STAGED.customer_id,
     STAGED.external_created_at,
+    (SELECT id FROM evaluation_status WHERE code = 'NS'), -- Not supervised by default
     STAGED.id
 FROM
     airflow.self_evaluation_staged STAGED

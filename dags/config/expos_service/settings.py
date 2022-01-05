@@ -64,3 +64,8 @@ ES_ETL_TARGET_OPERATIONS_ORDER = os.environ.get(
 ).split(',')
 
 ES_STAGE = os.environ.get('STAGE', 'development')
+
+SMPL_DAG_ID = 'survey_monthly_photo_loader'
+SMPL_DAG_START_DATE_VALUE = os.environ.get('SMPL_DAG_START_DATE_VALUE', '2022-01-01')
+SMPL_SELF_EVALUATION_SURVEY_ID = os.environ.get('SMPL_SELF_EVALUATION_SURVEY_ID', '6183e40c889a0f0013010903')
+PRE_AUTHENTICATED_REQUESTS_URL = os.environ.get('PRE_AUTHENTICATED_REQUESTS_URL')
