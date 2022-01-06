@@ -22,7 +22,7 @@ INSERT INTO airflow.vendor_staged (
 )
 SELECT
     VEC.source_id,
-    VEC.name,
+    VPC.name,
     VEC.rut,
     VEC.email,
     VEC.phone,
