@@ -3,6 +3,7 @@ import os
 from pathlib import Path
 from datetime import timedelta
 import shutil
+import zipfile
 import urllib.request
 from functools import reduce
 from airflow.models import DAG
@@ -14,6 +15,7 @@ from oci.object_storage import UploadManager
 from oci.object_storage.transfer.constants import MEBIBYTE
 
 from base.survey_monthly_photo_loader.health_checks_taskgroup import SmplHealthChecksTaskGroup
+from base.utils.zip import zipdir
 from config.expos_service.settings import (
     airflow_root_dir,
     SMPL_DAG_ID,
@@ -108,7 +110,8 @@ class SmplDagFactory:
             print(f'Downloaded photo N°{idx}')
 
     def compress(self, filename):
-        shutil.make_archive(f'{airflow_root_dir}/data/{filename}', 'zip', f'{airflow_root_dir}/data/survey_photos')
+        with zipfile.ZipFile(f'{airflow_root_dir}/data/{filename}.zip', 'w', zipfile.ZIP_DEFLATED) as zipf:
+            zipdir(f'{airflow_root_dir}/data/survey_photos', zipf)
 
     def upload(self, file_name):
         file_path = f'{airflow_root_dir}/data/{file_name}'
