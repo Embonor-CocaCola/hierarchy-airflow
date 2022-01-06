@@ -186,12 +186,14 @@ class SmplDagFactory:
                 task_id='compress_images',
                 python_callable=self.compress,
                 op_args=[_folder_name],
+                execution_timeout=None,
             )
 
             upload_compressed = PythonOperator(
                 task_id='upload_compressed_images',
                 python_callable=self.upload,
                 op_args=[_compressed_filename],
+                execution_timeout=None,
             )
 
             self.health_checks_instance.build() >> extract_data >> transform_data >> download_images >> compress_images
