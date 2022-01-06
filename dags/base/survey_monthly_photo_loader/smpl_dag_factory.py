@@ -7,6 +7,7 @@ import zipfile
 import urllib.request
 from functools import reduce
 from airflow.models import DAG
+from airflow.operators.bash import BashOperator
 from airflow.operators.python import PythonOperator
 from airflow.providers.http.operators.http import SimpleHttpOperator
 from airflow.models import Variable
@@ -196,6 +197,10 @@ class SmplDagFactory:
                 execution_timeout=None,
             )
 
+            cleanup = BashOperator(
+                task_id='cleanup',
+                bash_command=f'cd {airflow_root_dir}/data && rm -rf survey_photos',
+            )
             self.health_checks_instance.build() >> extract_data >> transform_data >> download_images >> compress_images
-            compress_images >> upload_compressed
+            compress_images >> upload_compressed >> cleanup
         return _dag
