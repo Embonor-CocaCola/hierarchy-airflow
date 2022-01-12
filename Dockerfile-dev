@@ -10,6 +10,8 @@ RUN apt-get update \
 
 USER airflow
 
+RUN mkdir -p data
+
 COPY ./dags ${AIRFLOW_HOME}/dags
 COPY ./include ${AIRFLOW_HOME}/include
 COPY ./plugins ${AIRFLOW_HOME}/plugins
