@@ -10,8 +10,8 @@ INSERT INTO self_evaluation (
 SELECT
     STAGED.source_id,
     STAGED.skips_survey,
-    STAGED.vendor_id,
-    STAGED.customer_id,
+    v.id,
+    c.id,
     STAGED.external_created_at,
     (SELECT id FROM evaluation_status WHERE code = 'NS'), -- Not supervised by default
     STAGED.id
@@ -35,7 +35,6 @@ WHERE
 UPDATE
     self_evaluation TARGET
 SET
-    skips_survey = STAGED.skips_survey,
     created_at = STAGED.external_created_at,
     vendor_id = v.id,
     customer_id = c.id
@@ -59,7 +58,6 @@ WHERE
     AND vs.job_id = %(job_id)s :: BIGINT
     AND cs.job_id = %(job_id)s :: BIGINT
     AND (
-        STAGED.skips_survey IS DISTINCT FROM TARGET.skips_survey OR
         STAGED.external_created_at IS DISTINCT FROM TARGET.created_at OR
         v.id IS DISTINCT FROM vv.id OR
         c.id IS DISTINCT FROM cc.id

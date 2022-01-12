@@ -26,8 +26,8 @@ SELECT
     TVP.id
 FROM
     airflow.vendor_plant_typed TVP
-    LEFT JOIN airflow.plant_typed TPL ON TPL.source_id = TVP.plant_id
-    LEFT JOIN airflow.supervisor_plant_typed TSP ON TSP.supervisor_id = TVP.supervisor_id
+    INNER JOIN airflow.plant_typed TPL ON TPL.source_id = TVP.plant_id
+    INNER JOIN airflow.supervisor_plant_typed TSP ON TSP.supervisor_id = TVP.supervisor_id
 WHERE
     TVP.job_id = %(job_id)s :: BIGINT AND
     TPL.job_id = %(job_id)s :: BIGINT AND
