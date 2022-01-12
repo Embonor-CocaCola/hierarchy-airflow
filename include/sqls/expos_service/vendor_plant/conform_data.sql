@@ -7,6 +7,7 @@ INSERT INTO airflow.vendor_plant_conform (
     vendor_id,
     supervisor_id,
     plant_id,
+    vendor_name,
 
     created_at,
     updated_at,
@@ -17,6 +18,7 @@ SELECT
     TVP.vendor_id,
     TSP.id,
     TPL.id,
+    TVP.vendor_name,
 
     now(),
     now(),

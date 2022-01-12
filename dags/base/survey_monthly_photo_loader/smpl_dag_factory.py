@@ -19,16 +19,11 @@ from base.survey_monthly_photo_loader.health_checks_taskgroup import SmplHealthC
 from base.utils.zip import zipdir
 from config.expos_service.settings import (
     airflow_root_dir,
-    SMPL_DAG_ID,
     ES_SQL_PATH,
-    SMPL_DAG_START_DATE_VALUE,
     ES_EMBONOR_SERVICES_BASE_URL_CONN_ID,
-    OCI_REGION,
-    OCI_KEY,
-    OCI_USER,
-    OCI_TENANCY,
-    OCI_FINGERPRINT,
 )
+from config.survey_monthly_photo_loader.settings import SMPL_DAG_ID, SMPL_DAG_START_DATE_VALUE, OCI_USER, OCI_KEY, \
+    OCI_FINGERPRINT, OCI_TENANCY, OCI_REGION
 
 oci_config = {
     'user': OCI_USER,

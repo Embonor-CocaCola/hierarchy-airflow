@@ -22,14 +22,6 @@ pyenv init
 # don't miss source shell rc
 ```
 
-* Install PostgreSQL v12 and OpenSSL
-```shell
-# don't miss set up the environment variables in your shell profile
-brew install libpq
-brew install postgresql@12
-brew install openssl
-```
-
 * Install Python 3.9.7
 ```shell
 pyenv install 3.9.7
@@ -111,8 +103,7 @@ ALTER ROLE airflow SET search_path = 'airflow,public';
 GRANT ALL PRIVILEGES ON DATABASE expos_service TO airflow;
 
 -- if you get 'no schema selected' errors, issue the following 2 commands
-GRANT USAGE ON SCHEMA airflow TO airflow;
-GRANT CREATE ON SCHEMA airflow TO airflow;
+GRANT USAGE, CREATE ON SCHEMA airflow TO airflow, public;
 -- if you get permission denied to create extension you might need to grant superuser too
 -- this depends on postgres version. As of v13 some extensions are considered safe
 -- to create from users with CREATE privileges on current DB

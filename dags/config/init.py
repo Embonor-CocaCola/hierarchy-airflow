@@ -1,10 +1,13 @@
 import logging
+import os
 
 from airflow import models
 from airflow.settings import Session
 from airflow.utils.session import provide_session
 
+import config.survey_monthly_photo_loader.settings
 import expos_service.settings as es_config
+import maxerience_load.settings as ml_config
 
 
 @provide_session
@@ -125,9 +128,13 @@ if __name__ == '__main__':
             'conn_id': es_config.ES_EMBONOR_MONGO_CONN_ID,
             'conn_uri': es_config.ES_EMBONOR_MONGO_CONN_URI,
         },
+        ml_config.ML_AIRFLOW_DATABASE_CONN_ID: {
+            'conn_id': ml_config.ML_AIRFLOW_DATABASE_CONN_ID,
+            'conn_uri': os.environ.get('GAC_SQL_CONN_URI'),
+        },
     }
     _variable_config = {
-        'smpl_survey_id': es_config.SMPL_SELF_EVALUATION_SURVEY_ID,
+        'smpl_survey_id': config.survey_monthly_photo_loader.settings.SMPL_SELF_EVALUATION_SURVEY_ID,
         'smpl_from': '2021-09-09',
         'smpl_to': '2021-10-09',
         'smpl_questions': '',  # Set this directly in the UI as a \r\n separated string
