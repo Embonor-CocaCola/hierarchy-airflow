@@ -6,6 +6,8 @@ ingress:
 env:
   - name: STAGE
     value: staging
+  - name: ML_MAXERIENCE_BASE_URL
+    value: https://portal-stg1.maxerience.com/IrHandler
 
 secret:
   - envName: "GAC_SQL_CONN_URI"

@@ -6,6 +6,8 @@ ingress:
 env:
   - name: STAGE
     value: production
+  - name: ML_MAXERIENCE_BASE_URL
+    value: https://portal.visioniot.net/IrHandler
 
 secret:
   - envName: "GAC_SQL_CONN_URI"
@@ -44,3 +46,9 @@ secret:
   - envName: "OCI_REGION"
     secretName: "airflow-envars"
     secretKey: "OCI_REGION"
+  - envName: "ML_MAXERIENCE_USER"
+    secretName: "airflow-envars"
+    secretKey: "ML_MAXERIENCE_USER"
+  - envName: "ML_MAXERIENCE_PASS"
+    secretName: "airflow-envars"
+    secretKey: "ML_MAXERIENCE_PASS"

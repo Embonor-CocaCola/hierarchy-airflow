@@ -138,5 +138,6 @@ if __name__ == '__main__':
         'smpl_from': '2021-09-09',
         'smpl_to': '2021-10-09',
         'smpl_questions': '',  # Set this directly in the UI as a \r\n separated string
+        'ml_auth_token': '6362F8A5-F441-4943-9C81-3D96229E8BDE',
     }
     _initialize(_db_config, _conn_config, _variable_config)

@@ -1,4 +1,5 @@
 from airflow.providers.postgres.hooks.postgres import PostgresHook
+from psycopg2 import ProgrammingError
 
 
 def perform_pg_query(conn_id, query, handle_result):
@@ -9,7 +10,10 @@ def perform_pg_query(conn_id, query, handle_result):
     conn = pg_hook.get_conn()
     cursor = conn.cursor()
     cursor.execute(query)
-    rows = cursor.fetchall()
+    try:
+        rows = cursor.fetchall()
+    except ProgrammingError:
+        rows = None
     handle_result(rows)
     cursor.close()
     conn.commit()

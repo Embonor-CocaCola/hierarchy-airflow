@@ -6,6 +6,8 @@ ingress:
 env:
   - name: STAGE
     value: development
+  - name: ML_MAXERIENCE_BASE_URL
+    value: https://portal-stg1.maxerience.com/IrHandler
 
 secret:
   - envName: "EMBONOR_MONGO_CONN_URI"
