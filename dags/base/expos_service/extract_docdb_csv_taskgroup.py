@@ -82,3 +82,6 @@ class ExtractDocumentDbCsvTaskGroup:
             docs.to_csv(f'/opt/airflow/data/{collection_name}.csv', index=False)
 
             info(f"Collection '{collection_name}' extracted successfully!")
+            cursor.close()
+            mongo_hook.close_conn()
+            print('Cursor and connection closed successfully!')
