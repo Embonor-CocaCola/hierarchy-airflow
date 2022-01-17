@@ -10,18 +10,15 @@ def parameterized_query(sql, wrap=True, is_procedure=False, **kwargs):
     print('params: ')
     print(kwargs['templates_dict'])
     pg_hook = PostgresHook(postgres_conn_id=ML_AIRFLOW_DATABASE_CONN_ID)
-    conn = pg_hook.get_conn()
-    if is_procedure:
-        conn.autocommit = True
-    cursor = conn.cursor()
-
-    cursor.execute(sql, kwargs['templates_dict'])
-    try:
-        rows = cursor.fetchall()
-    except ProgrammingError:
-        rows = []
-    cursor.close()
-    conn.close()
+    with pg_hook.get_conn() as conn:
+        if is_procedure:
+            conn.autocommit = True
+        with conn.cursor() as cursor:
+            cursor.execute(sql, kwargs['templates_dict'])
+            try:
+                rows = cursor.fetchall()
+            except ProgrammingError:
+                rows = []
 
     if wrap:
         return [item for sublist in rows for item in sublist]
