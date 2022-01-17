@@ -21,7 +21,7 @@ INSERT INTO airflow.chief_staged (
 SELECT
     CHC.source_id,
     CHC.name,
-    PLC.id,
+    COALESCE(p.id, PLC.id),
     CHC.code,
     CHC.location,
     CHC.rut,
@@ -33,8 +33,9 @@ SELECT
     CHC.job_id,
     CHC.id
 FROM
-    airflow.chief_conform CHC INNER JOIN airflow.plant_conform PLC
-    ON PLC.source_id = CHC.plant_id
+    airflow.chief_conform CHC
+    INNER JOIN airflow.plant_conform PLC ON PLC.source_id = CHC.plant_id
+    LEFT JOIN plant p ON PLC.source_id = p.source_id
 WHERE CHC.job_id = %(job_id)s :: BIGINT
     AND PLC.job_id = %(job_id)s :: BIGINT
 ;

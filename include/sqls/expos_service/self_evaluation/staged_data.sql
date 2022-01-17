@@ -18,8 +18,8 @@ INSERT INTO airflow.self_evaluation_staged (
 SELECT
     SEC.source_id,
     SEC.skips_survey,
-    VEC.id,
-    CUC.id,
+    COALESCE(v.id, VEC.id),
+    COALESCE(c.id, CUC.id),
     SEC.external_created_at,
 
     now(),
@@ -29,7 +29,9 @@ SELECT
 FROM
     airflow.self_evaluation_conform SEC
     INNER JOIN airflow.vendor_conform VEC ON VEC.source_id = SEC.vendor_id
+    LEFT JOIN vendor v ON VEC.source_id = v.source_id
     INNER JOIN airflow.customer_conform CUC ON CUC.source_id = SEC.customer_id
+    LEFT JOIN customer c ON CUC.source_id = c.source_id
 WHERE
     SEC.job_id = %(job_id)s :: BIGINT AND
     VEC.job_id = %(job_id)s :: BIGINT AND

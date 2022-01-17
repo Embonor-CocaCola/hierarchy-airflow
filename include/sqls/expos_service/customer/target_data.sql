@@ -115,10 +115,10 @@ WHERE
     STAGED.job_id = %(job_id)s :: BIGINT
     AND TARGET.source_id = STAGED.source_id
     AND pls.id = STAGED.plant_id
-    AND pls.source_id = p.source_id
+    AND p.source_id = pls.source_id
     AND pp.id = TARGET.plant_id
     AND bos.id = STAGED.branch_office_id
-    AND bos.source_id = bo.source_id
+    AND bo.source_id = bos.source_id
     AND bbo.id = TARGET.branch_office_id
     AND pls.job_id = %(job_id)s :: BIGINT
     AND bos.job_id = %(job_id)s :: BIGINT

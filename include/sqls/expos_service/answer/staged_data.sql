@@ -19,7 +19,7 @@ SELECT
     ANC.values,
     ANC.attachments,
     ANC.self_evaluation_id,
-    QUC.id,
+    COALESCE(Q.id, QUC.id),
 
     now(),
     now(),
@@ -27,6 +27,7 @@ SELECT
 FROM
     airflow.answer_conform ANC
     INNER JOIN airflow.question_conform QUC ON QUC.id = ANC.question_id :: uuid
+    LEFT JOIN question Q on Q.source_id = QUC.source_id
 
 WHERE ANC.job_id = %(job_id)s :: BIGINT
     AND QUC.job_id = %(job_id)s :: BIGINT

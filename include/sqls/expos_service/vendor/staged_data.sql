@@ -26,7 +26,7 @@ SELECT
     VEC.rut,
     VEC.email,
     VEC.phone,
-    BOC.id,
+    COALESCE(b.id, BOC.id),
     VTC.name,
     VEC.deleted_at,
     VPC.plant_id,
@@ -39,6 +39,7 @@ SELECT
 FROM
     airflow.vendor_conform VEC
     INNER JOIN airflow.branch_office_conform BOC ON BOC.source_id = VEC.branch_office_id
+    LEFT JOIN branch_office b ON BOC.source_id = b.source_id
     INNER JOIN airflow.vendor_type_conform VTC ON VTC.source_id = VEC.vendor_type_id
     INNER JOIN airflow.vendor_plant_conform VPC ON substr(VEC.rut, 1, length(COALESCE(NULLIF(VEC.rut, ''), ' ')) - 1) = VPC.vendor_id :: TEXT
 WHERE

@@ -16,8 +16,8 @@ INSERT INTO airflow.vendor_customer_staged (
     id
 )
 SELECT DISTINCT ON (VEC.id, CUC.id)
-    VEC.id,
-    CUC.id,
+    COALESCE(v.id, VEC.id),
+    COALESCE(c.id, CUC.id),
     VCC.start_date,
     VCC.frequency,
     VCC.priority,
@@ -29,7 +29,9 @@ SELECT DISTINCT ON (VEC.id, CUC.id)
 FROM
     airflow.vendor_customer_conform VCC
     INNER JOIN airflow.customer_conform CUC ON CUC.source_id = VCC.customer_id
+    LEFT JOIN customer c ON CUC.source_id = c.source_id
     INNER JOIN airflow.vendor_conform VEC ON VEC.source_id = VCC.vendor_id
+    LEFT JOIN vendor v ON VEC.source_id = v.source_id
 WHERE
     VCC.job_id = %(job_id)s :: BIGINT AND
     CUC.job_id = %(job_id)s :: BIGINT AND

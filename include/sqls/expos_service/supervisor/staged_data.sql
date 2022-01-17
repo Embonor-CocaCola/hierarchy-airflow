@@ -20,11 +20,11 @@ INSERT INTO airflow.supervisor_staged (
 SELECT
     SUC.source_id,
     SUC.name,
-    PLC.id,
+    COALESCE(p.id, PLC.id),
     SUC.code,
     SUC.location,
     SUC.role,
-    CHC.id ,
+    COALESCE(c.id, CHC.id),
 
     now(),
     now(),
@@ -33,7 +33,9 @@ SELECT
 FROM
     airflow.supervisor_conform SUC
 INNER JOIN airflow.chief_conform CHC ON CHC.source_id = SUC.chief_id
+LEFT JOIN chief c ON CHC.source_id = c.source_id
 INNER JOIN airflow.plant_conform PLC ON PLC.source_id = SUC.plant_id
+LEFT JOIN plant p ON PLC.source_id = p.source_id
 
 WHERE SUC.job_id = %(job_id)s :: BIGINT
     AND CHC.job_id = %(job_id)s :: BIGINT

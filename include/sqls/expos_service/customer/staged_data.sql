@@ -52,7 +52,7 @@ SELECT
     CUC.location,
     CUC.sub_location,
     CUC.phone_number,
-    BOC.id,
+    COALESCE(bo.id, BOC.id),
     CUC.business_name,
     CUC.category_name,
     CUC.category_id,
@@ -64,7 +64,7 @@ SELECT
     CUC.credit_amount,
     CUC.credit_balance,
     CUC.duty_free_price_list,
-    PLC.id,
+    COALESCE(p.id, PLC.id),
     CUC.zone_id,
     CUC.route_id,
     CUC.territory_id,
@@ -81,7 +81,9 @@ SELECT
 FROM
     airflow.customer_conform CUC
     INNER JOIN airflow.branch_office_conform BOC ON BOC.source_id = CUC.branch_office
+    LEFT JOIN branch_office bo ON BOC.source_id = bo.source_id
     INNER JOIN airflow.plant_conform PLC ON PLC.source_id = CUC.plant_id
+    LEFT JOIN plant p on PLC.source_id = p.source_id
 WHERE
     CUC.job_id = %(job_id)s :: BIGINT AND
     BOC.job_id = %(job_id)s :: BIGINT AND

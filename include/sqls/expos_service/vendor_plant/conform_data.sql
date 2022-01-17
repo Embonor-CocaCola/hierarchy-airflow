@@ -16,8 +16,8 @@ INSERT INTO airflow.vendor_plant_conform (
 )
 SELECT
     TVP.vendor_id,
-    TSP.id,
-    TPL.id,
+    COALESCE(s.id, TSP.id),
+    COALESCE(p.id, TPL.id),
     TVP.vendor_name,
 
     now(),
@@ -27,7 +27,9 @@ SELECT
 FROM
     airflow.vendor_plant_typed TVP
     INNER JOIN airflow.plant_typed TPL ON TPL.source_id = TVP.plant_id
+    LEFT JOIN plant p ON TPL.source_id = p.source_id
     INNER JOIN airflow.supervisor_plant_typed TSP ON TSP.supervisor_id = TVP.supervisor_id
+    LEFT JOIN supervisor s ON TSP.supervisor_id = s.source_id
 WHERE
     TVP.job_id = %(job_id)s :: BIGINT AND
     TPL.job_id = %(job_id)s :: BIGINT AND
