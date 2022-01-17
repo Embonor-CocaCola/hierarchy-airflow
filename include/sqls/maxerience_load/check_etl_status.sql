@@ -1,1 +1,7 @@
-select * from airflow.dag_run where execution_date::date = now()::date and dag_id = 'expos_etl' and run_type = 'scheduled' and state = 'success';
+select *
+from airflow.dag_run dr
+inner join airflow.etl_job ej  on dr.run_id = ej.dag_run_id
+where ej.created_at::date = now()::date
+and dr.dag_id = 'expos_etl'
+and dr.run_type = 'scheduled'
+and dr.state = 'success';
