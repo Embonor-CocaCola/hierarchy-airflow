@@ -53,7 +53,7 @@ class ExtractDocumentDbCsvTaskGroup:
 
     def convert_fields_to_json(self, value):
         if type(value) in [list, dict]:
-            return json.dumps(value, ensure_ascii=False)
+            return json.dumps(value, ensure_ascii=True)
         return value
 
     def extract_csv(self, collection_name: str):
@@ -69,7 +69,7 @@ class ExtractDocumentDbCsvTaskGroup:
             cursor = collection.find()
 
             jsondocs = json_util.dumps(
-                list(cursor), ensure_ascii=False, json_options=json_util.JSONOptions(datetime_representation=2),
+                list(cursor), ensure_ascii=True, json_options=json_util.JSONOptions(datetime_representation=2),
             )
             docs = pandas.read_json(StringIO(jsondocs))
 
