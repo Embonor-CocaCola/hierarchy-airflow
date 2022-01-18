@@ -26,7 +26,7 @@ SELECT
     pollsterid,
     surveyedid,
     createdat,
-    answers,
+    regexp_replace(answers, '\\u0000', '', 'g'),
 
     now(),
     now(),
