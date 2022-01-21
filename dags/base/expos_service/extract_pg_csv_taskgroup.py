@@ -34,13 +34,11 @@ class ExtractPostgresCsvTaskGroup:
 
             pg_hook = PostgresHook(postgres_conn_id=ES_EMBONOR_PG_CONN_ID,
                                    schema='embonor')
-            conn = pg_hook.get_conn()
-            cursor = conn.cursor()
-            with open(f'/opt/airflow/data/{table_name}.csv', 'w') as file:
-                cursor.copy_expert(
-                    f'COPY "{table_name}" TO STDOUT WITH CSV HEADER', file)
-            cursor.close()
-            conn.close()
+            with pg_hook.get_conn() as conn:
+                with conn.cursor() as cursor:
+                    with open(f'/opt/airflow/data/{table_name}.csv', 'w') as file:
+                        cursor.copy_expert(
+                            f'COPY "{table_name}" TO STDOUT WITH CSV HEADER', file)
 
     def create_extract_task(self, table, task_group):
         return PythonOperator(

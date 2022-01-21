@@ -1,1 +1,1 @@
-(cd include/db/gac/; python manage.py "$@")
+(cd include/db/expos/; python manage.py "$@")

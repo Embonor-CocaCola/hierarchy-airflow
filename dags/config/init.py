@@ -130,7 +130,7 @@ if __name__ == '__main__':
         },
         ml_config.ML_AIRFLOW_DATABASE_CONN_ID: {
             'conn_id': ml_config.ML_AIRFLOW_DATABASE_CONN_ID,
-            'conn_uri': os.environ.get('GAC_SQL_CONN_URI'),
+            'conn_uri': os.environ.get('EXPOS_SQL_CONN_URI'),
         },
     }
     _variable_config = {

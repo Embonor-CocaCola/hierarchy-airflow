@@ -39,6 +39,7 @@ class TablesInsertTaskGroup:
                 'expos_service', table_name, f'{self.stage}_data.sql',
             ),
             parameters=parameters,
+            autocommit=True,
         )
 
     def create_params_key(self, table_name):

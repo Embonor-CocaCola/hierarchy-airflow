@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 
 from airflow.models import DAG
+from airflow.operators.python import PythonOperator
 
 from base.expos_service.load_csv_into_temp_tables_taskgroup import LoadCsvIntoTempTablesTaskGroup
 from base.expos_service.tables_insert_taskgroup import TablesInsertTaskGroup
@@ -9,8 +10,10 @@ from base.expos_service.extract_docdb_csv_taskgroup import \
 from base.expos_service.extract_pg_csv_taskgroup import \
     ExtractPostgresCsvTaskGroup
 from base.expos_service.health_checks_taskgroup import HealthChecksTaskGroup
+from base.utils.slack import build_etl_status_msg, send_slack_notification
 from base.utils.table_names import TableNameManager
 from base.utils.tunneler import Tunneler
+from config.common.settings import SHOULD_NOTIFY
 from config.expos_service.settings import (
     ES_AIRFLOW_DATABASE_CONN_ID,
     ES_ETL_DAG_ID,
@@ -25,10 +28,32 @@ from config.expos_service.settings import (
     ES_PG_TABLES_TO_EXTRACT,
     ES_ETL_CONFORM_OPERATIONS_ORDER, ES_ETL_STAGED_OPERATIONS_ORDER, ES_ETL_TARGET_OPERATIONS_ORDER,
 )
+
 from operators.postgres.create_job import PostgresOperatorCreateJob
 
 
 class EtlDagFactory:
+
+    @staticmethod
+    def on_failure_callback(context):
+        if not SHOULD_NOTIFY:
+            return
+        ti = context['task_instance']
+        run_id = context['run_id']
+        send_slack_notification(notification_type='alert',
+                                payload=build_etl_status_msg(status='failed',
+                                                             mappings={'run_id': run_id, 'task_id': ti.task_id}))
+
+    @staticmethod
+    def on_success_callback(context):
+        if not SHOULD_NOTIFY:
+            return
+
+        run_id = context['run_id']
+        send_slack_notification(notification_type='success',
+                                payload=build_etl_status_msg(status='finished',
+                                                             mappings={'run_id': run_id}))
+
     @staticmethod
     def build() -> DAG:
         _start_date = datetime.strptime(
@@ -40,6 +65,7 @@ class EtlDagFactory:
             'execution_timeout': timedelta(seconds=180),
             'retries': 2,
             'retry_delay': timedelta(seconds=5),
+            'on_failure_callback': EtlDagFactory.on_failure_callback,
         }
         _pg_table_list = ES_PG_TABLES_TO_EXTRACT
         _mongo_collection_list = ES_MONGO_COLLECTIONS_TO_EXTRACT
@@ -48,7 +74,6 @@ class EtlDagFactory:
         _staged_operations = ES_ETL_STAGED_OPERATIONS_ORDER
         _target_operations = ES_ETL_TARGET_OPERATIONS_ORDER
         _table_manager = TableNameManager(_tables_to_insert)
-
         pg_tunnel = Tunneler(
             ES_REMOTE_RDS_PORT, ES_REMOTE_RDS_HOST, 5433) if IS_LOCAL_RUN else None
         mongo_tunnel = Tunneler(
@@ -60,6 +85,7 @@ class EtlDagFactory:
                 default_args=_default_args,
                 template_searchpath=ES_SQL_PATH,
                 max_active_runs=1,
+                on_success_callback=EtlDagFactory.on_success_callback,
                 catchup=False,
         ) as _dag:
             create_job_task = PostgresOperatorCreateJob(
@@ -70,6 +96,14 @@ class EtlDagFactory:
             )
 
             _job_id = PostgresOperatorCreateJob.get_job_id(_dag.dag_id, create_job_task.task_id)
+            if SHOULD_NOTIFY:
+                notify_etl_start = PythonOperator(
+                    task_id='notify_etl_start',
+                    op_kwargs={'payload': build_etl_status_msg(status='started', mappings={'run_id': '{{ run_id }}'}),
+                               'notification_type': 'success'},
+                    python_callable=send_slack_notification,
+                    dag=_dag,
+                )
 
             health_checks_task = HealthChecksTaskGroup(
                 _dag, group_id='health_checks', pg_tunnel=pg_tunnel).build()
@@ -122,7 +156,12 @@ class EtlDagFactory:
                 job_id=_job_id,
             ).build()
 
-            create_job_task >> health_checks_task >> [extract_from_pg, extract_from_mongo] >> load_into_tmp_tables
+            if SHOULD_NOTIFY:
+                create_job_task >> notify_etl_start >> health_checks_task
+            else:
+                create_job_task >> health_checks_task
+
+            health_checks_task >> [extract_from_pg, extract_from_mongo] >> load_into_tmp_tables
             load_into_tmp_tables >> raw_tables_insert >> typed_tables_insert >> conform_tables_insert
             conform_tables_insert >> staged_tables_insert >> target_tables_insert
 

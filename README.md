@@ -7,7 +7,6 @@
 
 
 ## Development configuration (on Mac M1)
-* change proyect name from "gac" to <your_project>
 
 ### Install
 * Install pyenv

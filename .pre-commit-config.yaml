@@ -27,4 +27,4 @@ repos:
             flake8-quotes,
             flake8-typing-imports
         ]
-        exclude: include/db/gac/.*/migrations
+        exclude: include/db/expos/.*/migrations

@@ -10,9 +10,9 @@ env:
     value: https://portal.visioniot.net/IrHandler
 
 secret:
-  - envName: "GAC_SQL_CONN_URI"
+  - envName: "EXPOS_SQL_CONN_URI"
     secretName: "airflow-envars"
-    secretKey: "GAC_SQL_CONN_URI"
+    secretKey: "EXPOS_SQL_CONN_URI"
   - envName: "EMBONOR_SERVICES_BASE_URL"
     secretName: "airflow-envars"
     secretKey: "EMBONOR_SERVICES_BASE_URL"
