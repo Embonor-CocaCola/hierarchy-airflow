@@ -29,16 +29,24 @@ class ExtractPostgresCsvTaskGroup:
         self.pg_tunnel = pg_tunnel
 
     def extract_csv(self, table_name):
-        with self.pg_tunnel if IS_LOCAL_RUN else ExitStack():
+        with self.pg_tunnel if (IS_LOCAL_RUN) else ExitStack():
             info(f'Starting extraction from postgres table: {table_name}...')
 
             pg_hook = PostgresHook(postgres_conn_id=ES_EMBONOR_PG_CONN_ID,
-                                   schema='embonor')
-            with pg_hook.get_conn() as conn:
-                with conn.cursor() as cursor:
-                    with open(f'/opt/airflow/data/{table_name}.csv', 'w') as file:
-                        cursor.copy_expert(
-                            f'COPY "{table_name}" TO STDOUT WITH CSV HEADER', file)
+                                   schema='embonor', extra_dejson={'pool_pre_ping': True})
+            conn = pg_hook.get_conn()
+            print('pg conn acquired')
+            with conn.cursor() as cursor:
+                print('pg cursor acquired')
+
+                with open(f'/opt/airflow/data/{table_name}.csv', 'w') as file:
+                    print('file opened')
+
+                    cursor.copy_expert(
+                        f'COPY "{table_name}" TO STDOUT WITH CSV HEADER', file)
+            conn.commit()
+            conn.close()
+        print('extract finished')
 
     def create_extract_task(self, table, task_group):
         return PythonOperator(

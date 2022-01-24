@@ -10,25 +10,16 @@ INSERT INTO self_evaluation (
 SELECT
     STAGED.source_id,
     STAGED.skips_survey,
-    v.id,
-    c.id,
+    STAGED.vendor_id,
+    STAGED.customer_id,
     STAGED.external_created_at,
     (SELECT id FROM evaluation_status WHERE code = 'NS'), -- Not supervised by default
     STAGED.id
 FROM
     airflow.self_evaluation_staged STAGED
--- TODO: Inner Joins below make sure that we don't attempt to insert rows without foreign related rows
--- Before going into prod, we must add another query to do the inverse and store the
--- rows with missing relation in an error table to do notifying and other handling logic
-INNER JOIN airflow.vendor_staged vs ON vs.id = STAGED.vendor_id
-INNER JOIN airflow.customer_staged cs ON cs.id = STAGED.customer_id
-INNER JOIN vendor v ON v.source_id = vs.source_id
-INNER JOIN customer c ON c.source_id = cs.source_id
 LEFT JOIN self_evaluation TARGET ON TARGET.source_id = STAGED.source_id
 WHERE
     STAGED.job_id = %(job_id)s :: BIGINT
-    AND cs.job_id = %(job_id)s :: BIGINT
-    AND vs.job_id = %(job_id)s :: BIGINT
     AND TARGET.id IS NULL
 ;
 
@@ -36,31 +27,17 @@ UPDATE
     self_evaluation TARGET
 SET
     created_at = STAGED.external_created_at,
-    vendor_id = v.id,
-    customer_id = c.id
+    vendor_id = STAGED.vendor_id,
+    customer_id = STAGED.customer_id
 FROM
-    airflow.self_evaluation_staged STAGED,
-    airflow.vendor_staged vs,
-    vendor v,
-    vendor vv,
-    airflow.customer_staged cs,
-    customer c,
-    customer cc
+    airflow.self_evaluation_staged STAGED
 WHERE
-    vs.id = STAGED.vendor_id
-    AND v.source_id = vs.source_id
-    AND vv.id = TARGET.vendor_id
-    AND cs.id = STAGED.customer_id
-    AND c.source_id = cs.source_id
-    AND cc.id = TARGET.customer_id
-    AND STAGED.source_id = TARGET.source_id
+    STAGED.source_id = TARGET.source_id
     AND STAGED.job_id = %(job_id)s :: BIGINT
-    AND vs.job_id = %(job_id)s :: BIGINT
-    AND cs.job_id = %(job_id)s :: BIGINT
     AND (
         STAGED.external_created_at IS DISTINCT FROM TARGET.created_at OR
-        v.id IS DISTINCT FROM vv.id OR
-        c.id IS DISTINCT FROM cc.id
+        STAGED.vendor_id IS DISTINCT FROM TARGET.vendor_id OR
+        STAGED.customer_id IS DISTINCT FROM TARGET.customer_id
     );
 
 UPDATE self_evaluation TARGET

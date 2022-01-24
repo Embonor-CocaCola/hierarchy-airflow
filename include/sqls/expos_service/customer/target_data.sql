@@ -82,7 +82,7 @@ SET
     location = STAGED.location,
     sub_location = STAGED.sub_location,
     phone_number = STAGED.phone_number,
-    branch_office_id = bo.id,
+    branch_office_id = STAGED.branch_office_id,
     business_name = STAGED.business_name,
     category_name = STAGED.category_name,
     category_id = STAGED.category_id,
@@ -94,7 +94,7 @@ SET
     credit_amount = STAGED.credit_amount,
     credit_balance = STAGED.credit_balance,
     duty_free_price_list = STAGED.duty_free_price_list,
-    plant_id = p.id,
+    plant_id = STAGED.plant_id,
     zone_id = STAGED.zone_id,
     route_id = STAGED.route_id,
     territory_id = STAGED.territory_id,
@@ -104,24 +104,10 @@ SET
     market_group_id = STAGED.market_group_id,
     market_chain_id = STAGED.market_chain_id
 FROM
-    airflow.customer_staged STAGED,
-    airflow.plant_staged pls,
-    plant p,
-    plant pp,
-    airflow.branch_office_staged bos,
-    branch_office bo,
-    branch_office bbo
+    airflow.customer_staged STAGED
 WHERE
     STAGED.job_id = %(job_id)s :: BIGINT
     AND TARGET.source_id = STAGED.source_id
-    AND pls.id = STAGED.plant_id
-    AND p.source_id = pls.source_id
-    AND pp.id = TARGET.plant_id
-    AND bos.id = STAGED.branch_office_id
-    AND bo.source_id = bos.source_id
-    AND bbo.id = TARGET.branch_office_id
-    AND pls.job_id = %(job_id)s :: BIGINT
-    AND bos.job_id = %(job_id)s :: BIGINT
     AND (
         STAGED.name IS DISTINCT FROM TARGET.name OR
         STAGED.email IS DISTINCT FROM TARGET.email OR
@@ -131,7 +117,7 @@ WHERE
         STAGED.location IS DISTINCT FROM TARGET.location OR
         STAGED.sub_location IS DISTINCT FROM TARGET.sub_location OR
         STAGED.phone_number IS DISTINCT FROM TARGET.phone_number OR
-        bo.id IS DISTINCT FROM bbo.id OR
+        STAGED.branch_office_id IS DISTINCT FROM TARGET.branch_office_id OR
         STAGED.business_name IS DISTINCT FROM TARGET.business_name OR
         STAGED.category_name IS DISTINCT FROM TARGET.category_name OR
         STAGED.category_id IS DISTINCT FROM TARGET.category_id OR
@@ -143,7 +129,7 @@ WHERE
         STAGED.credit_amount IS DISTINCT FROM TARGET.credit_amount OR
         STAGED.credit_balance IS DISTINCT FROM TARGET.credit_balance OR
         STAGED.duty_free_price_list IS DISTINCT FROM TARGET.duty_free_price_list OR
-        p.id IS DISTINCT FROM pp.id OR
+        STAGED.plant_id IS DISTINCT FROM TARGET.plant_id OR
         STAGED.zone_id IS DISTINCT FROM TARGET.zone_id OR
         STAGED.route_id IS DISTINCT FROM TARGET.route_id OR
         STAGED.territory_id IS DISTINCT FROM TARGET.territory_id OR

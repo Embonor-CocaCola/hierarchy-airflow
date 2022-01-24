@@ -35,19 +35,11 @@ SET
     rut = STAGED.rut,
     role = STAGED.role,
     unit = STAGED.unit,
-    plant_id = pp.id
+    plant_id = STAGED.plant_id
 FROM
-    airflow.chief_staged STAGED,
-    chief c,
-    airflow.plant_staged pls,
-    plant p,
-    plant pp
+    airflow.chief_staged STAGED
 WHERE
     STAGED.source_id = TARGET.source_id
-    AND STAGED.source_id = c.source_id
-    AND pls.id = STAGED.plant_id
-    AND c.plant_id = p.id
-    AND pls.source_id = pp.source_id
     AND STAGED.job_id = %(job_id)s :: BIGINT
     AND (
         STAGED.name IS DISTINCT FROM TARGET.name OR
@@ -56,5 +48,5 @@ WHERE
         STAGED.rut IS DISTINCT FROM TARGET.rut OR
         STAGED.role IS DISTINCT FROM TARGET.role OR
         STAGED.unit IS DISTINCT FROM TARGET.unit OR
-        pls.source_id IS DISTINCT FROM p.source_id)
+        STAGED.plant_id IS DISTINCT FROM TARGET.plant_id)
 ;
