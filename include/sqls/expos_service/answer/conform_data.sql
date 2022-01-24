@@ -19,15 +19,15 @@ SELECT
     ANS->'value',
     ARRAY(SELECT jsonb_array_elements_text(ANS->'attach')),
     TYPED.id,
-    find_question_id_from_portals(SUR.portals, ANS->>'questionId'),
+    find_question_id_from_portals(SUR.portals, ANS->>'questionId', %(job_id)s::INTEGER),
 
     now(),
     now(),
     TYPED.job_id
 FROM
-    airflow.answer_typed TYPED INNER JOIN airflow.survey_typed SUR ON SUR.source_id = TYPED.survey_id,
+    airflow.answer_typed TYPED
+    INNER JOIN airflow.survey_typed SUR ON SUR.source_id = TYPED.survey_id,
     jsonb_array_elements(TYPED.answers) ANS
-
 WHERE TYPED.job_id = %(job_id)s :: BIGINT
     AND SUR.job_id = %(job_id)s :: BIGINT
 ;
