@@ -165,3 +165,25 @@ class AnswerStaged(models.Model):
     class Meta:
         managed = True
         db_table = 'airflow\".\"answer_staged'
+
+
+class SelfEvaluationFailedInserts(models.Model):
+    source_id = models.TextField()
+
+    vendor_source_id = models.TextField(null=True)
+    customer_source_id = models.TextField(null=True)
+    vendor_name = models.TextField(null=True)
+    customer_name = models.TextField(null=True)
+
+    job_id = models.ForeignKey(
+        EtlJob,
+        on_delete=models.CASCADE,
+        db_column='job_id',
+    )
+
+    created_at = DateTimeWithoutTZField(default=datetime.now)
+    updated_at = DateTimeWithoutTZField(default=datetime.now)
+
+    class Meta:
+        managed = True
+        db_table = 'airflow\".\"self_evaluation_failed'

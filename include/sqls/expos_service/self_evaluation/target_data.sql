@@ -17,11 +17,50 @@ SELECT
     STAGED.id
 FROM
     airflow.self_evaluation_staged STAGED
+INNER JOIN airflow.vendor_staged VES on STAGED.vendor_id = VES.id
+INNER JOIN airflow.customer_staged CUS on STAGED.customer_id = CUS.id
 LEFT JOIN self_evaluation TARGET ON TARGET.source_id = STAGED.source_id
 WHERE
     STAGED.job_id = %(job_id)s :: BIGINT
+    AND VES.job_id = %(job_id)s :: BIGINT
+    AND CUS.job_id = %(job_id)s :: BIGINT
     AND TARGET.id IS NULL
 ;
+
+INSERT INTO airflow.self_evaluation_failed (
+    source_id,
+    vendor_source_id,
+    customer_source_id,
+    vendor_name,
+    customer_name,
+
+    job_id,
+    created_at,
+    updated_at
+)
+SELECT
+    STAGED.source_id,
+    VES.source_id,
+    CUS.source_id,
+    VES.name,
+    CUS.name,
+
+    STAGED.job_id,
+    now(),
+    now()
+FROM
+    airflow.self_evaluation_staged STAGED
+LEFT JOIN airflow.vendor_staged VES on STAGED.vendor_id = VES.id
+LEFT JOIN airflow.customer_staged CUS on STAGED.customer_id = CUS.id
+LEFT JOIN self_evaluation TARGET ON TARGET.source_id = STAGED.source_id
+
+WHERE (VES.id IS NULL OR CUS.id IS NULL)
+    AND STAGED.job_id = %(job_id)s :: BIGINT
+    AND VES.job_id = %(job_id)s :: BIGINT
+    AND CUS.job_id = %(job_id)s :: BIGINT
+    AND TARGET.id IS NULL
+;
+
 
 UPDATE
     self_evaluation TARGET
