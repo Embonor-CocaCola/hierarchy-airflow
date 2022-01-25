@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 from airflow.models import DAG
 from airflow.operators.python import PythonOperator
 
+from base.expos_service.clean_data_taskgroup import CleanDataTaskGroup
 from base.expos_service.load_csv_into_temp_tables_taskgroup import LoadCsvIntoTempTablesTaskGroup
 from base.expos_service.tables_insert_taskgroup import TablesInsertTaskGroup
 from base.expos_service.extract_docdb_csv_taskgroup import \
@@ -156,6 +157,11 @@ class EtlDagFactory:
                 job_id=_job_id,
             ).build()
 
+            clean_data = CleanDataTaskGroup(
+                stage='cleanup',
+                job_id=_job_id,
+            ).build()
+
             if SHOULD_NOTIFY:
                 create_job_task >> notify_etl_start >> health_checks_task
             else:
@@ -163,6 +169,6 @@ class EtlDagFactory:
 
             health_checks_task >> [extract_from_pg, extract_from_mongo] >> load_into_tmp_tables
             load_into_tmp_tables >> raw_tables_insert >> typed_tables_insert >> conform_tables_insert
-            conform_tables_insert >> staged_tables_insert >> target_tables_insert
+            conform_tables_insert >> staged_tables_insert >> target_tables_insert >> clean_data
 
         return _dag
