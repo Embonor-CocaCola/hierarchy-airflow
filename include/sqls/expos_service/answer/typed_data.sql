@@ -19,25 +19,26 @@ INSERT INTO airflow.answer_typed (
     id
 )
 SELECT
-    trim((source_id:: jsonb)->>'$oid'),
-    trim(survey_id),
-    trim(latitude) :: FLOAT,
-    trim(longitude) :: FLOAT,
-    CASE skips_survey
+    trim((raw.source_id:: jsonb)->>'$oid'),
+    trim(raw.survey_id),
+    trim(raw.latitude) :: FLOAT,
+    trim(raw.longitude) :: FLOAT,
+    CASE raw.skips_survey
         WHEN '0' THEN false
         WHEN '1' THEN true
         ELSE false
         END,
-    trim(pollster_id) :: INTEGER,
-    trim(surveyed_id) :: INTEGER,
-    to_timestamp(((external_created_at :: jsonb)->>'$date'), 'YYYY-MM-DD"T"HH24:MI:SS"Z"'),
-    clean_answer_collection_ids(trim(answers) :: jsonb),
+    trim(raw.pollster_id) :: INTEGER,
+    trim(raw.surveyed_id) :: INTEGER,
+    to_timestamp(((raw.external_created_at :: jsonb)->>'$date'), 'YYYY-MM-DD"T"HH24:MI:SS"Z"'),
+    clean_answer_collection_ids(trim(raw.answers) :: jsonb),
 
     now(),
     now(),
-    job_id,
-    id
+    raw.job_id,
+    COALESCE(s.id, raw.id)
 FROM
-    airflow.answer_raw
+    airflow.answer_raw raw
+LEFT JOIN public.self_evaluation s ON s.source_id = raw.source_id
 WHERE job_id = %(job_id)s :: BIGINT
 ;
