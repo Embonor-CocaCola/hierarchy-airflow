@@ -9,7 +9,7 @@ INSERT INTO vendor_customer (
     VCS.vendor_id,
     VCS.customer_id,
     VCS.start_date,
-    VCS.id
+    VCS.target_id
 FROM
     airflow.vendor_customer_staged VCS
 
@@ -18,7 +18,7 @@ FROM
 -- rows with missing relation in an error table to do notifying and other handling logic
 INNER JOIN customer CUS ON CUS.id = VCS.customer_id
 INNER JOIN vendor VET ON VET.id = VCS.vendor_id
-LEFT JOIN vendor_customer TARGET ON TARGET.id = VCS.id
+LEFT JOIN vendor_customer TARGET ON TARGET.id = VCS.target_id
 WHERE VCS.job_id = %(job_id)s :: BIGINT
     AND TARGET.id IS NULL)
 ;
@@ -29,7 +29,7 @@ WHERE
     TARGET.id IN (
             SELECT VC.id FROM vendor_customer VC
                 LEFT JOIN airflow.vendor_customer_staged VCS
-                ON VCS.id = VC.id
-                WHERE VCS.id IS NULL
+                ON VCS.target_id = VC.id
+                WHERE VCS.target_id IS NULL
         )
 ;

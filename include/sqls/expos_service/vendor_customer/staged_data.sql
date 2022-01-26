@@ -13,9 +13,10 @@ INSERT INTO airflow.vendor_customer_staged (
     created_at,
     updated_at,
     job_id,
-    id
+    id,
+    target_id
 )
-SELECT DISTINCT ON (VEC.id, CUC.id)
+SELECT
     COALESCE(v.id, VEC.id),
     COALESCE(c.id, CUC.id),
     VCC.start_date,
@@ -25,7 +26,8 @@ SELECT DISTINCT ON (VEC.id, CUC.id)
     now(),
     now(),
     VCC.job_id,
-    VCC.id
+    VCC.id,
+    VCC.target_id
 FROM
     airflow.vendor_customer_conform VCC
     INNER JOIN airflow.customer_conform CUC ON CUC.source_id = VCC.customer_id

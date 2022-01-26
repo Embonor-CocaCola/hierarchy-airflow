@@ -70,6 +70,7 @@ class VendorCustomerConform(models.Model):
     updated_at = DateTimeWithoutTZField(default=datetime.now)
 
     id = models.TextField(primary_key=True)
+    target_id = models.TextField(null=True)
 
     class Meta:
         managed = True
@@ -98,6 +99,7 @@ class VendorCustomerStaged(models.Model):
     updated_at = DateTimeWithoutTZField(default=datetime.now)
 
     id = models.TextField(primary_key=True)
+    target_id = models.TextField(null=True)
 
     class Meta:
         managed = True
