@@ -2,6 +2,7 @@ DELETE FROM
     airflow.self_evaluation_staged
 WHERE
     job_id = %(job_id)s :: BIGINT;
+ANALYZE airflow.self_evaluation_staged;
 
 INSERT INTO airflow.self_evaluation_staged (
     source_id,
@@ -37,3 +38,4 @@ WHERE
     VEC.job_id = %(job_id)s :: BIGINT AND
     CUC.job_id = %(job_id)s :: BIGINT
 ;
+ANALYZE airflow.self_evaluation_staged;

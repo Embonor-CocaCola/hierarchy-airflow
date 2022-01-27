@@ -30,6 +30,7 @@ LEFT JOIN vendor TARGET ON TARGET.source_id = STAGED.source_id
 WHERE STAGED.job_id = %(job_id)s :: BIGINT
     AND TARGET.id IS NULL
 ;
+ANALYZE vendor;
 
 UPDATE
     vendor TARGET
@@ -59,3 +60,4 @@ WHERE
         STAGED.supervisor_id IS DISTINCT FROM TARGET.supervisor_id OR
         STAGED.deleted_at IS DISTINCT FROM TARGET.deleted_at)
 ;
+ANALYZE vendor;

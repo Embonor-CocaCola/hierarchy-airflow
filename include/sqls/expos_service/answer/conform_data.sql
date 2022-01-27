@@ -3,6 +3,8 @@ DELETE FROM
 WHERE
     job_id = %(job_id)s :: BIGINT;
 
+ANALYZE airflow.answer_conform;
+
 INSERT INTO airflow.answer_conform (
     source_id,
     values,
@@ -31,3 +33,5 @@ FROM
 WHERE TYPED.job_id = %(job_id)s :: BIGINT
     AND SUR.job_id = %(job_id)s :: BIGINT
 ;
+
+ANALYZE airflow.answer_conform;

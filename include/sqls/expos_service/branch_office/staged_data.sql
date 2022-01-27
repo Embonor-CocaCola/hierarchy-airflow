@@ -2,6 +2,7 @@ DELETE FROM
     airflow.branch_office_staged
 WHERE
     job_id = %(job_id)s :: BIGINT;
+ANALYZE airflow.branch_office_staged;
 
 INSERT INTO airflow.branch_office_staged (
     source_id,
@@ -29,3 +30,4 @@ FROM
 WHERE BOC.job_id = %(job_id)s :: BIGINT
     AND PLC.job_id = %(job_id)s :: BIGINT
 ;
+ANALYZE airflow.branch_office_staged;

@@ -3,6 +3,8 @@ DELETE FROM
 WHERE
     job_id = %(job_id)s :: BIGINT;
 
+ANALYZE airflow.answer_staged;
+
 INSERT INTO airflow.answer_staged (
     source_id,
     values,

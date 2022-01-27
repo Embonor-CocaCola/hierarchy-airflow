@@ -41,3 +41,4 @@ WHERE SUC.job_id = %(job_id)s :: BIGINT
     AND CHC.job_id = %(job_id)s :: BIGINT
     AND PLC.job_id = %(job_id)s :: BIGINT
 ;
+ANALYZE airflow.supervisor_staged ;

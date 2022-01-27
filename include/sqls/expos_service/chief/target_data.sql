@@ -25,6 +25,7 @@ LEFT JOIN chief TARGET ON TARGET.source_id = STAGED.source_id
 WHERE STAGED.job_id = %(job_id)s :: BIGINT
     AND TARGET.id IS NULL
 ;
+ANALYZE chief;
 
 UPDATE
     chief TARGET
@@ -50,3 +51,4 @@ WHERE
         STAGED.unit IS DISTINCT FROM TARGET.unit OR
         STAGED.plant_id IS DISTINCT FROM TARGET.plant_id)
 ;
+ANALYZE chief;

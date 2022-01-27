@@ -2,6 +2,7 @@ DELETE FROM
     airflow.customer_staged
 WHERE
     job_id = %(job_id)s :: BIGINT;
+ANALYZE airflow.customer_staged;
 
 INSERT INTO airflow.customer_staged (
     source_id,
@@ -89,3 +90,4 @@ WHERE
     BOC.job_id = %(job_id)s :: BIGINT AND
     PLC.job_id = %(job_id)s :: BIGINT
 ;
+ANALYZE airflow.customer_staged;

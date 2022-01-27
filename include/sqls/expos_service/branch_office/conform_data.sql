@@ -3,6 +3,8 @@ DELETE FROM
 WHERE
     job_id = %(job_id)s :: BIGINT;
 
+ANALYZE airflow.branch_office_conform;
+
 INSERT INTO airflow.branch_office_conform (
     source_id,
     name,
@@ -26,3 +28,5 @@ FROM
     airflow.branch_office_typed
 WHERE job_id = %(job_id)s :: BIGINT
 ;
+
+ANALYZE airflow.branch_office_conform;

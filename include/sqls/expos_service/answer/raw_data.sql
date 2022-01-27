@@ -36,3 +36,4 @@ FROM
 ;
 
 DROP TABLE IF EXISTS airflow.tmp_answer;
+ANALYZE airflow.answer_raw;

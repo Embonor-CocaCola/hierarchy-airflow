@@ -2,6 +2,7 @@ DELETE FROM
     airflow.vendor_plant_conform
 WHERE
     job_id = %(job_id)s :: BIGINT;
+ANALYZE airflow.vendor_plant_conform;
 
 INSERT INTO airflow.vendor_plant_conform (
     vendor_id,
@@ -35,3 +36,4 @@ WHERE
     TPL.job_id = %(job_id)s :: BIGINT AND
     TSP.job_id = %(job_id)s :: BIGINT
 ;
+ANALYZE airflow.vendor_plant_conform;

@@ -70,6 +70,7 @@ LEFT JOIN customer TARGET ON TARGET.source_id = STAGED.source_id
 WHERE STAGED.job_id = %(job_id)s :: BIGINT
     AND TARGET.id IS NULL
 ;
+ANALYZE customer;
 
 UPDATE
     customer TARGET
@@ -139,3 +140,4 @@ WHERE
         STAGED.market_group_id IS DISTINCT FROM TARGET.market_group_id OR
         STAGED.market_chain_id IS DISTINCT FROM TARGET.market_chain_id
 );
+ANALYZE customer;

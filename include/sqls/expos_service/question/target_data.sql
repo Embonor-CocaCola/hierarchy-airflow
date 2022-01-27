@@ -20,6 +20,8 @@ WHERE STAGED.job_id = %(job_id)s :: BIGINT
     AND TARGET.id IS NULL
 ;
 
+ANALYZE question;
+
 UPDATE
     question TARGET
 SET
@@ -38,3 +40,5 @@ WHERE
         STAGED.type IS DISTINCT FROM TARGET.type OR
         STAGED.sub_type IS DISTINCT FROM TARGET.sub_type
     );
+
+ANALYZE question;

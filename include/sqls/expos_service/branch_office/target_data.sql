@@ -15,6 +15,7 @@ LEFT JOIN branch_office TARGET ON TARGET.source_id = STAGED.source_id
 WHERE STAGED.job_id = %(job_id)s :: BIGINT
     AND TARGET.id IS NULL
 ;
+ANALYZE branch_office;
 
 UPDATE
     branch_office TARGET
@@ -30,3 +31,4 @@ WHERE
         STAGED.name IS DISTINCT FROM TARGET.name OR
         STAGED.plant_id IS DISTINCT FROM TARGET.plant_id
     );
+ANALYZE branch_office;

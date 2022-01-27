@@ -2,6 +2,7 @@ DELETE FROM
     airflow.customer_conform
 WHERE
     job_id = %(job_id)s :: BIGINT;
+ANALYZE airflow.customer_conform;
 
 INSERT INTO airflow.customer_conform (
     source_id,
@@ -82,3 +83,4 @@ FROM
     airflow.customer_typed
 WHERE job_id = %(job_id)s :: BIGINT
 ;
+ANALYZE airflow.customer_conform;

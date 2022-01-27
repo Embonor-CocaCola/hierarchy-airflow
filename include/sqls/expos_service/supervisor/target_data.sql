@@ -26,6 +26,8 @@ WHERE STAGED.job_id = %(job_id)s :: BIGINT
     AND TARGET.id IS NULL
 ;
 
+
+ANALYZE supervisor;
 UPDATE
     supervisor TARGET
 SET
@@ -48,3 +50,4 @@ WHERE
         STAGED.role IS DISTINCT FROM TARGET.role OR
         STAGED.plant_id IS DISTINCT FROM TARGET.plant_id)
 ;
+ANALYZE supervisor;

@@ -3,6 +3,8 @@ DELETE FROM
 WHERE
     job_id = %(job_id)s :: BIGINT;
 
+ANALYZE airflow.vendor_staged;
+
 INSERT INTO airflow.vendor_staged (
     source_id,
     name,
@@ -48,3 +50,5 @@ WHERE
     VTC.job_id = %(job_id)s :: BIGINT AND
     VPC.job_id = %(job_id)s :: BIGINT
 ;
+
+ANALYZE airflow.vendor_staged;

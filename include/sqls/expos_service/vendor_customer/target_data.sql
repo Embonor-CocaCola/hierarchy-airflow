@@ -22,6 +22,7 @@ LEFT JOIN vendor_customer TARGET ON TARGET.id = VCS.target_id
 WHERE VCS.job_id = %(job_id)s :: BIGINT
     AND TARGET.id IS NULL)
 ;
+ANALYZE vendor_customer;
 
 DELETE FROM
     vendor_customer TARGET
@@ -33,3 +34,4 @@ WHERE
                 WHERE VCS.target_id IS NULL
         )
 ;
+ANALYZE vendor_customer;

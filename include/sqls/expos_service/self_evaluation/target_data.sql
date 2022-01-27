@@ -26,6 +26,7 @@ WHERE
     AND CUS.job_id = %(job_id)s :: BIGINT
     AND TARGET.id IS NULL
 ;
+ANALYZE self_evaluation;
 
 INSERT INTO airflow.self_evaluation_failed (
     source_id,
@@ -61,6 +62,7 @@ WHERE (VES.id IS NULL OR CUS.id IS NULL)
     AND TARGET.id IS NULL
 ;
 
+ANALYZE airflow.self_evaluation_failed;
 
 UPDATE
     self_evaluation TARGET
@@ -78,6 +80,7 @@ WHERE
         STAGED.vendor_id IS DISTINCT FROM TARGET.vendor_id OR
         STAGED.customer_id IS DISTINCT FROM TARGET.customer_id
     );
+ANALYZE self_evaluation;
 
 UPDATE self_evaluation TARGET
 SET
@@ -97,3 +100,4 @@ WHERE
         ans.values->>0 LIKE '%%encuentra cerrado'
     )
 ;
+ANALYZE self_evaluation;

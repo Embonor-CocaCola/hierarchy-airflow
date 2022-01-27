@@ -3,6 +3,8 @@ DELETE FROM
 WHERE
     job_id = %(job_id)s :: BIGINT;
 
+ANALYZE airflow.answer_typed;
+
 INSERT INTO airflow.answer_typed (
     source_id,
     survey_id,
@@ -42,3 +44,5 @@ FROM
 LEFT JOIN public.self_evaluation s ON s.source_id = raw.source_id
 WHERE job_id = %(job_id)s :: BIGINT
 ;
+
+ANALYZE airflow.answer_typed;

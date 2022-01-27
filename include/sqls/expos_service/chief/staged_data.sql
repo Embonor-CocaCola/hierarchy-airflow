@@ -2,6 +2,7 @@ DELETE FROM
     airflow.chief_staged
 WHERE
     job_id = %(job_id)s :: BIGINT;
+ANALYZE airflow.chief_staged;
 
 INSERT INTO airflow.chief_staged (
     source_id,
@@ -39,3 +40,4 @@ FROM
 WHERE CHC.job_id = %(job_id)s :: BIGINT
     AND PLC.job_id = %(job_id)s :: BIGINT
 ;
+ANALYZE airflow.chief_staged;
