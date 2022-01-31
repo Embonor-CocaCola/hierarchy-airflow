@@ -24,7 +24,7 @@ def build_maxerience_payload(
                 {
                     'sessionUid': survey_id,
                     'sessionStartTime': unix_timestamp,
-                    'sessionEndTime': unix_timestamp,
+                    'sessionEndTime': unix_timestamp + 3600 * 1000,  # One hour later
                     'outletCode': '123321',
                     'visitDate': created_at.date().isoformat(),
                     'localTimeZone': 'CL',

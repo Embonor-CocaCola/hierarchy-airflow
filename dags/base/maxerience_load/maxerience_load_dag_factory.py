@@ -1,7 +1,5 @@
 import json
-import shutil
 import uuid
-import urllib.request
 from datetime import datetime, timedelta
 from pathlib import Path
 
@@ -61,16 +59,9 @@ class MaxerienceLoadDagFactory:
                 get_question_photos_id=self._get_questions_photos_id,
             ).build()
 
-            download_photos = PythonOperator(
-                task_id='download_photos',
-                python_callable=self.download_photos,
-                execution_timeout=None,
-                dag=_dag,
-            )
-
-            load_photos_to_maxerience = PythonOperator(
-                task_id='load_photos_to_maxerience',
-                python_callable=self.load_photos_to_maxerience,
+            download_and_upload_photos = PythonOperator(
+                task_id='download_and_upload_photos',
+                python_callable=self.download_and_upload_photos,
                 execution_timeout=None,
                 dag=_dag,
             )
@@ -81,7 +72,7 @@ class MaxerienceLoadDagFactory:
                 dag=_dag,
             )
 
-            es_etl_finished_sensor >> get_api_key >> get_photos >> download_photos >> load_photos_to_maxerience
+            es_etl_finished_sensor >> get_api_key >> get_photos >> download_and_upload_photos
 
         return _dag
 
@@ -97,94 +88,62 @@ class MaxerienceLoadDagFactory:
 
             Variable.set('ml_auth_token', json_response['authToken'])
 
-    def load_photos_to_maxerience(self, ti):
-        photos_to_upload = ti.xcom_pull(task_ids=f'{self._get_photos_group_id}.{self._get_questions_photos_id}')
-        base_path = Path(f'{airflow_root_dir}/data/ir_photos')
-        print('Starting photo upload process...')
-
-        auth_token = Variable.get('ml_auth_token')
-
-        base_url = 'https://portal-stg1.maxerience.com/IrHandler'
-
-        for survey in photos_to_upload:
-            survey_id = survey[0]
-            survey_created_at = survey[4]
-            latitude = survey[2]
-            longitude = survey[3]
-            survey_answers = survey[1]
-            print(f'Creating self_evaluation_analysis for survey: {survey_id}')
-
-            analysis_id = self.create_self_evaluation_analysis(survey_id, survey_created_at)
-
-            print(f'uploading photos of survey: {survey_id}')
-            for answer in survey_answers:
-                question_heading = answer['question']['heading']
-                question_id = answer['question']['id']
-                scene_info = extract_info_from_question_heading(question_heading)
-
-                for photo_url in answer['attachments']:
-                    scene_id = str(uuid.uuid4())
-                    photo_name = photo_url.split('/')[-1]
-                    with open(
-                        base_path / survey_id / str(scene_info['scene']) / str(scene_info['sub_scene']) / photo_name,
-                        'rb',
-                    ) as file:
-                        print(f'Sending request to maxerience for photo: {photo_name}')
-                        r = requests.post(
-                            f'{base_url}/uploadSessionSceneImages',
-                            files=build_maxerience_payload(
-                                img_file=file,
-                                survey_id=survey_id,
-                                filename=photo_name,
-                                scene_info=scene_info,
-                                scene_id=scene_id,
-                                auth_token=auth_token,
-                                survey_created_at=survey_created_at,
-                                latitude=latitude,
-                                longitude=longitude,
-                            ),
-                        )
-                        print('Response ready')
-                        json_response = r.json()
-                        print(json_response)
-                        self.create_analyzed_photo(
-                            analysis_id=analysis_id,
-                            scene_info=scene_info,
-                            scene_id=scene_id,
-                            survey_id=survey_id,
-                            question_id=question_id,
-                            origin_url=photo_url,
-                            sent_ok=json_response['success'],
-                        )
-
-    def download_photos(self, ti):
-        try:
-            shutil.rmtree(
-                path='data/ir_photos',
-                onerror=lambda a, b, c: print('WARN: Could not remove ir_photos folder. Maybe it did not exist.'),
-            )
-        except FileNotFoundError as error:
-            print(error)
-
-        path = Path(f'{airflow_root_dir}/data/ir_photos')  # ir = image recognition
-        path.mkdir(parents=True, exist_ok=True)
-
+    def download_and_upload_photos(self, ti):
         photos_to_download = ti.xcom_pull(task_ids=f'{self._get_photos_group_id}.{self._get_questions_photos_id}')
+        base_url = 'https://portal-stg1.maxerience.com/IrHandler'
+        auth_token = Variable.get('ml_auth_token')
 
         for survey in photos_to_download:
             survey_id = survey[0]
             survey_answers = survey[1]
-            print(f'Downloading photos of answer with id: {survey_id}')
+            latitude = survey[2]
+            longitude = survey[3]
+            survey_created_at = survey[4]
+
+            analysis_id = self.create_self_evaluation_analysis(survey_id, survey_created_at)
+
+            print(f'Downloading and uploading photos of answer with id: {survey_id}')
             for answer in survey_answers:
                 question_heading = answer['question']['heading']
                 scene_info = extract_info_from_question_heading(question_heading)
-                scene_path = Path(
-                    f'{airflow_root_dir}/data/ir_photos/{survey_id}/{scene_info["scene"]}/{scene_info["sub_scene"]}')
-                scene_path.mkdir(parents=True, exist_ok=True)
+                question_id = answer['question']['id']
+
                 print(f'Question heading: {question_heading}')
                 for photo_url in answer['attachments']:
+                    scene_id = str(uuid.uuid4())
+
                     photo_name = photo_url.split('/')[-1]
-                    urllib.request.urlretrieve(photo_url, scene_path / photo_name)
+                    print(f'Downloading photo: {photo_name}')
+
+                    photo_content = requests.get(photo_url).content
+                    print(f'Sending request to maxerience for photo: {photo_name}')
+
+                    r = requests.post(
+                        f'{base_url}/v2/uploadSessionSceneImages',
+                        files=build_maxerience_payload(
+                            img_file=photo_content,
+                            survey_id=survey_id,
+                            filename=photo_name,
+                            scene_info=scene_info,
+                            scene_id=scene_id,
+                            auth_token=auth_token,
+                            survey_created_at=survey_created_at,
+                            latitude=latitude,
+                            longitude=longitude,
+                        ),
+                    )
+                    print('Response ready')
+                    json_response = r.json()
+                    print(json_response)
+                    self.create_analyzed_photo(
+                        analysis_id=analysis_id,
+                        scene_info=scene_info,
+                        scene_id=scene_id,
+                        survey_id=survey_id,
+                        question_id=question_id,
+                        origin_url=photo_url,
+                        sent_ok=json_response['success'],
+                    )
 
     def create_self_evaluation_analysis(self, survey_id, created_at):
         analysis_id = str(uuid.uuid4())
