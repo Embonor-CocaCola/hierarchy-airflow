@@ -90,7 +90,7 @@ class MaxerienceLoadDagFactory:
 
     def download_and_upload_photos(self, ti):
         photos_to_download = ti.xcom_pull(task_ids=f'{self._get_photos_group_id}.{self._get_questions_photos_id}')
-        base_url = 'https://portal-stg1.maxerience.com/IrHandler'
+        base_url = ML_MAXERIENCE_BASE_URL
         auth_token = Variable.get('ml_auth_token')
 
         for survey in photos_to_download:
