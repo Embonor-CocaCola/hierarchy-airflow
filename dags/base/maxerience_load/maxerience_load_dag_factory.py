@@ -12,6 +12,8 @@ from base.maxerience_load.get_photos_to_upload_taskgroup import GetPhotosToUploa
 from base.utils.build_maxerience_payload import build_maxerience_payload
 from base.utils.ml_scene_info import extract_info_from_question_heading
 from base.utils.query_with_return import parameterized_query
+from base.utils.slack import send_slack_notification, build_status_msg
+from config.common.settings import SHOULD_NOTIFY
 from config.expos_service.settings import airflow_root_dir, ES_STAGE
 from config.maxerience_load.settings import ML_DAG_START_DATE_VALUE, ML_DAG_SCHEDULE_INTERVAL, ML_SQL_PATH, ML_DAG_ID, \
     ML_AIRFLOW_DATABASE_CONN_ID, ML_MAXERIENCE_BASE_URL, ML_MAXERIENCE_USER, ML_MAXERIENCE_PASS
@@ -21,6 +23,32 @@ class MaxerienceLoadDagFactory:
     def __init__(self):
         self._get_photos_group_id = 'get_photos_to_upload'
         self._get_questions_photos_id = 'get_questions_photos'
+
+    @staticmethod
+    def on_failure_callback(context):
+        if not SHOULD_NOTIFY:
+            return
+        ti = context['task_instance']
+        run_id = context['run_id']
+        send_slack_notification(notification_type='alert',
+                                payload=build_status_msg(
+                                    dag_id=ML_DAG_ID,
+                                    status='failed',
+                                    mappings={'run_id': run_id, 'task_id': ti.task_id},
+                                ))
+
+    @staticmethod
+    def on_success_callback(context):
+        if not SHOULD_NOTIFY:
+            return
+
+        run_id = context['run_id']
+        send_slack_notification(notification_type='success',
+                                payload=build_status_msg(
+                                    dag_id=ML_DAG_ID,
+                                    status='finished',
+                                    mappings={'run_id': run_id},
+                                ))
 
     def build(self) -> DAG:
         _start_date = datetime.strptime(
@@ -32,6 +60,7 @@ class MaxerienceLoadDagFactory:
             'execution_timeout': timedelta(minutes=10),
             'retries': 2,
             'retry_delay': timedelta(seconds=5),
+            'on_failure_callback': MaxerienceLoadDagFactory.on_failure_callback,
         }
 
         with DAG(
@@ -41,10 +70,12 @@ class MaxerienceLoadDagFactory:
                 template_searchpath=ML_SQL_PATH,
                 max_active_runs=1,
                 catchup=False,
+                on_success_callback=MaxerienceLoadDagFactory.on_success_callback,
                 user_defined_filters={
                     'fromjson': lambda s: json.loads(s), 'replace_single_quotes': lambda s: s.replace("'", '"'),
                 },
         ) as _dag:
+
             es_etl_finished_sensor = SqlSensor(
                 task_id='es_etl_finished_sensor',
                 conn_id=ML_AIRFLOW_DATABASE_CONN_ID,
@@ -52,6 +83,20 @@ class MaxerienceLoadDagFactory:
                 poke_interval=120,
                 timeout=60 * 60 * 2,  # 2 hours
             )
+
+            if SHOULD_NOTIFY:
+                notify_ml_dag_start = PythonOperator(
+                    task_id='notify_etl_start',
+                    op_kwargs={
+                        'payload': build_status_msg(
+                            dag_id=ML_DAG_ID,
+                            status='started',
+                            mappings={'run_id': '{{ run_id }}'},
+                        ),
+                        'notification_type': 'success'},
+                    python_callable=send_slack_notification,
+                    dag=_dag,
+                )
 
             get_photos = GetPhotosToUploadTaskGroup(
                 dag=_dag,
@@ -72,7 +117,12 @@ class MaxerienceLoadDagFactory:
                 dag=_dag,
             )
 
-            es_etl_finished_sensor >> get_api_key >> get_photos >> download_and_upload_photos
+            if SHOULD_NOTIFY:
+                es_etl_finished_sensor >> notify_ml_dag_start >> get_api_key
+            else:
+                es_etl_finished_sensor >> get_api_key
+
+            get_api_key >> get_photos >> download_and_upload_photos
 
         return _dag
 

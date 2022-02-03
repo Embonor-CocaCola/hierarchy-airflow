@@ -11,7 +11,7 @@ from base.expos_service.extract_docdb_csv_taskgroup import \
 from base.expos_service.extract_pg_csv_taskgroup import \
     ExtractPostgresCsvTaskGroup
 from base.expos_service.health_checks_taskgroup import HealthChecksTaskGroup
-from base.utils.slack import build_etl_status_msg, send_slack_notification
+from base.utils.slack import build_status_msg, send_slack_notification
 from base.utils.table_names import TableNameManager
 from base.utils.tunneler import Tunneler
 from config.common.settings import SHOULD_NOTIFY
@@ -42,8 +42,11 @@ class EtlDagFactory:
         ti = context['task_instance']
         run_id = context['run_id']
         send_slack_notification(notification_type='alert',
-                                payload=build_etl_status_msg(status='failed',
-                                                             mappings={'run_id': run_id, 'task_id': ti.task_id}))
+                                payload=build_status_msg(
+                                    dag_id=ES_ETL_DAG_ID,
+                                    status='failed',
+                                    mappings={'run_id': run_id, 'task_id': ti.task_id},
+                                ))
 
     @staticmethod
     def on_success_callback(context):
@@ -52,8 +55,11 @@ class EtlDagFactory:
 
         run_id = context['run_id']
         send_slack_notification(notification_type='success',
-                                payload=build_etl_status_msg(status='finished',
-                                                             mappings={'run_id': run_id}))
+                                payload=build_status_msg(
+                                    dag_id=ES_ETL_DAG_ID,
+                                    status='finished',
+                                    mappings={'run_id': run_id},
+                                ))
 
     @staticmethod
     def build() -> DAG:
@@ -100,8 +106,13 @@ class EtlDagFactory:
             if SHOULD_NOTIFY:
                 notify_etl_start = PythonOperator(
                     task_id='notify_etl_start',
-                    op_kwargs={'payload': build_etl_status_msg(status='started', mappings={'run_id': '{{ run_id }}'}),
-                               'notification_type': 'success'},
+                    op_kwargs={
+                        'payload': build_status_msg(
+                            dag_id=ES_ETL_DAG_ID,
+                            status='started',
+                            mappings={'run_id': '{{ run_id }}'},
+                        ),
+                        'notification_type': 'success'},
                     python_callable=send_slack_notification,
                     dag=_dag,
                 )
