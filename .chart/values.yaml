@@ -33,6 +33,7 @@ ingress:
   enabled: true
   web:
     annotations:
+      #{} #To use ALB Ingress, uncomment this line, comment the next one and uncomment the corresponding annotations
       kubernetes.io/ingress.class: traefik
     path: /
 config:

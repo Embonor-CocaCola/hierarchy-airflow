@@ -2,6 +2,18 @@ ingress:
   web:
     hosts:
       - airflow2.develop.embonorservices.cl
+    #Values for ALB Ingress
+    # annotations:
+    #   alb.ingress.kubernetes.io/backend-protocol: 'HTTP'
+    #   alb.ingress.kubernetes.io/subnets: subnet-08790fcdfc65db851,subnet-07e2cc4eac206af36,subnet-02b71983b55acb9e3
+    #   alb.ingress.kubernetes.io/listen-ports: '[{"HTTP":80,"HTTPS": 443}]'
+    #   alb.ingress.kubernetes.io/load-balancer-attributes: "routing.http2.enabled=true, idle_timeout.timeout_seconds=360"
+    #   alb.ingress.kubernetes.io/scheme: internet-facing
+    #   alb.ingress.kubernetes.io/target-type: ip
+    #   kubernetes.io/ingress.class: alb-ingress
+    #   alb.ingress.kubernetes.io/group.name: alb-ingress-develop-embonorservices-cl
+    #   alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:us-east-1:429421768787:certificate/96267a26-758c-4ba7-a880-89d1e43830d9
+    # path: /*
 
 env:
   - name: STAGE
