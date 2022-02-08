@@ -23,23 +23,21 @@
 #
 # Feel free to modify this file to suit your needs.
 ---
-version: '3'
+version: "3"
 
-x-airflow-common:
-  &airflow-common
+x-airflow-common: &airflow-common
   build:
     context: .
     dockerfile: Dockerfile-dev
   env_file:
     - .env
-  environment:
-    &airflow-common-env
+  environment: &airflow-common-env
     AIRFLOW__CORE__EXECUTOR: CeleryExecutor
     AIRFLOW__CELERY__BROKER_URL: redis://:@redis:6379/0
-    AIRFLOW__CORE__FERNET_KEY: ''
-    AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: 'true'
-    AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
-    AIRFLOW__API__AUTH_BACKEND: 'airflow.api.auth.backend.basic_auth'
+    AIRFLOW__CORE__FERNET_KEY: ""
+    AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: "true"
+    AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+    AIRFLOW__API__AUTH_BACKEND: "airflow.api.auth.backend.basic_auth"
     _PIP_ADDITIONAL_REQUIREMENTS: ${_PIP_ADDITIONAL_REQUIREMENTS:-}
   volumes:
     - ./dags:/opt/airflow/dags
@@ -55,10 +53,9 @@ x-airflow-common:
       condition: service_healthy
 
 services:
-
   postgres:
-    # Amazon RDS for PostgreSQL currently supports PostgreSQL 9.6, 10, 11, and 12.
-    image: postgres:12
+    # Amazon RDS for PostgreSQL currently supports PostgreSQL 9.6, 10, 11, 12 and 13.
+    image: postgres:13
     ports:
       - 5433:5432
     environment:
@@ -101,7 +98,11 @@ services:
     <<: *airflow-common
     command: scheduler
     healthcheck:
-      test: ["CMD-SHELL", 'airflow jobs check --job-type SchedulerJob --hostname "$${HOSTNAME}"']
+      test:
+        [
+          "CMD-SHELL",
+          'airflow jobs check --job-type SchedulerJob --hostname "$${HOSTNAME}"',
+        ]
       interval: 30s
       timeout: 30s
       retries: 5
@@ -111,7 +112,11 @@ services:
     <<: *airflow-common
     command: celery worker
     healthcheck:
-      test: ["CMD-SHELL", 'celery --app airflow.executors.celery_executor.app inspect ping -d "celery@$${HOSTNAME}"']
+      test:
+        [
+          "CMD-SHELL",
+          'celery --app airflow.executors.celery_executor.app inspect ping -d "celery@$${HOSTNAME}"',
+        ]
       interval: 30s
       timeout: 30s
       retries: 5
@@ -122,8 +127,8 @@ services:
     command: bash -c "sh /opt/airflow/include/db/init.sh && python /opt/airflow/dags/config/init.py && airflow version"
     environment:
       <<: *airflow-common-env
-      _AIRFLOW_DB_UPGRADE: 'true'
-      _AIRFLOW_WWW_USER_CREATE: 'true'
+      _AIRFLOW_DB_UPGRADE: "true"
+      _AIRFLOW_WWW_USER_CREATE: "true"
       _AIRFLOW_WWW_USER_USERNAME: ${_AIRFLOW_WWW_USER_USERNAME:-airflow}
       _AIRFLOW_WWW_USER_PASSWORD: ${_AIRFLOW_WWW_USER_PASSWORD:-airflow}
 

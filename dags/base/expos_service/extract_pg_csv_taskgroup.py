@@ -33,7 +33,7 @@ class ExtractPostgresCsvTaskGroup:
             info(f'Starting extraction from postgres table: {table_name}...')
 
             pg_hook = PostgresHook(postgres_conn_id=ES_EMBONOR_PG_CONN_ID,
-                                   schema='embonor', extra_dejson={'pool_pre_ping': True})
+                                   schema='embonor')
             conn = pg_hook.get_conn()
             print('pg conn acquired')
             with conn.cursor() as cursor:

@@ -1,4 +1,4 @@
-from logging import info, warn
+from logging import info, warning
 
 from airflow.providers.ssh.hooks.ssh import SSHHook
 
@@ -14,9 +14,10 @@ class Tunneler():
     def __enter__(self):
         self.clients += 1
         if self.clients == 1:
+            print('opening tunnel')
             self.open_tunnel()
         else:
-            warn('Tunnel already opened')
+            warning('Tunnel already opened')
 
     def __exit__(self, type, value, traceback):
         self.clients -= 1
