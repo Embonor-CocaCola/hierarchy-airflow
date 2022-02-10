@@ -70,7 +70,7 @@ SELECT
     route_id,
     territory_id,
     channel_mkt,
-    country_specific->>'cluster',
+    COALESCE(country_specific->>'cluster', 'Sin cluster'),
     deleted_at,
     market_group_id,
     market_chain_id,
