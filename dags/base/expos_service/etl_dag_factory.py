@@ -69,8 +69,8 @@ class EtlDagFactory:
             'owner': 'airflow',
             'start_date': _start_date,
             'provide_context': True,
-            'execution_timeout': timedelta(seconds=180),
-            'retries': 2,
+            'execution_timeout': timedelta(seconds=240),
+            'retries': 30,
             'retry_delay': timedelta(seconds=5),
             'on_failure_callback': EtlDagFactory.on_failure_callback,
         }

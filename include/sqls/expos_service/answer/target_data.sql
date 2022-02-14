@@ -3,7 +3,7 @@ INSERT INTO answer (
     values,
     attachments,
     observations,
-    self_evaluation_id,
+    survey_id,
     question_id,
     id
 )
@@ -12,12 +12,12 @@ SELECT
     STAGED.values,
     STAGED.attachments,
     STAGED.observations,
-    STAGED.self_evaluation_id,
+    STAGED.survey_id,
     STAGED.question_id,
     STAGED.id
 FROM
     airflow.answer_staged STAGED
-    INNER JOIN self_evaluation se ON STAGED.self_evaluation_id = se.id
+    INNER JOIN survey se ON STAGED.survey_id = se.id
     LEFT JOIN answer TARGET ON TARGET.source_id = STAGED.source_id
 WHERE STAGED.job_id = %(job_id)s :: BIGINT
     AND TARGET.id IS NULL
@@ -31,17 +31,17 @@ SET
     values = STAGED.values,
     attachments = STAGED.attachments,
     observations = STAGED.observations,
-    self_evaluation_id = sse.id,
+    survey_id = sse.id,
     question_id = STAGED.question_id
 FROM
     airflow.answer_staged STAGED,
-    airflow.self_evaluation_staged ses,
-    self_evaluation se,
-    self_evaluation sse
+    airflow.survey_staged ses,
+    survey se,
+    survey sse
 WHERE
     STAGED.source_id = TARGET.source_id
-    AND ses.id = STAGED.self_evaluation_id
-    AND se.id = TARGET.self_evaluation_id
+    AND ses.id = STAGED.survey_id
+    AND se.id = TARGET.survey_id
     AND sse.source_id = se.source_id
     AND STAGED.job_id = %(job_id)s :: BIGINT
     AND ses.job_id = %(job_id)s :: BIGINT

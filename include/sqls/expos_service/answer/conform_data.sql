@@ -9,12 +9,13 @@ INSERT INTO airflow.answer_conform (
     source_id,
     values,
     attachments,
-    self_evaluation_id,
+    survey_id,
     question_id,
 
     created_at,
     updated_at,
-    job_id
+    job_id,
+    id
 )
 SELECT
     ANS->>'id',
@@ -25,7 +26,8 @@ SELECT
 
     now(),
     now(),
-    TYPED.job_id
+    TYPED.job_id,
+    uuid_generate_v4()
 FROM
     airflow.answer_typed TYPED
     INNER JOIN airflow.survey_typed SUR ON SUR.source_id = TYPED.survey_id,

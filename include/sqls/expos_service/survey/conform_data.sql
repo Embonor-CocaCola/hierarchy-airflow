@@ -1,9 +1,9 @@
 DELETE FROM
-    airflow.self_evaluation_conform
+    airflow.survey_conform
 WHERE
     job_id = %(job_id)s :: BIGINT;
 
-INSERT INTO airflow.self_evaluation_conform (
+INSERT INTO airflow.survey_conform (
     source_id,
     skips_survey,
     vendor_id,

@@ -15,7 +15,8 @@ INSERT INTO airflow.question_raw (
 
     created_at,
     updated_at,
-    job_id
+    job_id,
+    id
 )
 
 SELECT
@@ -30,7 +31,8 @@ SELECT
 
     now(),
     now(),
-    %(job_id)s :: BIGINT
+    %(job_id)s :: BIGINT,
+    uuid_generate_v4()
 FROM
     airflow.tmp_question
 ;

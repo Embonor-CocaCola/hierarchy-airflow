@@ -104,7 +104,7 @@ class Migration(migrations.Migration):
                 ('id', expos.models.AutoUUIDField(editable=False, primary_key=True, serialize=False)),
             ],
             options={
-                'db_table': 'airflow"."self_evaluation_conform',
+                'db_table': 'airflow"."survey_conform',
                 'managed': True,
             },
         ),
@@ -121,7 +121,7 @@ class Migration(migrations.Migration):
                 ('updated_at', expos.models.DateTimeWithoutTZField(default=datetime.datetime.now)),
             ],
             options={
-                'db_table': 'airflow"."self_evaluation_failed',
+                'db_table': 'airflow"."survey_failed',
                 'managed': True,
             },
         ),
@@ -136,7 +136,7 @@ class Migration(migrations.Migration):
                 ('id', expos.models.AutoUUIDField(editable=False, primary_key=True, serialize=False)),
             ],
             options={
-                'db_table': 'airflow"."self_evaluation_staged',
+                'db_table': 'airflow"."survey_staged',
                 'managed': True,
             },
         ),

@@ -8,7 +8,8 @@ INSERT INTO airflow.plant_raw (
     name,
     created_at,
     updated_at,
-    job_id
+    job_id,
+    id
 )
 
 SELECT
@@ -16,7 +17,9 @@ SELECT
     name,
     now(),
     now(),
-    %(job_id)s :: BIGINT
+    %(job_id)s :: BIGINT,
+    uuid_generate_v4()
+
 FROM
     airflow.tmp_plant
 ;

@@ -1,4 +1,5 @@
 from logging import info, warning
+from time import sleep
 
 from airflow.providers.ssh.hooks.ssh import SSHHook
 
@@ -13,7 +14,7 @@ class Tunneler():
 
     def __enter__(self):
         self.clients += 1
-        if self.clients == 1:
+        if self.clients == 1 or True:
             print('opening tunnel')
             self.open_tunnel()
         else:
@@ -26,6 +27,7 @@ class Tunneler():
 
     def open_tunnel(self):
         self.tunnel.start()
+        sleep(3)
         info('Tunnel started')
 
     def close_tunnel(self):

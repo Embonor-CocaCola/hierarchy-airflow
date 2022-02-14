@@ -41,7 +41,7 @@ SELECT
     COALESCE(s.id, raw.id)
 FROM
     airflow.answer_raw raw
-LEFT JOIN public.self_evaluation s ON s.source_id = raw.source_id
+LEFT JOIN public.survey s ON s.source_id = raw.source_id
 WHERE job_id = %(job_id)s :: BIGINT
 ;
 

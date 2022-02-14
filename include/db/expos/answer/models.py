@@ -63,7 +63,7 @@ class AnswerTyped(models.Model):
         db_table = 'airflow\".\"answer_typed'
 
 
-class SelfEvaluationConform(models.Model):
+class SurveyConform(models.Model):
     source_id = models.TextField()
     skips_survey = models.BooleanField()
     vendor_id = models.IntegerField()
@@ -83,10 +83,10 @@ class SelfEvaluationConform(models.Model):
 
     class Meta:
         managed = True
-        db_table = 'airflow\".\"self_evaluation_conform'
+        db_table = 'survey_conform'
 
 
-class SelfEvaluationStaged(models.Model):
+class SurveyStaged(models.Model):
     source_id = models.TextField()
     skips_survey = models.BooleanField()
     vendor_id = models.ForeignKey(VendorStaged, on_delete=models.CASCADE, db_column='vendor_id', db_constraint=False)
@@ -111,7 +111,7 @@ class SelfEvaluationStaged(models.Model):
 
     class Meta:
         managed = True
-        db_table = 'airflow\".\"self_evaluation_staged'
+        db_table = 'survey_staged'
 
 
 class AnswerConform(models.Model):
@@ -119,7 +119,7 @@ class AnswerConform(models.Model):
     values = models.JSONField()
     attachments = ArrayField(models.TextField())
     observations = models.TextField(null=True)
-    self_evaluation_id = models.UUIDField()
+    survey_id = models.UUIDField()
     question_id = models.TextField()
 
     job_id = models.ForeignKey(
@@ -186,4 +186,4 @@ class SelfEvaluationFailedInserts(models.Model):
 
     class Meta:
         managed = True
-        db_table = 'airflow\".\"self_evaluation_failed'
+        db_table = 'airflow\".\"survey_failed'

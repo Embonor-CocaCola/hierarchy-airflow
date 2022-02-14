@@ -2,8 +2,8 @@ INSERT INTO analyzed_photo (
     id,
     scene_type,
     sub_scene_type,
-    self_evaluation_id,
-    self_evaluation_analysis_id,
+    survey_id,
+    survey_analysis_id,
     question_id,
     origin_url,
     sent_ok

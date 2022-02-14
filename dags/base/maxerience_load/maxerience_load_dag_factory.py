@@ -150,7 +150,7 @@ class MaxerienceLoadDagFactory:
             longitude = survey[3]
             survey_created_at = survey[4]
 
-            analysis_id = self.create_self_evaluation_analysis(survey_id, survey_created_at)
+            analysis_id = self.create_survey_analysis(survey_id, survey_created_at)
 
             print(f'Downloading and uploading photos of answer with id: {survey_id}')
             for answer in survey_answers:
@@ -195,11 +195,11 @@ class MaxerienceLoadDagFactory:
                         sent_ok=json_response['success'],
                     )
 
-    def create_self_evaluation_analysis(self, survey_id, created_at):
+    def create_survey_analysis(self, survey_id, created_at):
         analysis_id = str(uuid.uuid4())
 
         with open(
-                Path(airflow_root_dir) / 'include' / 'sqls' / 'maxerience_load' / 'create_self_evaluation_analysis.sql',
+                Path(airflow_root_dir) / 'include' / 'sqls' / 'maxerience_load' / 'create_survey_analysis.sql',
                 'r',
         ) as file:
             sql = file.read()
