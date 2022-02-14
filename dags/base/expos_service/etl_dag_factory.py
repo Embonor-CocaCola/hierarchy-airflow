@@ -70,7 +70,7 @@ class EtlDagFactory:
             'start_date': _start_date,
             'provide_context': True,
             'execution_timeout': timedelta(seconds=240),
-            'retries': 30,
+            'retries': 2,
             'retry_delay': timedelta(seconds=5),
             'on_failure_callback': EtlDagFactory.on_failure_callback,
         }
