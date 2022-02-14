@@ -143,7 +143,7 @@ class AnswerStaged(models.Model):
     values = models.JSONField()
     attachments = ArrayField(models.TextField())
     observations = models.TextField(null=True)
-    self_evaluation_id = models.UUIDField()
+    survey_id = models.UUIDField()
     question_id = models.ForeignKey(
         QuestionStaged,
         on_delete=models.CASCADE,
@@ -167,7 +167,7 @@ class AnswerStaged(models.Model):
         db_table = 'airflow\".\"answer_staged'
 
 
-class SelfEvaluationFailedInserts(models.Model):
+class SurveyFailedInserts(models.Model):
     source_id = models.TextField()
 
     vendor_source_id = models.TextField(null=True)
