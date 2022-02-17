@@ -6,7 +6,7 @@ additional_params = {
         'additional_columns': '',
     },
     'production.questions.temp': {
-        'additional_columns': '',
+        'additional_columns': 'observation TEXT,',
     },
     'development.surveys.temp': {
         'additional_columns':
