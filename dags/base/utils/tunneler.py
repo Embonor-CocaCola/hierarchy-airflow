@@ -14,7 +14,7 @@ class Tunneler():
 
     def __enter__(self):
         self.clients += 1
-        if self.clients == 1 or True:
+        if self.clients == 1:
             print('opening tunnel')
             self.open_tunnel()
         else:

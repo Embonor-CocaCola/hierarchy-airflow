@@ -4,12 +4,11 @@ from contextlib import ExitStack
 from logging import info
 
 import pandas
-from bson import json_util
 from airflow.models.dag import DAG
 from airflow.operators.python import PythonOperator
-from airflow.providers.mongo.hooks.mongo import MongoHook
 from airflow.utils.task_group import TaskGroup
 
+from base.utils.mongo import execute_query, get_filters_per_docdb_collection
 from base.utils.tasks import arrange_task_list_sequentially
 from base.utils.tunneler import Tunneler
 from config.expos_service.settings import (
@@ -44,11 +43,12 @@ class ExtractDocumentDbCsvTaskGroup:
         return task_group
 
     def create_extract_task(self, collection, task_group):
+        filters = get_filters_per_docdb_collection(self.dag.dag_id).get(collection, None)
         return PythonOperator(
             task_id=f'extract_{collection}_to_csv',
             task_group=task_group,
             python_callable=self.extract_csv,
-            op_args=[collection],
+            op_args=[collection, filters],
         )
 
     def convert_fields_to_json(self, value):
@@ -56,21 +56,21 @@ class ExtractDocumentDbCsvTaskGroup:
             return json.dumps(value, ensure_ascii=True)
         return value
 
-    def extract_csv(self, collection_name: str):
+    def extract_csv(self, collection_name: str, filters):
         with self.mongo_tunnel if IS_LOCAL_RUN else ExitStack():
             info(
                 f'Starting extraction from document db collection: {collection_name}...')
 
-            mongo_hook = MongoHook(
-                mongo_conn_id=ES_EMBONOR_MONGO_CONN_ID,
+            info('filters:')
+            info(filters)
+            jsondocs = execute_query(
+                collection_name,
+                ES_EMBONOR_MONGO_CONN_ID,
+                ES_EMBONOR_MONGO_DB_NAME,
+                tunnel=self.mongo_tunnel,
+                filters=filters,
             )
-            collection = mongo_hook.get_collection(
-                mongo_collection=collection_name, mongo_db=ES_EMBONOR_MONGO_DB_NAME)
-            cursor = collection.find()
 
-            jsondocs = json_util.dumps(
-                list(cursor), ensure_ascii=True, json_options=json_util.JSONOptions(datetime_representation=2),
-            )
             docs = pandas.read_json(StringIO(jsondocs))
 
             docs = docs.apply(lambda row: list(map(lambda field: self.convert_fields_to_json(field), row)))
@@ -82,6 +82,3 @@ class ExtractDocumentDbCsvTaskGroup:
             docs.to_csv(f'/opt/airflow/data/{collection_name}.csv', index=False)
 
             info(f"Collection '{collection_name}' extracted successfully!")
-            cursor.close()
-            mongo_hook.close_conn()
-            print('Cursor and connection closed successfully!')

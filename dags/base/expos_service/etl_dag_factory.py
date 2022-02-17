@@ -1,3 +1,4 @@
+import json
 from datetime import datetime, timedelta
 
 from airflow.models import DAG
@@ -11,6 +12,7 @@ from base.expos_service.extract_docdb_csv_taskgroup import \
 from base.expos_service.extract_pg_csv_taskgroup import \
     ExtractPostgresCsvTaskGroup
 from base.expos_service.health_checks_taskgroup import HealthChecksTaskGroup
+from base.utils.mongo import execute_query
 from base.utils.slack import build_status_msg, send_slack_notification
 from base.utils.table_names import TableNameManager
 from base.utils.tunneler import Tunneler
@@ -22,6 +24,8 @@ from config.expos_service.settings import (
     ES_ETL_DAG_START_DATE_VALUE,
     ES_REMOTE_MONGO_HOST,
     ES_REMOTE_MONGO_PORT,
+    ES_EMBONOR_MONGO_CONN_ID,
+    ES_EMBONOR_MONGO_DB_NAME,
     ES_REMOTE_RDS_HOST,
     ES_REMOTE_RDS_PORT, ES_SQL_PATH,
     IS_LOCAL_RUN,
@@ -94,6 +98,10 @@ class EtlDagFactory:
                 max_active_runs=1,
                 on_success_callback=EtlDagFactory.on_success_callback,
                 catchup=False,
+                user_defined_filters={
+                    'oid_from_dict': lambda dict: dict[0]['_id']['$oid'],
+                    'from_json': lambda jsonstr: json.loads(jsonstr),
+                },
         ) as _dag:
             create_job_task = PostgresOperatorCreateJob(
                 task_id='create_job',
@@ -119,6 +127,19 @@ class EtlDagFactory:
 
             health_checks_task = HealthChecksTaskGroup(
                 _dag, group_id='health_checks', pg_tunnel=pg_tunnel).build()
+
+            get_self_evaluation_survey_id = PythonOperator(
+                task_id='get_self_evaluation_survey_id',
+                python_callable=execute_query,
+                do_xcom_push=True,
+                op_kwargs={
+                    'collection_name': 'surveys',
+                    'conn_id': ES_EMBONOR_MONGO_CONN_ID,
+                    'db_name': ES_EMBONOR_MONGO_DB_NAME,
+                    'filters': {'paused': False, 'name': 'Autoevaluación'},
+                    'tunnel': mongo_tunnel,
+                },
+            )
 
             extract_from_pg = ExtractPostgresCsvTaskGroup(
                 _dag, group_id='extract_from_pg', pg_tunnel=pg_tunnel, table_list=_pg_table_list).build()
@@ -178,8 +199,8 @@ class EtlDagFactory:
             else:
                 create_job_task >> health_checks_task
 
-            health_checks_task >> [extract_from_pg, extract_from_mongo] >> load_into_tmp_tables
-            load_into_tmp_tables >> raw_tables_insert >> typed_tables_insert >> conform_tables_insert
+            health_checks_task >> get_self_evaluation_survey_id >> [extract_from_pg, extract_from_mongo] >>\
+                load_into_tmp_tables >> raw_tables_insert >> typed_tables_insert >> conform_tables_insert
             conform_tables_insert >> staged_tables_insert >> target_tables_insert >> clean_data
 
         return _dag
