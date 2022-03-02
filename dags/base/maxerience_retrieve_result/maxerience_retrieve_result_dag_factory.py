@@ -28,6 +28,33 @@ class MaxerienceRetrieveResultDagFactory:
         self.rest_url = f'{MRR_REST_BASE_URL}embonor?{MRR_SAS_KEY}'
         register_adapter(dict, Json)
 
+    @staticmethod
+    def on_failure_callback(context):
+        if not SHOULD_NOTIFY:
+            return
+        ti = context['task_instance']
+        run_id = context['run_id']
+        send_slack_notification(notification_type='alert',
+                                payload=build_status_msg(
+                                    dag_id=MRR_DAG_ID,
+                                    status='failed',
+                                    mappings={'run_id': run_id,
+                                              'task_id': ti.task_id},
+                                ))
+
+    @staticmethod
+    def on_success_callback(context):
+        if not SHOULD_NOTIFY:
+            return
+
+        run_id = context['run_id']
+        send_slack_notification(notification_type='success',
+                                payload=build_status_msg(
+                                    dag_id=MRR_DAG_ID,
+                                    status='finished',
+                                    mappings={'run_id': run_id},
+                                ))
+
     def create_parquet_file(self, values):
         with open(
                 Path(airflow_root_dir) / 'include' / 'sqls' / 'maxerience_retrieve_result' / 'create_parquet_file.sql',
@@ -64,6 +91,7 @@ class MaxerienceRetrieveResultDagFactory:
             'execution_timeout': timedelta(minutes=10),
             'retries': 0,
             'retry_delay': timedelta(seconds=5),
+            'on_failure_callback': MaxerienceRetrieveResultDagFactory.on_failure_callback,
         }
 
         with DAG(
@@ -73,6 +101,7 @@ class MaxerienceRetrieveResultDagFactory:
             template_searchpath=MRR_SQL_PATH,
             max_active_runs=1,
             catchup=False,
+            on_success_callback=MaxerienceRetrieveResultDagFactory.on_success_callback,
         ) as _dag:
 
             if SHOULD_NOTIFY:
@@ -98,7 +127,7 @@ class MaxerienceRetrieveResultDagFactory:
 
             if SHOULD_NOTIFY:
                 notify_mrr_dag_start >> fetch_last_parquet_files
-            else:
-                fetch_last_parquet_files >> process_parquet_files
+
+            fetch_last_parquet_files >> process_parquet_files
 
         return _dag
