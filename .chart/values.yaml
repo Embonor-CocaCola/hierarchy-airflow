@@ -41,3 +41,6 @@ config:
     auth_backend: airflow.api.auth.backend.basic_auth
 statsd:
   enabled: false
+env:
+  - name: "MRR_MAXERIENCE_REST_BASE_URL"
+    value: "https://irclientdataexport.blob.core.windows.net/"

@@ -7,13 +7,14 @@ from airflow.utils.session import provide_session
 
 import config.survey_monthly_photo_loader.settings
 import expos_service.settings as es_config
-import maxerience_load.settings as ml_config
+import common.settings as common_config
 
 
 @provide_session
 def _create_connection(conn_id: str = None, uri: str = None, conn_type: str = None, host: str = None,
                        login: str = None, password: str = None, extra=None, session: Session = None):
-    connection = session.query(models.Connection).filter_by(conn_id=conn_id).first()
+    connection = session.query(models.Connection).filter_by(
+        conn_id=conn_id).first()
 
     if connection:
         session.delete(connection)
@@ -128,8 +129,8 @@ if __name__ == '__main__':
             'conn_id': es_config.ES_EMBONOR_MONGO_CONN_ID,
             'conn_uri': es_config.ES_EMBONOR_MONGO_CONN_URI,
         },
-        ml_config.ML_AIRFLOW_DATABASE_CONN_ID: {
-            'conn_id': ml_config.ML_AIRFLOW_DATABASE_CONN_ID,
+        common_config.EXPOS_DATABASE_CONN_ID: {
+            'conn_id': common_config.EXPOS_DATABASE_CONN_ID,
             'conn_uri': os.environ.get('EXPOS_SQL_CONN_URI'),
         },
     }

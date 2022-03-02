@@ -2,6 +2,8 @@ FROM reigncl/airflow:2.2.1-python3.9-onbuild
 
 USER root
 
+RUN sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 467B942D3A79BD29
+
 RUN apt-get update \
   && apt-get install -y --no-install-recommends less unzip wget vim zip \
   && apt-get autoremove -yqq --purge \

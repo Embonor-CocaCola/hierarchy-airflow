@@ -13,10 +13,17 @@ from base.utils.build_maxerience_payload import build_maxerience_payload
 from base.utils.ml_scene_info import extract_info_from_question_heading
 from base.utils.query_with_return import parameterized_query
 from base.utils.slack import send_slack_notification, build_status_msg
-from config.common.settings import SHOULD_NOTIFY
+from config.common.settings import SHOULD_NOTIFY, EXPOS_DATABASE_CONN_ID
 from config.expos_service.settings import airflow_root_dir, ES_STAGE
-from config.maxerience_load.settings import ML_DAG_START_DATE_VALUE, ML_DAG_SCHEDULE_INTERVAL, ML_SQL_PATH, ML_DAG_ID, \
-    ML_AIRFLOW_DATABASE_CONN_ID, ML_MAXERIENCE_BASE_URL, ML_MAXERIENCE_USER, ML_MAXERIENCE_PASS
+from config.maxerience_load.settings import (
+    ML_DAG_START_DATE_VALUE,
+    ML_DAG_SCHEDULE_INTERVAL,
+    ML_SQL_PATH,
+    ML_DAG_ID,
+    ML_MAXERIENCE_BASE_URL,
+    ML_MAXERIENCE_USER,
+    ML_MAXERIENCE_PASS,
+)
 
 
 class MaxerienceLoadDagFactory:
@@ -34,7 +41,8 @@ class MaxerienceLoadDagFactory:
                                 payload=build_status_msg(
                                     dag_id=ML_DAG_ID,
                                     status='failed',
-                                    mappings={'run_id': run_id, 'task_id': ti.task_id},
+                                    mappings={'run_id': run_id,
+                                              'task_id': ti.task_id},
                                 ))
 
     @staticmethod
@@ -78,7 +86,7 @@ class MaxerienceLoadDagFactory:
 
             es_etl_finished_sensor = SqlSensor(
                 task_id='es_etl_finished_sensor',
-                conn_id=ML_AIRFLOW_DATABASE_CONN_ID,
+                conn_id=EXPOS_DATABASE_CONN_ID,
                 sql='maxerience_load/check_etl_status.sql',
                 poke_interval=120,
                 timeout=60 * 60 * 2,  # 2 hours
@@ -134,12 +142,14 @@ class MaxerienceLoadDagFactory:
             })
             json_response = response.json()
             if not json_response['success']:
-                raise RuntimeError('Log in request failed. Could not get API KEY.')
+                raise RuntimeError(
+                    'Log in request failed. Could not get API KEY.')
 
             Variable.set('ml_auth_token', json_response['authToken'])
 
     def download_and_upload_photos(self, ti):
-        photos_to_download = ti.xcom_pull(task_ids=f'{self._get_photos_group_id}.{self._get_questions_photos_id}')
+        photos_to_download = ti.xcom_pull(
+            task_ids=f'{self._get_photos_group_id}.{self._get_questions_photos_id}')
         base_url = ML_MAXERIENCE_BASE_URL
         auth_token = Variable.get('ml_auth_token')
 
@@ -150,12 +160,15 @@ class MaxerienceLoadDagFactory:
             longitude = survey[3]
             survey_created_at = survey[4]
 
-            analysis_id = self.create_survey_analysis(survey_id, survey_created_at)
+            analysis_id = self.create_survey_analysis(
+                survey_id, survey_created_at)
 
-            print(f'Downloading and uploading photos of answer with id: {survey_id}')
+            print(
+                f'Downloading and uploading photos of answer with id: {survey_id}')
             for answer in survey_answers:
                 question_heading = answer['question']['heading']
-                scene_info = extract_info_from_question_heading(question_heading)
+                scene_info = extract_info_from_question_heading(
+                    question_heading)
                 question_id = answer['question']['id']
 
                 print(f'Question heading: {question_heading}')
@@ -166,7 +179,8 @@ class MaxerienceLoadDagFactory:
                     print(f'Downloading photo: {photo_name}')
 
                     photo_content = requests.get(photo_url).content
-                    print(f'Sending request to maxerience for photo: {photo_name}')
+                    print(
+                        f'Sending request to maxerience for photo: {photo_name}')
 
                     r = requests.post(
                         f'{base_url}/v2/uploadSessionSceneImages',

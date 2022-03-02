@@ -8,7 +8,8 @@ env:
     value: production
   - name: ML_MAXERIENCE_BASE_URL
     value: https://portal.visioniot.net/IrHandler
-
+  - name: MRR_MAXERIENCE_REST_BASE_URL
+    value: https://irclientdataexport.blob.core.windows.net/
 secret:
   - envName: "EXPOS_SQL_CONN_URI"
     secretName: "airflow-envars"

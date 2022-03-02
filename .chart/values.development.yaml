@@ -20,6 +20,8 @@ env:
     value: development
   - name: ML_MAXERIENCE_BASE_URL
     value: https://portal-stg1.maxerience.com/IrHandler
+  - name: MRR_MAXERIENCE_REST_BASE_URL
+    value: https://irclientdataexportpp.blob.core.windows.net/
 
 secret:
   - envName: "EMBONOR_MONGO_CONN_URI"
