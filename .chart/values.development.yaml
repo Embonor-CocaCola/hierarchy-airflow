@@ -60,3 +60,6 @@ secret:
   - envName: "OCI_REGION"
     secretName: "airflow-envars"
     secretKey: "OCI_REGION"
+  - envName: "MRR_SAS_KEY"
+    secretName: "airflow-envars"
+    secretKey: "MRR_SAS_KEY"

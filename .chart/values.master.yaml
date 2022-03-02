@@ -59,3 +59,6 @@ secret:
   - envName: "SLACK_FAILURE_CHANNEL_URL"
     secretName: "airflow-envars"
     secretKey: "SLACK_FAILURE_CHANNEL_URL"
+  - envName: "MRR_SAS_KEY"
+    secretName: "airflow-envars"
+    secretKey: "MRR_SAS_KEY"
