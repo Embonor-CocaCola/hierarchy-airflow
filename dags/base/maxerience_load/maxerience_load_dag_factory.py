@@ -161,7 +161,7 @@ class MaxerienceLoadDagFactory:
             survey_created_at = survey[4]
 
             analysis_id = self.create_survey_analysis(
-                survey_id, survey_created_at)
+                survey_id)
 
             print(
                 f'Downloading and uploading photos of answer with id: {survey_id}')
@@ -209,7 +209,7 @@ class MaxerienceLoadDagFactory:
                         sent_ok=json_response['success'],
                     )
 
-    def create_survey_analysis(self, survey_id, created_at):
+    def create_survey_analysis(self, survey_id):
         analysis_id = str(uuid.uuid4())
 
         with open(
@@ -220,7 +220,6 @@ class MaxerienceLoadDagFactory:
             parameterized_query(
                 sql=sql,
                 templates_dict={
-                    'created_at': created_at,
                     'survey_id': survey_id,
                     'analysis_id': analysis_id,
                 },
