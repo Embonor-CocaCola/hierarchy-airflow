@@ -168,7 +168,7 @@ class MaxerienceLoadRetryDagFactory:
                     scene_info=scene_info,
                     scene_id=scene_id,
                     auth_token=auth_token,
-                    survey_created_at=survey_created_at,
+                    survey_created_at=survey_created_at.isoformat(),
                     latitude=latitude,
                     longitude=longitude,
                 ),
