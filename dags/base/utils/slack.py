@@ -5,6 +5,7 @@ import requests
 import config.common.settings as config
 from config.expos_service.settings import ES_STAGE, ES_ETL_DAG_ID
 from config.maxerience_load.settings import ML_DAG_ID
+from config.maxerience_load_retry.settings import MLR_DAG_ID
 from config.maxerience_retrieve_result.settings import MRR_DAG_ID
 
 webhooks_by_type = {
@@ -24,6 +25,10 @@ details_by_dag = {
     MRR_DAG_ID: {
         'emoji': ':open_file_folder:',
         'dag_name': 'MAXERIENCE RETRIEVE RESULT DAG',
+    },
+    MLR_DAG_ID: {
+        'emoji': ':arrows_clockwise:',
+        'dag_name': 'MAXERIENCE LOAD RETRY DAG',
     },
 }
 

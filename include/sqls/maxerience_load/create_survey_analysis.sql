@@ -1,1 +1,1 @@
-CALL airflow.create_survey_analysis(now(), %(survey_id)s, %(analysis_id)s);
+CALL airflow.create_survey_analysis(now()::timestamp, %(survey_id)s, %(analysis_id)s);

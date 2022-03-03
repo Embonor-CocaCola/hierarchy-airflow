@@ -3,6 +3,7 @@ import uuid
 from datetime import datetime, timedelta
 from pathlib import Path
 
+import psycopg2
 import requests
 from airflow.models import DAG, Variable
 from airflow.operators.python import PythonOperator
@@ -160,9 +161,15 @@ class MaxerienceLoadDagFactory:
             longitude = survey[3]
             survey_created_at = survey[4]
 
-            analysis_id = self.create_survey_analysis(
-                survey_id)
-
+            try:
+                analysis_id = self.create_survey_analysis(
+                    survey_id)
+            except psycopg2.Error:
+                analysis_id = parameterized_query(
+                    'select id from survey_analysis where survey_id = %(survey_id)s',
+                    templates_dict={
+                        'survey_id': survey_id,
+                    })
             print(
                 f'Downloading and uploading photos of answer with id: {survey_id}')
             for answer in survey_answers:
