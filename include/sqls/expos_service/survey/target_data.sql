@@ -17,21 +17,16 @@ SELECT
     STAGED.id
 FROM
     airflow.survey_staged STAGED
+INNER JOIN airflow.vendor_staged VES on STAGED.vendor_id = VES.id
+INNER JOIN airflow.customer_staged CUS on STAGED.customer_id = CUS.id
 LEFT JOIN survey TARGET ON TARGET.source_id = STAGED.source_id
 WHERE
     STAGED.job_id = %(job_id)s :: BIGINT
-    AND TARGET.id IS NULL
-;
-ANALYZE survey;
-
-WHERE (VES.id IS NULL OR CUS.id IS NULL)
-    AND STAGED.job_id = %(job_id)s :: BIGINT
     AND VES.job_id = %(job_id)s :: BIGINT
     AND CUS.job_id = %(job_id)s :: BIGINT
     AND TARGET.id IS NULL
 ;
-
-ANALYZE airflow.survey_failed;
+ANALYZE survey;
 
 UPDATE
     survey TARGET
