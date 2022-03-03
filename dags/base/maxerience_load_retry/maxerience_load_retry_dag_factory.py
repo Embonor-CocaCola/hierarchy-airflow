@@ -134,11 +134,13 @@ class MaxerienceLoadRetryDagFactory:
                 'r',
         ) as file:
             sql = file.read()
-        photos_to_download = parameterized_query(sql)
+        photos_to_download = parameterized_query(sql, wrap=False)
         print(f'Attempting to retry {len(photos_to_download)} photo uploads')
         base_url = ML_MAXERIENCE_BASE_URL
         auth_token = Variable.get('ml_auth_token')
         for photo in photos_to_download:
+            print('Attempting retry of photo:')
+            print(photo)
             photo_url = photo[2]
             survey_id = photo[0]
             scene_id = photo[1]
