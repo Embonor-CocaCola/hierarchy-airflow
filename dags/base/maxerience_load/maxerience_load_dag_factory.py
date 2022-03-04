@@ -161,15 +161,6 @@ class MaxerienceLoadDagFactory:
             longitude = survey[3]
             survey_created_at = survey[4]
 
-            try:
-                analysis_id = self.create_survey_analysis(
-                    survey_id)
-            except psycopg2.Error:
-                analysis_id = parameterized_query(
-                    'select id from survey_analysis where survey_id = %(survey_id)s',
-                    templates_dict={
-                        'survey_id': survey_id,
-                    })
             print(
                 f'Downloading and uploading photos of answer with id: {survey_id}')
             for answer in survey_answers:
@@ -207,7 +198,6 @@ class MaxerienceLoadDagFactory:
                     json_response = r.json()
                     print(json_response)
                     self.create_analyzed_photo(
-                        analysis_id=analysis_id,
                         scene_info=scene_info,
                         scene_id=scene_id,
                         survey_id=survey_id,
@@ -215,6 +205,12 @@ class MaxerienceLoadDagFactory:
                         origin_url=photo_url,
                         sent_ok=json_response['success'],
                     )
+
+            try:
+                self.create_survey_analysis(
+                    survey_id)
+            except psycopg2.Error:
+                pass
 
     def create_survey_analysis(self, survey_id):
         analysis_id = str(uuid.uuid4())
@@ -235,7 +231,7 @@ class MaxerienceLoadDagFactory:
 
         return analysis_id
 
-    def create_analyzed_photo(self, analysis_id, scene_info, scene_id, survey_id, question_id, origin_url, sent_ok):
+    def create_analyzed_photo(self, scene_info, scene_id, survey_id, question_id, origin_url, sent_ok):
         with open(
                 Path(airflow_root_dir) / 'include' / 'sqls' / 'maxerience_load' / 'create_analyzed_photo.sql',
                 'r',
@@ -247,7 +243,6 @@ class MaxerienceLoadDagFactory:
                     'scene_type': scene_info['scene'],
                     'sub_scene_type': scene_info['sub_scene'],
                     'survey_id': survey_id,
-                    'analysis_id': analysis_id,
                     'scene_id': scene_id,
                     'question_id': question_id,
                     'origin_url': origin_url,
