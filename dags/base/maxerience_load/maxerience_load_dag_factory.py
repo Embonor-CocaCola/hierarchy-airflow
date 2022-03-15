@@ -126,14 +126,67 @@ class MaxerienceLoadDagFactory:
                 dag=_dag,
             )
 
+            close_complete_sessions = PythonOperator(
+                task_id='close_complete_sessions',
+                python_callable=self.close_complete_sessions,
+                dag=_dag,
+            )
+
             if SHOULD_NOTIFY:
                 es_etl_finished_sensor >> notify_ml_dag_start >> get_api_key
             else:
                 es_etl_finished_sensor >> get_api_key
 
-            get_api_key >> get_photos >> download_and_upload_photos
+            get_api_key >> get_photos >> download_and_upload_photos >> close_complete_sessions
 
         return _dag
+
+    def close_complete_sessions(self):
+        base_url = ML_MAXERIENCE_BASE_URL
+        auth_token = Variable.get('ml_auth_token')
+
+        with open(
+                f'{airflow_root_dir}/include/sqls/maxerience_load/get_completed_surveys_for_closing.sql', 'r',
+        ) as file:
+            sql = file.read()
+        sessions = parameterized_query(sql, wrap=False)
+
+        with open(f'{airflow_root_dir}/include/sqls/maxerience_load/update_survey_analysis_completed.sql', 'r') as file:
+            sql = file.read()
+
+        for session in sessions:
+            _, total_images, survey_id, session_start, visit_date, session_end = session
+            response = requests.post(
+                f'{base_url}/v2/uploadSessionSceneImages',
+                files={
+                    'authToken': (None, auth_token),
+                    'data': (None, json.dumps({
+                        'session': [
+                            {
+                                'sessionUid': survey_id,
+                                'sessionStartTime': session_start,
+                                'sessionEndTime': session_end,
+                                'outlet_code': '123321',
+                                'visitDate': visit_date,
+                                'scene': [],
+                                'localTimeZone': 'CL',
+                                'surveyStatus': 1,
+                                'totalScene': total_images,
+                                'totalSceneImages': total_images,
+                            },
+                        ],
+                    })),
+                },
+            )
+            print('Response ready')
+            json_response = response.json()
+            print(json_response)
+
+            if json_response['success']:
+                print('updating survey_analysis')
+                parameterized_query(sql, templates_dict={
+                    'survey_id': survey_id,
+                })
 
     def get_api_key(self):
         if ES_STAGE == 'production':

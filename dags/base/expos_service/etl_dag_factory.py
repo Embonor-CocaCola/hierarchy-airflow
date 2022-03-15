@@ -1,8 +1,9 @@
 import json
 from datetime import datetime, timedelta
 
-from airflow.models import DAG
+from airflow.models import DAG, Variable
 from airflow.operators.python import PythonOperator
+from airflow.providers.postgres.operators.postgres import PostgresOperator
 
 from base.expos_service.clean_data_taskgroup import CleanDataTaskGroup
 from base.expos_service.load_csv_into_temp_tables_taskgroup import LoadCsvIntoTempTablesTaskGroup
@@ -32,6 +33,7 @@ from config.expos_service.settings import (
     ES_MONGO_COLLECTIONS_TO_EXTRACT,
     ES_PG_TABLES_TO_EXTRACT,
     ES_ETL_CONFORM_OPERATIONS_ORDER, ES_ETL_STAGED_OPERATIONS_ORDER, ES_ETL_TARGET_OPERATIONS_ORDER,
+    ES_FETCH_OLD_EVALUATIONS_KEY,
 )
 
 from operators.postgres.create_job import PostgresOperatorCreateJob
@@ -128,6 +130,12 @@ class EtlDagFactory:
             health_checks_task = HealthChecksTaskGroup(
                 _dag, group_id='health_checks', pg_tunnel=pg_tunnel).build()
 
+            _survey_filters = {'name': 'Autoevaluación'}
+            _fetch_old_surveys = Variable.get(ES_FETCH_OLD_EVALUATIONS_KEY) == 'True'
+
+            if not _fetch_old_surveys:
+                _survey_filters['paused'] = False
+
             get_self_evaluation_survey_id = PythonOperator(
                 task_id='get_self_evaluation_survey_id',
                 python_callable=execute_query,
@@ -136,7 +144,7 @@ class EtlDagFactory:
                     'collection_name': 'surveys',
                     'conn_id': ES_EMBONOR_MONGO_CONN_ID,
                     'db_name': ES_EMBONOR_MONGO_DB_NAME,
-                    'filters': {'paused': False, 'name': 'Autoevaluación'},
+                    'filters': _survey_filters,
                     'tunnel': mongo_tunnel,
                 },
             )
@@ -189,6 +197,15 @@ class EtlDagFactory:
                 job_id=_job_id,
             ).build()
 
+            if _fetch_old_surveys:
+                process_old_evaluations_data = PostgresOperator(
+                    task_id='process_old_evaluations_data',
+                    postgres_conn_id=ES_AIRFLOW_DATABASE_CONN_ID,
+                    sql="""
+                        CALL process_old_survey_data();
+                    """,
+                )
+
             clean_data = CleanDataTaskGroup(
                 stage='cleanup',
                 job_id=_job_id,
@@ -203,4 +220,6 @@ class EtlDagFactory:
                 load_into_tmp_tables >> raw_tables_insert >> typed_tables_insert >> conform_tables_insert
             conform_tables_insert >> staged_tables_insert >> target_tables_insert >> clean_data
 
+            if _fetch_old_surveys:
+                clean_data >> process_old_evaluations_data
         return _dag

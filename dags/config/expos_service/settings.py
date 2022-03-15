@@ -64,3 +64,4 @@ ES_ETL_TARGET_OPERATIONS_ORDER = os.environ.get(
 ).split(',')
 
 ES_STAGE = os.environ.get('STAGE', 'development')
+ES_FETCH_OLD_EVALUATIONS_KEY = 'es_etl_fetch_old_self_evaluations'
