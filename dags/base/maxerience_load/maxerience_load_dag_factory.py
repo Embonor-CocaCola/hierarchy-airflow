@@ -156,8 +156,9 @@ class MaxerienceLoadDagFactory:
 
         for session in sessions:
             _, total_images, survey_id, session_start, visit_date, session_end = session
+            print(f'Attempting to close session {session}')
             response = requests.post(
-                f'{base_url}/v2/uploadSessionSceneImages',
+                f'{base_url}/uploadSessionSceneImages',
                 files={
                     'authToken': (None, auth_token),
                     'data': (None, json.dumps({
