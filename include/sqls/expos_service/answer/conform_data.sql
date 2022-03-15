@@ -35,15 +35,3 @@ FROM
 WHERE TYPED.job_id = %(job_id)s :: BIGINT
     AND SUR.job_id = %(job_id)s :: BIGINT
 ;
-
-ANALYZE airflow.answer_conform;
-
-UPDATE airflow.answer_conform
-SET
-    question_id = 1
-FROM
-    airflow.answer_conform ac,
-    airflow.question_typed qt,
-    question q
-WHERE
-    qt.id = ac.question_id
