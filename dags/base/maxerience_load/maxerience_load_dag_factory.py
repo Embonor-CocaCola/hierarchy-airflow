@@ -165,8 +165,8 @@ class MaxerienceLoadDagFactory:
                         'session': [
                             {
                                 'sessionUid': survey_id,
-                                'sessionStartTime': session_start,
-                                'sessionEndTime': session_end,
+                                'sessionStartTime': int(session_start),
+                                'sessionEndTime': int(session_end),
                                 'outlet_code': '123321',
                                 'visitDate': visit_date,
                                 'scene': [],

@@ -1,4 +1,4 @@
-SELECT *, now()::date::text as session_end_at FROM
+SELECT *, floor(extract(epoch from now())) as session_end_at FROM
 (
 SELECT
     (COUNT(ap.id) FILTER( WHERE ap.sent_ok = true AND ap.parquet_file_id is null ) = COUNT(ap.id)) AS ready_for_closing,
