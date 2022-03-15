@@ -43,12 +43,13 @@ CREATE OR REPLACE PROCEDURE process_old_survey_data()
             INSERT INTO tmp_question_counterparts(source_id, target_id) VALUES (old_source, new_id);
         END LOOP;
 
-    UPDATE answer SET question_id = tmp.target_id
+    UPDATE answer
+        SET question_id = tmp.target_id
         FROM
             answer TARGET,
             tmp_question_counterparts tmp,
             question q
-        WHERE answer.question_id = q.id
+        WHERE TARGET.question_id = q.id
             AND q.source_id = tmp.source_id;
 
     DROP TABLE tmp_question_counterparts;
