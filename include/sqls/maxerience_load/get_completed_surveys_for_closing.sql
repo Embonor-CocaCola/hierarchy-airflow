@@ -9,5 +9,6 @@ SELECT
 FROM public.survey_analysis sa
 INNER JOIN analyzed_photo ap on sa.survey_id = ap.survey_id
 INNER JOIN survey s on ap.survey_id = s.id
+WHERE sa.status = 'in_progress'
 GROUP BY sa.survey_id, session_start_at, visit_date) subquery
 WHERE ready_for_closing = true;
