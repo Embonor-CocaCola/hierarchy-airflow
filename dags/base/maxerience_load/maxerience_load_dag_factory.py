@@ -164,15 +164,15 @@ class MaxerienceLoadDagFactory:
                     'data': (None, json.dumps({
                         'session': [
                             {
-                                'sessionUid': survey_id,
+                                'sessionUid': str(survey_id),
                                 'sessionStartTime': int(session_start),
                                 'sessionEndTime': int(session_end),
-                                'outlet_code': '123321',
+                                'outletCode': '123321',
                                 'visitDate': visit_date,
                                 'scene': [],
                                 'localTimeZone': 'CL',
                                 'surveyStatus': 1,
-                                'totalScene': int(total_images),
+                                'totalscene': int(total_images),
                                 'totalSceneImages': int(total_images),
                             },
                         ],
