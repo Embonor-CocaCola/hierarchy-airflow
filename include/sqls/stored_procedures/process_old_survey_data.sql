@@ -11,10 +11,12 @@ CREATE OR REPLACE PROCEDURE process_old_survey_data()
             target_id uuid
         );
 
+        ANALYZE tmp_question_counterparts;
+
         FOR qn IN SELECT * FROM question
         LOOP
             old_source := qn.source_id;
-
+            RAISE NOTICE 'Inserting wntry in tmp table for question %', qn.heading;
             CASE qn.heading
                 WHEN '¿Tenemos el 60% del espacio en SSD? Se sugiere agregar dos imágenes.'
                     THEN
@@ -40,9 +42,14 @@ CREATE OR REPLACE PROCEDURE process_old_survey_data()
                     CONTINUE;
             END CASE;
 
+            RAISE NOTICE 'new id = %', new_id;
             INSERT INTO tmp_question_counterparts(source_id, target_id) VALUES (old_source, new_id);
+            RAISE NOTICE 'Entry inserted in tmp_question_counterparts table';
+            ANALYZE tmp_question_counterparts;
         END LOOP;
 
+    RAISE NOTICE 'Looping and building of tmp table completed. Attempting to update answers';
+    ANALYZE answer;
     UPDATE answer
         SET question_id = tmp.target_id
         FROM
@@ -52,6 +59,8 @@ CREATE OR REPLACE PROCEDURE process_old_survey_data()
         WHERE TARGET.question_id = q.id
             AND q.source_id = tmp.source_id;
 
+    RAISE NOTICE 'updated answers successfully';
     DROP TABLE tmp_question_counterparts;
+    RAISE NOTICE 'tmp table dropped';
     END;
     $$
