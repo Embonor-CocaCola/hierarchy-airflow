@@ -31,11 +31,16 @@ CREATE OR REPLACE PROCEDURE process_old_survey_data()
                         SELECT id INTO new_id from question
                         WHERE heading
                         LIKE '¿Están los equipos de frío Embonor puros?';
-                WHEN '¿Estan los%Equipos de Frío llenos al menos en un 75%?'
+                WHEN '¿Estan los  Equipos de Frío llenos al menos en un 75%?'
                     THEN
                         SELECT id INTO new_id from question
                         WHERE heading
                         LIKE '¿Estan los equipos de frío Embonor llenos al menos en un 75%';
+                WHEN '¿Se encuentra el equipo de frío en primera posición?'
+                    THEN
+                        SELECT id INTO new_id from question
+                        WHERE heading
+                        LIKE '¿Se encuentra el equipo de frío Embonor en primera posición?';
                 ELSE
                     CONTINUE;
             END CASE;
