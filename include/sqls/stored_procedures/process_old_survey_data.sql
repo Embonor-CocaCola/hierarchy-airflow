@@ -11,8 +11,6 @@ CREATE OR REPLACE PROCEDURE process_old_survey_data()
             target_id uuid
         );
 
-        ANALYZE tmp_question_counterparts;
-
         FOR qn IN SELECT * FROM question
         LOOP
             old_source := qn.source_id;
