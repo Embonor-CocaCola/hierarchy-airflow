@@ -21,6 +21,6 @@ def recognized_product_row_to_record(row, **kwargs):
         row['DoorIndex'],
         row['SingleFacings'],
         row['IsForeign'] or False,
-        row['REId'],
+        str(row['REId']),
         row['FileCreatedTime'],
     )
