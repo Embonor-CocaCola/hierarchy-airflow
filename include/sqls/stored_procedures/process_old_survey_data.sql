@@ -49,11 +49,9 @@ CREATE OR REPLACE PROCEDURE process_old_survey_data()
         END LOOP;
 
     RAISE NOTICE 'Looping and building of tmp table completed. Attempting to update answers';
-    ANALYZE answer;
-    UPDATE answer
+    UPDATE answer TARGET
         SET question_id = tmp.target_id
         FROM
-            answer TARGET,
             tmp_question_counterparts tmp,
             question q
         WHERE TARGET.question_id = q.id
@@ -63,4 +61,4 @@ CREATE OR REPLACE PROCEDURE process_old_survey_data()
     DROP TABLE tmp_question_counterparts;
     RAISE NOTICE 'tmp table dropped';
     END;
-    $$
+    $$;

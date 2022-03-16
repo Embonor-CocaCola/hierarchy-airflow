@@ -202,6 +202,7 @@ class EtlDagFactory:
                     task_id='process_old_evaluations_data',
                     postgres_conn_id=ES_AIRFLOW_DATABASE_CONN_ID,
                     sql="""
+                        VACUUM ANALYZE answer;
                         CALL process_old_survey_data();
                     """,
                 )
