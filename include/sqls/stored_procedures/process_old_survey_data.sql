@@ -14,7 +14,7 @@ CREATE OR REPLACE PROCEDURE process_old_survey_data()
         FOR qn IN SELECT * FROM question
         LOOP
             old_source := qn.source_id;
-            RAISE NOTICE 'Inserting wntry in tmp table for question %', qn.heading;
+            RAISE NOTICE 'Inserting entry in tmp table for question %', qn.heading;
             CASE qn.heading
                 WHEN '¿Tenemos el 60% del espacio en SSD? Se sugiere agregar dos imágenes.'
                     THEN
