@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'vendor_plant',
     'vendor_type',
     'chief_plant',
+    'cluster',
 ]
 
 MIDDLEWARE = [

@@ -1,6 +1,7 @@
 from django.db import models
 
 from branch_office.models import BranchOfficeStaged
+from cluster.models import ClusterStaged
 from expos.models import DateTimeWithoutTZField, AutoUUIDField
 from datetime import datetime
 from etl_job.models import EtlJob
@@ -188,7 +189,8 @@ class CustomerStaged(models.Model):
     route_id = models.IntegerField()
     territory_id = models.IntegerField()
     channel_mkt = models.TextField(blank=True, null=True)
-    cluster = models.TextField(null=True)
+    cluster_id = models.ForeignKey(ClusterStaged, on_delete=models.CASCADE, db_column='cluster_id',
+                                   db_constraint=False, null=True)
     deleted_at = models.DateField(null=True)
     market_group_id = models.TextField(blank=True, null=True)
     market_chain_id = models.TextField(blank=True, null=True)

@@ -32,7 +32,7 @@ INSERT INTO airflow.customer_staged (
     route_id,
     territory_id,
     channel_mkt,
-    cluster,
+    cluster_id,
     deleted_at,
     market_group_id,
     market_chain_id,
@@ -70,7 +70,7 @@ SELECT
     CUC.route_id,
     CUC.territory_id,
     CUC.channel_mkt,
-    CUC.cluster,
+    COALESCE(cl.id, clc.id),
     CUC.deleted_at,
     CUC.market_group_id,
     CUC.market_chain_id,
@@ -85,9 +85,12 @@ FROM
     LEFT JOIN branch_office bo ON BOC.source_id = bo.source_id
     INNER JOIN airflow.plant_conform PLC ON PLC.source_id = CUC.plant_id
     LEFT JOIN plant p on PLC.source_id = p.source_id
+    INNER JOIN airflow.cluster_conform clc ON clc.name = CUC.cluster
+    LEFT JOIN cluster cl on cl.name = CUC.cluster
 WHERE
     CUC.job_id = %(job_id)s :: BIGINT AND
     BOC.job_id = %(job_id)s :: BIGINT AND
-    PLC.job_id = %(job_id)s :: BIGINT
+    PLC.job_id = %(job_id)s :: BIGINT AND
+    clc.job_id = %(job_id)s :: BIGINT
 ;
 ANALYZE airflow.customer_staged;
