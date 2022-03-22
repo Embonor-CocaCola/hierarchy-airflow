@@ -12,7 +12,7 @@ INSERT INTO airflow.cluster_conform (
     id
 )
 SELECT
-    distinct(COALESCE(country_specific->>'cluster', 'Sin cluster')),
+    COALESCE(country_specific->>'cluster', 'Sin cluster') as cl,
 
     now(),
     now(),
@@ -21,4 +21,5 @@ SELECT
 FROM
     airflow.customer_typed
 WHERE job_id = %(job_id)s :: BIGINT
+GROUP BY cl, job_id
 ;
