@@ -10,6 +10,8 @@ env:
     value: https://portal.visioniot.net/IrHandler
   - name: MRR_MAXERIENCE_REST_BASE_URL
     value: https://irclientdataexport.blob.core.windows.net/
+  - name: SLACK_ETL_SUCCESS_CHANNEL
+    value: C030CACGC1E
 secret:
   - envName: "EXPOS_SQL_CONN_URI"
     secretName: "airflow-envars"

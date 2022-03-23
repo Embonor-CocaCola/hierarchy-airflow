@@ -22,7 +22,8 @@ env:
     value: https://portal-stg1.maxerience.com/IrHandler
   - name: MRR_MAXERIENCE_REST_BASE_URL
     value: https://irclientdataexportpp.blob.core.windows.net/
-
+  - name: SLACK_ETL_SUCCESS_CHANNEL
+    value: C032Y1XQAJ1
 secret:
   - envName: "EXPOS_SQL_CONN_URI"
     secretName: "airflow-envars"
