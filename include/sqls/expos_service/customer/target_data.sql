@@ -25,7 +25,7 @@ INSERT INTO customer (
     route_id,
     territory_id,
     channel_mkt,
-    cluster,
+    cluster_id,
     deleted_at,
     market_group_id,
     market_chain_id,
@@ -59,7 +59,7 @@ SELECT
     STAGED.route_id,
     STAGED.territory_id,
     STAGED.channel_mkt,
-    STAGED.cluster,
+    STAGED.cluster_id,
     STAGED.deleted_at,
     STAGED.market_group_id,
     STAGED.market_chain_id,
@@ -100,7 +100,7 @@ SET
     route_id = STAGED.route_id,
     territory_id = STAGED.territory_id,
     channel_mkt = STAGED.channel_mkt,
-    cluster = STAGED.cluster,
+    cluster = STAGED.cluster_id,
     deleted_at = STAGED.deleted_at,
     market_group_id = STAGED.market_group_id,
     market_chain_id = STAGED.market_chain_id
@@ -135,7 +135,7 @@ WHERE
         STAGED.route_id IS DISTINCT FROM TARGET.route_id OR
         STAGED.territory_id IS DISTINCT FROM TARGET.territory_id OR
         STAGED.channel_mkt IS DISTINCT FROM TARGET.channel_mkt OR
-        STAGED.cluster IS DISTINCT FROM TARGET.cluster OR
+        STAGED.cluster_id IS DISTINCT FROM TARGET.cluster_id OR
         STAGED.deleted_at IS DISTINCT FROM TARGET.deleted_at OR
         STAGED.market_group_id IS DISTINCT FROM TARGET.market_group_id OR
         STAGED.market_chain_id IS DISTINCT FROM TARGET.market_chain_id
