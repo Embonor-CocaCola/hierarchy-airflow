@@ -88,7 +88,7 @@ def send_slack_notification(notification_type, payload):
 
 def send_file_content_to_channels(file_content, channels, initial_comment, title):
     payload = {
-        'content': 'This is a sample content',
+        'content': file_content,
         'channels': ','.join(channels),
         'initial_comment': initial_comment,
         'title': title,
