@@ -1,5 +1,3 @@
-import json
-
 from base.utils.query_with_return import parameterized_query
 from base.utils.slack import send_file_content_to_channels
 from config.common.settings import SLACK_ETL_SUCCESS_CHANNEL
@@ -16,7 +14,7 @@ def send_broken_hierarchy_data(job_id):
         for row in data:
             csv_data += ','.join(map(lambda entry: str(entry), row))
             csv_data += '\n'
-        send_file_content_to_channels(file_content=json.dumps(data), channels=[SLACK_ETL_SUCCESS_CHANNEL],
+        send_file_content_to_channels(file_content=csv_data, channels=[SLACK_ETL_SUCCESS_CHANNEL],
                                       initial_comment='Aquí está el reporte de vendedores sin supervisor '
                                                       'correspondiente al ETL de hoy :spiral_note_pad:',
                                       title='reporte_vendedores_sin_jerarquia.txt')
