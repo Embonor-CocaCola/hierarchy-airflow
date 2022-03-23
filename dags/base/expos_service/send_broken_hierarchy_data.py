@@ -5,7 +5,7 @@ from base.utils.slack import send_file_content_to_channels
 
 
 def send_broken_hierarchy_data(job_id):
-    data = parameterized_query(f'select * from find_vendors_with_broken_hierarchy({int(job_id)})')
+    data = parameterized_query(f'select * from find_vendors_with_broken_hierarchy({int(job_id)})', wrap=False)
     print(data)
     if len(data) == 0:
         pass  # TODO: send just a message

@@ -1,4 +1,5 @@
-CREATE OR REPLACE FUNCTION find_vendors_with_broken_hierarchy(jobid int)
+DROP FUNCTION find_vendors_with_broken_hierarchy(jobid int);
+CREATE FUNCTION find_vendors_with_broken_hierarchy(jobid int)
     RETURNS TABLE (
                     vendor_source_id int,
                     vendor_name text,
@@ -7,7 +8,7 @@ CREATE OR REPLACE FUNCTION find_vendors_with_broken_hierarchy(jobid int)
                     vendor_phone text,
                     branch_office_name text,
                     plant_name text,
-                    last_evaluation_at timestamp,
+                    last_evaluation_at text,
                     evaluations_total bigint
                   ) AS $$
     BEGIN
@@ -19,7 +20,7 @@ CREATE OR REPLACE FUNCTION find_vendors_with_broken_hierarchy(jobid int)
             vc.phone,
             boc.name,
             pc.name,
-            MAX(sc.external_created_at),
+            MAX(sc.external_created_at)::text,
             count(sc.id)
         FROM airflow.vendor_conform vc
             INNER JOIN airflow.branch_office_conform boc ON vc.branch_office_id = boc.source_id
