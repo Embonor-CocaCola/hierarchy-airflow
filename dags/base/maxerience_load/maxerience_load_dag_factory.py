@@ -91,6 +91,7 @@ class MaxerienceLoadDagFactory:
                 sql='maxerience_load/check_etl_status.sql',
                 poke_interval=120,
                 timeout=60 * 60 * 2,  # 2 hours
+                execution_timeout=None,
             )
 
             if SHOULD_NOTIFY:

@@ -84,3 +84,16 @@ def build_status_msg(dag_id, status, mappings):
 def send_slack_notification(notification_type, payload):
     webhook = webhooks_by_type[notification_type]
     requests.post(webhook, data=payload, headers={'content-type': 'application/json'})
+
+
+def send_file_content_to_channels(file_content, channels, initial_comment, title):
+    payload = {
+        'content': 'This is a sample content',
+        'channels': ','.join(channels),
+        'initial_comment': initial_comment,
+        'title': title,
+    }
+    response = requests.post('https://slack.com/api/files.upload', data=payload, headers={
+        'Authorization': f'Bearer {config.SLACK_EXPOS_BOT_TOKEN}',
+    })
+    print(response.json())

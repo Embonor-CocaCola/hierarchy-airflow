@@ -62,3 +62,6 @@ secret:
   - envName: "MRR_SAS_KEY"
     secretName: "airflow-envars"
     secretKey: "MRR_SAS_KEY"
+  - envName: "SLACK_EXPOS_BOT_TOKEN"
+    secretName: "airflow-envars"
+    secretKey: "SLACK_EXPOS_BOT_TOKEN"

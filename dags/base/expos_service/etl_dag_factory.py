@@ -7,6 +7,7 @@ from airflow.providers.postgres.operators.postgres import PostgresOperator
 
 from base.expos_service.clean_data_taskgroup import CleanDataTaskGroup
 from base.expos_service.load_csv_into_temp_tables_taskgroup import LoadCsvIntoTempTablesTaskGroup
+from base.expos_service.send_broken_hierarchy_data import send_broken_hierarchy_data
 from base.expos_service.tables_insert_taskgroup import TablesInsertTaskGroup
 from base.expos_service.extract_docdb_csv_taskgroup import \
     ExtractDocumentDbCsvTaskGroup
@@ -207,6 +208,12 @@ class EtlDagFactory:
                     """,
                 )
 
+            report_broken_hierarchy = PythonOperator(
+                task_id='report_broken_hierarchy',
+                python_callable=send_broken_hierarchy_data,
+                op_args=[_job_id],
+            )
+
             clean_data = CleanDataTaskGroup(
                 stage='cleanup',
                 job_id=_job_id,
@@ -219,7 +226,8 @@ class EtlDagFactory:
 
             health_checks_task >> get_self_evaluation_survey_id >> [extract_from_pg, extract_from_mongo] >>\
                 load_into_tmp_tables >> raw_tables_insert >> typed_tables_insert >> conform_tables_insert
-            conform_tables_insert >> staged_tables_insert >> target_tables_insert >> clean_data
+            conform_tables_insert >> staged_tables_insert >> target_tables_insert >>\
+                report_broken_hierarchy >> clean_data
 
             if _fetch_old_surveys:
                 clean_data >> process_old_evaluations_data
