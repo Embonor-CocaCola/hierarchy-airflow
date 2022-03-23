@@ -100,7 +100,7 @@ SET
     route_id = STAGED.route_id,
     territory_id = STAGED.territory_id,
     channel_mkt = STAGED.channel_mkt,
-    cluster = STAGED.cluster_id,
+    cluster_id = STAGED.cluster_id,
     deleted_at = STAGED.deleted_at,
     market_group_id = STAGED.market_group_id,
     market_chain_id = STAGED.market_chain_id
