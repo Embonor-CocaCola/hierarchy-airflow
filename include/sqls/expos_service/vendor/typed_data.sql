@@ -23,7 +23,7 @@ INSERT INTO airflow.vendor_typed (
 SELECT
     trim(source_id) :: INTEGER,
     trim(name),
-    trim(rut)::int::text, -- To eliminate leading zeros
+    remove_rut_leading_zero(trim(rut)),
     trim(email),
     trim(phone),
     trim(branch_office) :: INTEGER,

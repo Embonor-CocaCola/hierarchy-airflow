@@ -1,4 +1,4 @@
-DROP FUNCTION find_vendors_with_broken_hierarchy(jobid int);
+DROP FUNCTION IF EXISTS find_vendors_with_broken_hierarchy(jobid int);
 CREATE FUNCTION find_vendors_with_broken_hierarchy(jobid int)
     RETURNS TABLE (
                     vendor_source_id int,
