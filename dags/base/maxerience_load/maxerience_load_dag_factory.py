@@ -130,6 +130,7 @@ class MaxerienceLoadDagFactory:
             close_complete_sessions = PythonOperator(
                 task_id='close_complete_sessions',
                 python_callable=self.close_complete_sessions,
+                execution_timeout=None,
                 dag=_dag,
             )
 
