@@ -81,6 +81,7 @@ class ProcessParquetFilesTaskGroup:
             task_id=f'process_{content_type}_parquet_files',
             task_group=task_group,
             python_callable=self.process_parquet_files,
+            execution_timeout=None,
             op_args=[content_type],
         ), self.parquet_types_to_process))
 
