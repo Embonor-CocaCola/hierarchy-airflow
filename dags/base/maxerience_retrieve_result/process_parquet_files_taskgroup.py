@@ -59,6 +59,7 @@ class ProcessParquetFilesTaskGroup:
             ) as file:
                 sql = file.read()
 
+            print(f'Attempting to insert {len(insert_data)} records...')
             multiple_insert_query(sql, values=insert_data)
 
             with open(
