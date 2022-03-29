@@ -8,7 +8,7 @@ UPDATE analyzed_photo AS ap SET
     external_id = a.external_id::integer,
     parquet_file_id = a.parquet_file_id::uuid
 FROM tmp_analyzed_photo_typed a
-where a.id = ap.id::text
+where a.id::text = ap.id::text
 and
 (
     ap.verified_on IS DISTINCT FROM a.verified_on OR

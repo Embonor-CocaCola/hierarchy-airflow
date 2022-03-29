@@ -61,7 +61,7 @@ def copy_csv_to_table(table, filepath, columns):
     print(f'Executing COPY to {table} from {filepath}')
     tmp_table_name_raw = f'tmp_{table}_raw'
     tmp_table_name_typed = f'tmp_{table}_typed'
-    columns_without_type = map(lambda name: name.split('::')[0])
+    columns_without_type = map(lambda name: name.split('::')[0], columns)
     if not os.path.isfile(filepath):
         raise FileNotFoundError(f'CSV file {filepath} not found')
 
@@ -71,20 +71,20 @@ def copy_csv_to_table(table, filepath, columns):
         with conn.cursor() as cursor:
             cursor.execute(f"""
                 DROP TABLE IF EXISTS {tmp_table_name_raw};
-                CREATE TEMPORARY UNLOGGED TABLE {tmp_table_name_raw}
+                CREATE TABLE {tmp_table_name_raw}
                 ({','.join(map(lambda name: f'{name} TEXT', columns_without_type))})
             """)
             cursor.execute(f"""
                 DROP TABLE IF EXISTS {tmp_table_name_typed};
-                CREATE TEMPORARY UNLOGGED TABLE {tmp_table_name_typed}
+                CREATE TABLE {tmp_table_name_typed}
                 ({','.join(map(lambda name: f'{name.split("::")[0]} {name.split("::")[1]}', columns))})
             """)
-            cursor.commit()
+            conn.commit()
             print('COPYing to raw tmp table')
             pg_hook.copy_expert(
                 f"""
                     COPY {tmp_table_name_raw}{enclose(','.join(columns_without_type))}
-                    FROM STDIN DELIMITER E',' CSV
+                    FROM STDIN DELIMITER E',' CSV QUOTE '|'
                     """,
                 filepath,
             )
@@ -94,5 +94,7 @@ def copy_csv_to_table(table, filepath, columns):
                             SELECT {','.join(columns)} FROM {tmp_table_name_raw}
                         """)
 
-            with open(f'{airflow_root_dir}/include/sqls/maxerience_retrieve_result/{table}inserts.sql') as sql:
+            with open(f'{airflow_root_dir}/include/sqls/maxerience_retrieve_result/{table}_inserts.sql', 'r') as file:
+                sql = file.read()
                 cursor.execute(sql)
+            conn.commit()

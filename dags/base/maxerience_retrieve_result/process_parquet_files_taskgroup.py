@@ -50,10 +50,10 @@ class ProcessParquetFilesTaskGroup:
             response = requests.get(parquet_file_uri)
             dataframe = pq.read_table(io.BytesIO(response.content)).to_pandas()
 
-            with open(csv_path, 'a') as file:
+            with open(csv_path, 'w') as file:
                 for row in dataframe.to_dict(orient='records'):
                     row_data = list(metadata['row_to_record'](row, parquet_id=parquet_id))
-                    file.write(','.join(row_data))
+                    file.write(','.join(map(lambda value: f'|{str(value)}|', row_data)))
                     file.write('\n')
 
             print(f'Attempting to insert {len(dataframe.index)} records...')
