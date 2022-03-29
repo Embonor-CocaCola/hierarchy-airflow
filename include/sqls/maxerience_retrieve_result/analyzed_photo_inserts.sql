@@ -7,17 +7,7 @@ UPDATE analyzed_photo AS ap SET
     file_created_time = a.file_created_time,
     external_id = a.external_id::integer,
     parquet_file_id = a.parquet_file_id::uuid
-from (values %s) as a(
-    id,
-    verified_on,
-    source,
-    image_quality,
-    created_on_time,
-    last_modified_time,
-    file_created_time,
-    external_id,
-    parquet_file_id
-)
+FROM tmp_analyzed_photo_typed a
 where a.id = ap.id::text
 and
 (

@@ -7,7 +7,7 @@ import uuid
 import pyarrow.parquet as pq
 
 from base.maxerience_retrieve_result.utils.parquet_type_metadata_map import parquet_type_metadata_map
-from base.utils.query_with_return import parameterized_query, multiple_insert_query
+from base.utils.query_with_return import parameterized_query, copy_csv_to_table
 from base.utils.tasks import arrange_task_list_sequentially
 from config.expos_service.settings import airflow_root_dir
 from config.maxerience_retrieve_result.settings import MRR_REST_BASE_URL, MRR_SAS_KEY
@@ -41,6 +41,8 @@ class ProcessParquetFilesTaskGroup:
             'content_type': metadata['maxerience_name'],
         })
 
+        csv_path = f'{airflow_root_dir}/data/parquet_as_csv.csv'
+
         for parquet in unprocessed_parquets:
             parquet_filename = parquet[1]
             parquet_id = parquet[0]
@@ -48,19 +50,14 @@ class ProcessParquetFilesTaskGroup:
             response = requests.get(parquet_file_uri)
             dataframe = pq.read_table(io.BytesIO(response.content)).to_pandas()
 
-            insert_data = []
+            with open(csv_path, 'a') as file:
+                for row in dataframe.to_dict(orient='records'):
+                    row_data = list(metadata['row_to_record'](row, parquet_id=parquet_id))
+                    file.write(','.join(row_data))
+                    file.write('\n')
 
-            for row in dataframe.to_dict(orient='records'):
-                insert_data.append(metadata['row_to_record'](row, parquet_id=parquet_id))
-
-            with open(
-                    f'{airflow_root_dir}/include/sqls/maxerience_retrieve_result/{metadata["table_name"]}_inserts.sql',
-                    'r',
-            ) as file:
-                sql = file.read()
-
-            print(f'Attempting to insert {len(insert_data)} records...')
-            multiple_insert_query(sql, values=insert_data)
+            print(f'Attempting to insert {len(dataframe.index)} records...')
+            copy_csv_to_table(table=metadata['table_name'], filepath=csv_path, columns=metadata['columns'])
 
             with open(
                     f'{airflow_root_dir}/include/sqls/maxerience_retrieve_result/update_parquet_file_as_processed.sql',

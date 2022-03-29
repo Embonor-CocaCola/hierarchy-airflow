@@ -1,5 +1,5 @@
+import json
 import uuid
-from psycopg2.extras import Json
 
 
 def recognized_product_row_to_record(row, **kwargs):
@@ -7,10 +7,10 @@ def recognized_product_row_to_record(row, **kwargs):
 
     return (
         recognized_prod_id,
-        uuid.UUID(row['SceneUID']),
+        row['SceneUID'],
         row['ProductID'],
-        uuid.UUID(row['SessionUID']),
-        Json({
+        row['SessionUID'],
+        json.dumps({
             'shelf': row['Shelf'],
             'column': row['Position'],
             'stock_position': row['StockPos'],

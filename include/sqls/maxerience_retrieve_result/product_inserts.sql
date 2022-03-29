@@ -44,7 +44,17 @@ INSERT INTO product (
     modified_by_user_id,
     modified_on
 )
-VALUES %s
+SELECT
+    id,
+    identity,
+    display,
+    details,
+    recognition_details,
+    created_by_user_id,
+    created_on,
+    modified_by_user_id,
+    modified_on
+FROM tmp_product_typed
 ON CONFLICT(id) DO UPDATE SET
     identity = EXCLUDED.identity,
     display = EXCLUDED.display,
