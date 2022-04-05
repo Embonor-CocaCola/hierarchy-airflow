@@ -208,6 +208,14 @@ class EtlDagFactory:
                     """,
                 )
 
+            precalculate_answers = PostgresOperator(
+                task_id='precalculate_answers',
+                postgres_conn_id=ES_AIRFLOW_DATABASE_CONN_ID,
+                sql="""
+                    CALL calculate_answer_based_data();
+                """,
+            )
+
             report_broken_hierarchy = PythonOperator(
                 task_id='report_broken_hierarchy',
                 python_callable=send_broken_hierarchy_data,
@@ -227,7 +235,7 @@ class EtlDagFactory:
             health_checks_task >> get_self_evaluation_survey_id >> [extract_from_pg, extract_from_mongo] >>\
                 load_into_tmp_tables >> raw_tables_insert >> typed_tables_insert >> conform_tables_insert
             conform_tables_insert >> staged_tables_insert >> target_tables_insert >>\
-                report_broken_hierarchy >> clean_data
+                precalculate_answers >> report_broken_hierarchy >> clean_data
 
             if _fetch_old_surveys:
                 clean_data >> process_old_evaluations_data

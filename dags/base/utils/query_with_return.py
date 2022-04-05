@@ -88,7 +88,7 @@ def copy_csv_to_table(table, filepath, columns):
                     """,
                 filepath,
             )
-            print('Inserting typed dat...')
+            print('Inserting typed data...')
             cursor.execute(f"""
                             INSERT INTO {tmp_table_name_typed}{enclose(','.join(columns_without_type))}
                             SELECT {','.join(columns)} FROM {tmp_table_name_raw}
