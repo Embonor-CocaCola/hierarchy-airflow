@@ -24,9 +24,9 @@ CREATE OR REPLACE PROCEDURE calculate_ir_based_data()
             ssd_amount,
             count(*) FILTER ( WHERE p.recognition_details->>'is_foreign' != 'true' AND p.details->>'category' IN ('AGUA', 'NCB', 'OTROS'))
             stills_amount,
-            count(*) FILTER ( WHERE p.recognition_details->>'is_foreign' != 'true' AND p.details->>'category' = 'SSD' AND p.display->>'package_type' IN ('TP', 'PET', 'VNR', 'LATA', 'SAC', 'TBD') )
-            returnable_amount,
             count(*) FILTER ( WHERE p.recognition_details->>'is_foreign' != 'true' AND p.details->>'category' = 'SSD' AND p.display->>'package_type' IN ('RP', 'V.RET', 'RGB') )
+            returnable_amount,
+            count(*) FILTER ( WHERE p.recognition_details->>'is_foreign' != 'true' AND p.details->>'category' = 'SSD' AND p.display->>'package_type' IN ('TP', 'PET', 'VNR', 'LATA', 'SAC', 'TBD') )
             disposable_amount,
             count(*) FILTER ( WHERE p.recognition_details->>'is_foreign' != 'true' AND p.details->>'category' = 'AGUA')
             waters_amount,
