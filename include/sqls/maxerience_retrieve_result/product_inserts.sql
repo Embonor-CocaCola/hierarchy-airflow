@@ -65,3 +65,16 @@ ON CONFLICT(id) DO UPDATE SET
     modified_by_user_id = EXCLUDED.modified_by_user_id,
     modified_on = EXCLUDED.modified_on
 ;
+
+ANALYZE product;
+
+DELETE FROM
+    product TARGET
+WHERE
+    TARGET.id IN (
+            SELECT p.id FROM product p
+                LEFT JOIN tmp_product_typed pt
+                ON pt.id = p.id
+                WHERE pt.id IS NULL
+        )
+;
