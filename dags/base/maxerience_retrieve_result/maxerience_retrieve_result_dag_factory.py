@@ -5,12 +5,15 @@ from airflow import DAG
 import xml.etree.ElementTree as ET
 
 from pathlib import Path
+
+from airflow.providers.postgres.operators.postgres import PostgresOperator
 from psycopg2.extensions import register_adapter
 from psycopg2.extras import Json
 from base.maxerience_retrieve_result.process_parquet_files_taskgroup import ProcessParquetFilesTaskGroup
 from base.utils.query_with_return import multiple_insert_query
 from base.utils.slack import build_status_msg, send_slack_notification
 from config.common.settings import SHOULD_NOTIFY, airflow_root_dir
+from config.expos_service.settings import ES_AIRFLOW_DATABASE_CONN_ID
 from config.maxerience_retrieve_result.settings import (
     MRR_DAG_ID,
     MRR_DAG_SCHEDULE_INTERVAL,
@@ -125,9 +128,17 @@ class MaxerienceRetrieveResultDagFactory:
 
             process_parquet_files = ProcessParquetFilesTaskGroup(dag=_dag, group_id='process_parquet_files').build()
 
+            preprocess_ir_data = PostgresOperator(
+                task_id='preprocess_ir_data',
+                postgres_conn_id=ES_AIRFLOW_DATABASE_CONN_ID,
+                sql="""
+                    CALL calculate_ir_based_data();
+                """,
+            )
+
             if SHOULD_NOTIFY:
                 notify_mrr_dag_start >> fetch_last_parquet_files
 
-            fetch_last_parquet_files >> process_parquet_files
+            fetch_last_parquet_files >> process_parquet_files >> preprocess_ir_data
 
         return _dag
