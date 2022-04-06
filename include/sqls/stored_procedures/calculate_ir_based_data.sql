@@ -39,5 +39,17 @@ CREATE OR REPLACE PROCEDURE calculate_ir_based_data()
             INNER JOIN product p on rp.product_id = p.id
         WHERE s.skips_survey = false
         GROUP BY s.id
-        ON CONFLICT (survey_id) DO NOTHING;
+        ON CONFLICT (survey_id) DO UPDATE SET
+            is_pure = excluded.is_pure,
+            total_cooler_products = excluded.total_cooler_products,
+            embonor_products = excluded.embonor_products,
+            ssd_amount = excluded.ssd_amount,
+            stills_amount = excluded.stills_amount,
+            returnable_amount = excluded.returnable_amount,
+            disposable_amount = excluded.disposable_amount,
+            waters_amount = excluded.waters_amount,
+            ncbs_amount = excluded.ncbs_amount,
+            essentials_compliant = excluded.essentials_compliant,
+            success_photo_compliant = excluded.success_photo_compliant
+;
 $$;

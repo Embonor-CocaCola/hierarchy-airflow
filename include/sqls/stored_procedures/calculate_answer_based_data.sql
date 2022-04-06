@@ -16,7 +16,7 @@ CREATE OR REPLACE PROCEDURE calculate_answer_based_data()
             is_first_position,
             CASE count(*) FILTER ( WHERE q.heading = '¿Están los equipos de frío Embonor puros?' and a.values->>0 = 'true')
             WHEN 1 THEN true ELSE false END
-            is_pure_by_answer,
+            is_pure,
             CASE count(*) FILTER ( WHERE q.heading = '¿Se encuentran marcados los precios?' and a.values->>0 = 'true')
             WHEN 1 THEN true ELSE false END
             tagged_price,
@@ -38,5 +38,13 @@ CREATE OR REPLACE PROCEDURE calculate_answer_based_data()
             INNER JOIN question q on q.id = a.question_id
         WHERE s.skips_survey = false
         GROUP BY s.id
-        ON CONFLICT (survey_id) DO NOTHING;
+        ON CONFLICT (survey_id) DO UPDATE SET
+        is_first_position = excluded.is_first_position,
+        is_pure = excluded.is_pure,
+        tagged_price = excluded.tagged_price,
+        has_sixty_percent_ssd = excluded.has_sixty_percent_ssd,
+        has_forty_percent_stills = excluded.has_forty_percent_stills,
+        has_edf = excluded.has_edf,
+        filled_75_percent = excluded.filled_75_percent
+;
 $$;
