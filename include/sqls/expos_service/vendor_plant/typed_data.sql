@@ -29,4 +29,5 @@ SELECT
 FROM
     airflow.vendor_plant_raw
 WHERE job_id = %(job_id)s :: BIGINT
+AND supervisor_id IS NOT NULL
 ;
