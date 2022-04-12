@@ -24,7 +24,7 @@ VALUES (
     '{"name": "Foreign", "sku": "0"}',
     '{}',
     '{}',
-    '{}',
+    '{"is_foreign": true}',
     1,
     now() :: timestamp,
     1,
