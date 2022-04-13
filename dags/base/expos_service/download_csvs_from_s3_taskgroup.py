@@ -29,11 +29,17 @@ class DownloadCsvsFromS3TaskGroup:
             SPCL_S3_CONN_ID,
         )
 
-        s3_hook.download_file(
-            key=f'etl_csvs/{file_name}',
-            bucket_name='expos_bucket',
-            local_path=os.path.join(airflow_root_dir, 'data', f'{file_name}.csv'),
+        tmp_filename = s3_hook.download_file(
+            key=f'etl_csvs/{file_name}.csv',
+            bucket_name='expos-bucket',
+            local_path=os.path.join(airflow_root_dir, 'data'),
         )
+
+        os.rename(
+            os.path.join(airflow_root_dir, 'data', tmp_filename),
+            os.path.join(airflow_root_dir, 'data', f'{file_name}.csv'),
+        )
+
         info('Download finished')
 
     def create_download_task(self, file_name: str, task_group: TaskGroup):

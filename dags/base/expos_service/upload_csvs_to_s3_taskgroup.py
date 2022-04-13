@@ -30,7 +30,7 @@ class UploadCsvsToS3TaskGroup:
         )
         s3_hook.load_file(
             filename=os.path.join(airflow_root_dir, 'data', f'{file_name}.csv'),
-            key=f'etl_csvs/{file_name}',
+            key=f'etl_csvs/{file_name}.csv',
             bucket_name='expos-bucket',
             replace=True,
         )
