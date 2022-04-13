@@ -1,5 +1,3 @@
-
-
 original_table_name_to_new_name_map = {
     'answers': 'answer',
     'BranchOffices': 'branch_office',
@@ -13,6 +11,8 @@ original_table_name_to_new_name_map = {
     'VendorsCustomers': 'vendor_customer',
     'VendorsPlants': 'vendor_plant',
     'VendorTypes': 'vendor_type',
+    'Dictionary': 'dictionary',
+    'SuccessPhotoProduct': 'success_photo_product',
 }
 
 table_name_to_columns = {

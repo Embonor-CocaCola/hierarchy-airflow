@@ -73,3 +73,6 @@ secret:
   - envName: "SLACK_EXPOS_BOT_TOKEN"
     secretName: "airflow-envars"
     secretKey: "SLACK_EXPOS_BOT_TOKEN"
+  - envName: "SPCL_S3_CONN_URI"
+    secretName: "airflow-envars"
+    secretKey: "SPCL_S3_CONN_URI"

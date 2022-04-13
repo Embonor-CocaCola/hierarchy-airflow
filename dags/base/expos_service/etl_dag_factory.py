@@ -6,9 +6,9 @@ from airflow.operators.python import PythonOperator
 from airflow.providers.postgres.operators.postgres import PostgresOperator
 
 from base.expos_service.clean_data_taskgroup import CleanDataTaskGroup
-from base.expos_service.load_csv_into_temp_tables_taskgroup import LoadCsvIntoTempTablesTaskGroup
+from base.utils.load_csv_into_temp_tables_taskgroup import LoadCsvIntoTempTablesTaskGroup
 from base.expos_service.send_broken_hierarchy_data import send_broken_hierarchy_data
-from base.expos_service.tables_insert_taskgroup import TablesInsertTaskGroup
+from base.utils.tables_insert_taskgroup import TablesInsertTaskGroup
 from base.expos_service.extract_docdb_csv_taskgroup import \
     ExtractDocumentDbCsvTaskGroup
 from base.expos_service.extract_pg_csv_taskgroup import \
@@ -163,22 +163,26 @@ class EtlDagFactory:
             load_into_tmp_tables = LoadCsvIntoTempTablesTaskGroup(
                 tables_to_insert=_tables_to_insert,
                 task_group_id='create_and_load_tmp_tables_from_csv',
+                sql_folder='expos_service',
             ).build()
 
             raw_tables_insert = TablesInsertTaskGroup(
                 tables_to_insert=_table_manager.get_normalized_names(),
+                sql_folder='expos_service',
                 stage='raw',
                 job_id=_job_id,
             ).build()
 
             typed_tables_insert = TablesInsertTaskGroup(
                 tables_to_insert=_table_manager.get_normalized_names(),
+                sql_folder='expos_service',
                 stage='typed',
                 job_id=_job_id,
             ).build()
 
             conform_tables_insert = TablesInsertTaskGroup(
                 tables_to_insert=_conform_operations,
+                sql_folder='expos_service',
                 stage='conform',
                 sequential=True,
                 job_id=_job_id,
@@ -186,6 +190,7 @@ class EtlDagFactory:
 
             staged_tables_insert = TablesInsertTaskGroup(
                 tables_to_insert=_staged_operations,
+                sql_folder='expos_service',
                 stage='staged',
                 sequential=True,
                 job_id=_job_id,
@@ -193,6 +198,7 @@ class EtlDagFactory:
 
             target_tables_insert = TablesInsertTaskGroup(
                 tables_to_insert=_target_operations,
+                sql_folder='expos_service',
                 stage='target',
                 sequential=True,
                 job_id=_job_id,

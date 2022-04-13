@@ -9,13 +9,14 @@ from airflow.providers.postgres.hooks.postgres import PostgresHook
 class PostgresOperatorCopyExpert(BaseOperator):
     template_fields = 'csv_path', 'additional_values'
 
-    def __init__(self, postgres_conn_id, table, csv_path, column_names=None, additional_columns=None,
+    def __init__(self, postgres_conn_id, table, csv_path, delimiter=',', column_names=None, additional_columns=None,
                  additional_values=None, *args, **kwargs):
         super(PostgresOperatorCopyExpert, self).__init__(*args, **kwargs)
 
         self.postgres_conn_id = postgres_conn_id
         self.table = table
         self.csv_path = csv_path
+        self.delimiter = delimiter
         self.column_names = column_names
         self.additional_columns = additional_columns
         self.additional_values = additional_values
@@ -39,7 +40,7 @@ class PostgresOperatorCopyExpert(BaseOperator):
         if not os.path.isfile(self.csv_path):
             raise FileNotFoundError(f'CSV file {self.csv_path} not found')
         hook.copy_expert(
-            f"COPY {self.table}{self.enclose(self.columns)} FROM STDIN DELIMITER E',' CSV HEADER",
+            f"COPY {self.table}{self.enclose(self.columns)} FROM STDIN DELIMITER E'{self.delimiter}' CSV HEADER",
             self.csv_path,
         )
 

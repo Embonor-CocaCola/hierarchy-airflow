@@ -8,6 +8,7 @@ from airflow.utils.session import provide_session
 import config.survey_monthly_photo_loader.settings
 import expos_service.settings as es_config
 import common.settings as common_config
+import success_photo_configuration_load.settings as spcl_config
 
 
 @provide_session
@@ -132,6 +133,10 @@ if __name__ == '__main__':
         common_config.EXPOS_DATABASE_CONN_ID: {
             'conn_id': common_config.EXPOS_DATABASE_CONN_ID,
             'conn_uri': os.environ.get('EXPOS_SQL_CONN_URI'),
+        },
+        spcl_config.SPCL_S3_CONN_ID: {
+            'conn_id': spcl_config.SPCL_S3_CONN_ID,
+            'conn_uri': os.environ.get('SPCL_S3_CONN_URI'),
         },
     }
     _variable_config = {

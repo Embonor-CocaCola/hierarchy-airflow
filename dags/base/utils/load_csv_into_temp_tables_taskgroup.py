@@ -11,7 +11,7 @@ from base.utils.tasks import arrange_task_list_sequentially
 
 
 class LoadCsvIntoTempTablesTaskGroup:
-    def __init__(self, tables_to_insert: list[str], task_group_id: str):
+    def __init__(self, tables_to_insert: list[str], task_group_id: str, sql_folder, delimiter=','):
         if not tables_to_insert:
             raise ValueError('missing parameter tables_to_insert')
 
@@ -19,6 +19,8 @@ class LoadCsvIntoTempTablesTaskGroup:
         self.task_group = TaskGroup(group_id=task_group_id)
 
         self.table_name_manager = TableNameManager(tables_to_insert)
+        self.sql_folder = sql_folder
+        self.delimiter = delimiter
 
     def create_insert_task(self, original_table_name: str):
         table_names = self.table_name_manager.get_variations(original_table_name)
@@ -31,7 +33,7 @@ class LoadCsvIntoTempTablesTaskGroup:
             task_id=f'create_tmp_{table_names["normalized"]}',
             task_group=task_group,
             sql=os.path.join(
-                'expos_service', table_names['normalized'], 'create_tmp_table.sql',
+                self.sql_folder, table_names['normalized'], 'create_tmp_table.sql',
             ),
             parameters=additional_params.get(params_key, {}),
         )
@@ -42,6 +44,7 @@ class LoadCsvIntoTempTablesTaskGroup:
             task_group=task_group,
             table=f"airflow.{table_names['tmp']}",
             csv_path=csv_path,
+            delimiter=self.delimiter,
         )
 
         create_temp_table_task >> insert_tmp_task

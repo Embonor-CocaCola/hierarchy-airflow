@@ -7,6 +7,7 @@ from config.expos_service.settings import ES_STAGE, ES_ETL_DAG_ID
 from config.maxerience_load.settings import ML_DAG_ID
 from config.maxerience_load_retry.settings import MLR_DAG_ID
 from config.maxerience_retrieve_result.settings import MRR_DAG_ID
+from config.success_photo_configuration_load.settings import SPCL_DAG_ID
 
 webhooks_by_type = {
     'success': config.SLACK_SUCCESS_CHANNEL_URL,
@@ -29,6 +30,10 @@ details_by_dag = {
     MLR_DAG_ID: {
         'emoji': ':arrows_clockwise:',
         'dag_name': 'MAXERIENCE LOAD RETRY DAG',
+    },
+    SPCL_DAG_ID: {
+        'emoji': ':selfie:',
+        'dag_name': 'SUCCESS PHOTO CONFIGURATION LOAD',
     },
 }
 
