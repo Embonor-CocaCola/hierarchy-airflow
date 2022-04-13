@@ -2,6 +2,7 @@ import json
 from datetime import datetime, timedelta
 
 from airflow.models import DAG, Variable
+from airflow.operators.dummy import DummyOperator
 from airflow.operators.python import PythonOperator
 from airflow.providers.postgres.operators.postgres import PostgresOperator
 
@@ -36,7 +37,7 @@ from config.expos_service.settings import (
     ES_MONGO_COLLECTIONS_TO_EXTRACT,
     ES_PG_TABLES_TO_EXTRACT,
     ES_ETL_CONFORM_OPERATIONS_ORDER, ES_ETL_STAGED_OPERATIONS_ORDER, ES_ETL_TARGET_OPERATIONS_ORDER,
-    ES_FETCH_OLD_EVALUATIONS_KEY,
+    ES_FETCH_OLD_EVALUATIONS_KEY, ES_ETL_CHECK_RUN_DAG_ID, ES_ETL_CHECK_RUN_DAG_SCHEDULE_INTERVAL,
 )
 
 from operators.postgres.create_job import PostgresOperatorCreateJob
@@ -44,34 +45,36 @@ from operators.postgres.create_job import PostgresOperatorCreateJob
 
 class EtlDagFactory:
 
-    @staticmethod
-    def on_failure_callback(context):
+    def on_failure_callback(self, context):
         if not SHOULD_NOTIFY:
             return
         ti = context['task_instance']
         run_id = context['run_id']
         send_slack_notification(notification_type='alert',
                                 payload=build_status_msg(
-                                    dag_id=ES_ETL_DAG_ID,
+                                    dag_id=self.dag_id,
                                     status='failed',
                                     mappings={'run_id': run_id, 'task_id': ti.task_id},
                                 ))
 
-    @staticmethod
-    def on_success_callback(context):
+    def on_success_callback(self, context):
         if not SHOULD_NOTIFY:
             return
 
         run_id = context['run_id']
         send_slack_notification(notification_type='success',
                                 payload=build_status_msg(
-                                    dag_id=ES_ETL_DAG_ID,
+                                    dag_id=self.dag_id,
                                     status='finished',
                                     mappings={'run_id': run_id},
                                 ))
 
-    @staticmethod
-    def build() -> DAG:
+    def __init__(self, check_run=False):
+        self.check_run = check_run
+        self.dag_id = ES_ETL_CHECK_RUN_DAG_ID if check_run else ES_ETL_DAG_ID
+        self.schedule_interval = ES_ETL_CHECK_RUN_DAG_SCHEDULE_INTERVAL if check_run else ES_ETL_DAG_SCHEDULE_INTERVAL
+
+    def build(self) -> DAG:
         _start_date = datetime.strptime(
             ES_ETL_DAG_START_DATE_VALUE, '%Y-%m-%d')
         _default_args = {
@@ -81,7 +84,7 @@ class EtlDagFactory:
             'execution_timeout': timedelta(seconds=240),
             'retries': 2,
             'retry_delay': timedelta(seconds=5),
-            'on_failure_callback': EtlDagFactory.on_failure_callback,
+            'on_failure_callback': self.on_failure_callback,
         }
         _pg_table_list = ES_PG_TABLES_TO_EXTRACT
         _mongo_collection_list = ES_MONGO_COLLECTIONS_TO_EXTRACT
@@ -90,18 +93,19 @@ class EtlDagFactory:
         _staged_operations = ES_ETL_STAGED_OPERATIONS_ORDER
         _target_operations = ES_ETL_TARGET_OPERATIONS_ORDER
         _table_manager = TableNameManager(_tables_to_insert)
+
         pg_tunnel = Tunneler(
             ES_REMOTE_RDS_PORT, ES_REMOTE_RDS_HOST, 5433) if IS_LOCAL_RUN else None
         mongo_tunnel = Tunneler(
             ES_REMOTE_MONGO_PORT, ES_REMOTE_MONGO_HOST, 27018) if IS_LOCAL_RUN else None
 
         with DAG(
-                ES_ETL_DAG_ID,
-                schedule_interval=ES_ETL_DAG_SCHEDULE_INTERVAL,
+                self.dag_id,
+                schedule_interval=self.schedule_interval,
                 default_args=_default_args,
                 template_searchpath=ES_SQL_PATH,
                 max_active_runs=1,
-                on_success_callback=EtlDagFactory.on_success_callback,
+                on_success_callback=self.on_success_callback,
                 catchup=False,
                 user_defined_filters={
                     'oid_from_dict': lambda dict: dict[0]['_id']['$oid'],
@@ -121,7 +125,7 @@ class EtlDagFactory:
                     task_id='notify_etl_start',
                     op_kwargs={
                         'payload': build_status_msg(
-                            dag_id=ES_ETL_DAG_ID,
+                            dag_id=self.dag_id,
                             status='started',
                             mappings={'run_id': '{{ run_id }}'},
                         ),
@@ -136,7 +140,7 @@ class EtlDagFactory:
             if not _fetch_old_surveys:
                 _survey_filters['paused'] = False
 
-            if SHOULD_UPLOAD_TO_S3:
+            if SHOULD_UPLOAD_TO_S3 or self.check_run:
                 health_checks_task = HealthChecksTaskGroup(
                     _dag, group_id='health_checks', pg_tunnel=pg_tunnel).build()
 
@@ -153,7 +157,8 @@ class EtlDagFactory:
                     },
                 )
 
-                upload_csvs_to_s3 = UploadCsvsToS3TaskGroup(
+                upload_csvs_to_s3 = DummyOperator(task_id='dummy_upload_to_s3') if self.check_run \
+                    else UploadCsvsToS3TaskGroup(
                     _dag,
                     group_id='upload_csvs_to_s3',
                     file_names=_pg_table_list + _mongo_collection_list,
@@ -178,6 +183,7 @@ class EtlDagFactory:
                 tables_to_insert=_tables_to_insert,
                 task_group_id='create_and_load_tmp_tables_from_csv',
                 sql_folder='expos_service',
+                check_run=self.check_run,
             ).build()
 
             raw_tables_insert = TablesInsertTaskGroup(
@@ -210,7 +216,8 @@ class EtlDagFactory:
                 job_id=_job_id,
             ).build()
 
-            target_tables_insert = TablesInsertTaskGroup(
+            target_tables_insert = DummyOperator(task_id='dummy_target_inserts') if self.check_run \
+                else TablesInsertTaskGroup(
                 tables_to_insert=_target_operations,
                 sql_folder='expos_service',
                 stage='target',
@@ -250,7 +257,7 @@ class EtlDagFactory:
             if SHOULD_NOTIFY:
                 notify_etl_start >> create_job_task
 
-            if SHOULD_UPLOAD_TO_S3:
+            if SHOULD_UPLOAD_TO_S3 or self.check_run:
                 create_job_task >> health_checks_task >> get_self_evaluation_survey_id >> \
                     [extract_from_pg, extract_from_mongo] >>\
                     upload_csvs_to_s3 >> load_into_tmp_tables
