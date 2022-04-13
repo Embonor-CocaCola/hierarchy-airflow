@@ -6,6 +6,7 @@ from airflow.operators.python import PythonOperator
 from airflow.providers.postgres.operators.postgres import PostgresOperator
 
 from base.expos_service.clean_data_taskgroup import CleanDataTaskGroup
+from base.expos_service.download_csvs_from_s3_taskgroup import DownloadCsvsFromS3TaskGroup
 from base.utils.load_csv_into_temp_tables_taskgroup import LoadCsvIntoTempTablesTaskGroup
 from base.expos_service.send_broken_hierarchy_data import send_broken_hierarchy_data
 from base.utils.tables_insert_taskgroup import TablesInsertTaskGroup
@@ -14,11 +15,12 @@ from base.expos_service.extract_docdb_csv_taskgroup import \
 from base.expos_service.extract_pg_csv_taskgroup import \
     ExtractPostgresCsvTaskGroup
 from base.expos_service.health_checks_taskgroup import HealthChecksTaskGroup
+from base.expos_service.upload_csvs_to_s3_taskgroup import UploadCsvsToS3TaskGroup
 from base.utils.mongo import execute_query
 from base.utils.slack import build_status_msg, send_slack_notification
 from base.utils.table_names import TableNameManager
 from base.utils.tunneler import Tunneler
-from config.common.settings import SHOULD_NOTIFY
+from config.common.settings import SHOULD_NOTIFY, SHOULD_UPLOAD_TO_S3
 from config.expos_service.settings import (
     ES_AIRFLOW_DATABASE_CONN_ID,
     ES_ETL_DAG_ID,
@@ -128,37 +130,49 @@ class EtlDagFactory:
                     dag=_dag,
                 )
 
-            health_checks_task = HealthChecksTaskGroup(
-                _dag, group_id='health_checks', pg_tunnel=pg_tunnel).build()
-
             _survey_filters = {'name': 'Autoevaluación'}
             _fetch_old_surveys = Variable.get(ES_FETCH_OLD_EVALUATIONS_KEY) == 'True'
 
             if not _fetch_old_surveys:
                 _survey_filters['paused'] = False
 
-            get_self_evaluation_survey_id = PythonOperator(
-                task_id='get_self_evaluation_survey_id',
-                python_callable=execute_query,
-                do_xcom_push=True,
-                op_kwargs={
-                    'collection_name': 'surveys',
-                    'conn_id': ES_EMBONOR_MONGO_CONN_ID,
-                    'db_name': ES_EMBONOR_MONGO_DB_NAME,
-                    'filters': _survey_filters,
-                    'tunnel': mongo_tunnel,
-                },
-            )
+            if SHOULD_UPLOAD_TO_S3:
+                health_checks_task = HealthChecksTaskGroup(
+                    _dag, group_id='health_checks', pg_tunnel=pg_tunnel).build()
 
-            extract_from_pg = ExtractPostgresCsvTaskGroup(
-                _dag, group_id='extract_from_pg', pg_tunnel=pg_tunnel, table_list=_pg_table_list).build()
+                get_self_evaluation_survey_id = PythonOperator(
+                    task_id='get_self_evaluation_survey_id',
+                    python_callable=execute_query,
+                    do_xcom_push=True,
+                    op_kwargs={
+                        'collection_name': 'surveys',
+                        'conn_id': ES_EMBONOR_MONGO_CONN_ID,
+                        'db_name': ES_EMBONOR_MONGO_DB_NAME,
+                        'filters': _survey_filters,
+                        'tunnel': mongo_tunnel,
+                    },
+                )
 
-            extract_from_mongo = ExtractDocumentDbCsvTaskGroup(
-                _dag,
-                group_id='extract_from_document_db',
-                mongo_tunnel=mongo_tunnel,
-                collection_list=_mongo_collection_list,
-            ).build()
+                upload_csvs_to_s3 = UploadCsvsToS3TaskGroup(
+                    _dag,
+                    group_id='upload_csvs_to_s3',
+                    file_names=_pg_table_list + _mongo_collection_list,
+                ).build()
+                extract_from_pg = ExtractPostgresCsvTaskGroup(
+                    _dag, group_id='extract_from_pg', pg_tunnel=pg_tunnel, table_list=_pg_table_list).build()
+
+                extract_from_mongo = ExtractDocumentDbCsvTaskGroup(
+                    _dag,
+                    group_id='extract_from_document_db',
+                    mongo_tunnel=mongo_tunnel,
+                    collection_list=_mongo_collection_list,
+                ).build()
+            else:
+                download_csvs_from_s3 = DownloadCsvsFromS3TaskGroup(
+                    _dag,
+                    group_id='download_csvs_from_s3',
+                    file_names=_pg_table_list + _mongo_collection_list,
+                ).build()
 
             load_into_tmp_tables = LoadCsvIntoTempTablesTaskGroup(
                 tables_to_insert=_tables_to_insert,
@@ -234,13 +248,17 @@ class EtlDagFactory:
             ).build()
 
             if SHOULD_NOTIFY:
-                create_job_task >> notify_etl_start >> health_checks_task
-            else:
-                create_job_task >> health_checks_task
+                notify_etl_start >> create_job_task
 
-            health_checks_task >> get_self_evaluation_survey_id >> [extract_from_pg, extract_from_mongo] >>\
-                load_into_tmp_tables >> raw_tables_insert >> typed_tables_insert >> conform_tables_insert
-            conform_tables_insert >> staged_tables_insert >> target_tables_insert >>\
+            if SHOULD_UPLOAD_TO_S3:
+                create_job_task >> health_checks_task >> get_self_evaluation_survey_id >> \
+                    [extract_from_pg, extract_from_mongo] >>\
+                    upload_csvs_to_s3 >> load_into_tmp_tables
+            else:
+                create_job_task >> download_csvs_from_s3 >> load_into_tmp_tables
+
+            load_into_tmp_tables >> raw_tables_insert >> typed_tables_insert >> conform_tables_insert >>\
+                staged_tables_insert >> target_tables_insert >>\
                 precalculate_answers >> report_broken_hierarchy >> clean_data
 
             if _fetch_old_surveys:
