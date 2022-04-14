@@ -11,7 +11,7 @@ from base.utils.tasks import arrange_task_list_sequentially
 
 
 class LoadCsvIntoTempTablesTaskGroup:
-    def __init__(self, tables_to_insert: list[str], task_group_id: str, sql_folder, delimiter=','):
+    def __init__(self, tables_to_insert: list[str], task_group_id: str, sql_folder, delimiter=',', check_run=False):
         if not tables_to_insert:
             raise ValueError('missing parameter tables_to_insert')
 
@@ -21,12 +21,13 @@ class LoadCsvIntoTempTablesTaskGroup:
         self.table_name_manager = TableNameManager(tables_to_insert)
         self.sql_folder = sql_folder
         self.delimiter = delimiter
+        self.check_run = check_run
 
     def create_insert_task(self, original_table_name: str):
         table_names = self.table_name_manager.get_variations(original_table_name)
         task_group = TaskGroup(group_id=f'insert_{table_names["tmp"]}')
         csv_path = os.path.join(airflow_root_dir, 'data', f'{original_table_name}.csv')
-        params_key = self.create_params_key(original_table_name)
+        params_key = self.create_params_key(original_table_name, check_run=self.check_run)
 
         create_temp_table_task = PostgresOperatorWithParams(
             postgres_conn_id=ES_AIRFLOW_DATABASE_CONN_ID,
@@ -51,8 +52,8 @@ class LoadCsvIntoTempTablesTaskGroup:
 
         return task_group
 
-    def create_params_key(self, original_table_name):
-        return '.'.join([ES_STAGE, original_table_name, 'temp'])
+    def create_params_key(self, original_table_name, check_run: bool):
+        return '.'.join([ES_STAGE if check_run else 'production', original_table_name, 'temp'])
 
     def build(self):
         with self.task_group as tg:

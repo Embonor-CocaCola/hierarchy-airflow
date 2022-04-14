@@ -30,6 +30,10 @@ ES_ETL_DAG_ID = 'expos_etl'
 ES_ETL_DAG_START_DATE_VALUE = os.environ.get('ES_ETL_DAG_START_DATE_VALUE', '2021-11-24')
 ES_ETL_DAG_SCHEDULE_INTERVAL = os.environ.get('ES_ETL_DAG_SCHEDULE_INTERVAL', '30 11 * * *')  # everyday at 11:30 UTC
 ES_SQL_PATH = os.path.join(airflow_root_dir, 'include', 'sqls')
+ES_ETL_CHECK_RUN_DAG_ID = 'expos_etl_check_run'
+
+# every sunday at 23:59 UTC
+ES_ETL_CHECK_RUN_DAG_SCHEDULE_INTERVAL = os.environ.get('ES_ETL_DAG_SCHEDULE_INTERVAL', '59 23 * * 0')
 
 ES_SSH_CONN_ID = 'ssh_conn'
 ES_SSH_CONN_URI = f'{os.environ.get("SSH_CONN_URI")}&key_file={os.environ.get("SSH_PEM_FILE_PATH")}'

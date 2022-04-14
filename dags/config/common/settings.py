@@ -11,3 +11,4 @@ SHOULD_NOTIFY = ES_STAGE in ['staging', 'production'] and not IS_LOCAL_RUN
 EXPOS_DATABASE_CONN_ID = 'expos_db_conn_id'
 SLACK_EXPOS_BOT_TOKEN = os.environ.get('SLACK_EXPOS_BOT_TOKEN')
 SLACK_ETL_SUCCESS_CHANNEL = os.environ.get('SLACK_ETL_SUCCESS_CHANNEL')
+SHOULD_UPLOAD_TO_S3 = ES_STAGE == 'production' and not IS_LOCAL_RUN
