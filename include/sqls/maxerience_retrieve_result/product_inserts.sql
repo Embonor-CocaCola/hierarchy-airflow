@@ -113,4 +113,5 @@ WHERE
                 ON pt.id = p.id
                 WHERE pt.id IS NULL
         )
+    AND TARGET.id NOT IN (18, 54)
 ;
