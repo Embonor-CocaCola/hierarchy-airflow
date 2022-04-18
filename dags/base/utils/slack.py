@@ -3,7 +3,7 @@ import json
 import requests
 
 import config.common.settings as config
-from config.expos_service.settings import ES_STAGE, ES_ETL_DAG_ID
+from config.expos_service.settings import ES_STAGE, ES_ETL_DAG_ID, ES_ETL_CHECK_RUN_DAG_ID
 from config.maxerience_load.settings import ML_DAG_ID
 from config.maxerience_load_retry.settings import MLR_DAG_ID
 from config.maxerience_retrieve_result.settings import MRR_DAG_ID
@@ -34,6 +34,10 @@ details_by_dag = {
     SPCL_DAG_ID: {
         'emoji': ':selfie:',
         'dag_name': 'SUCCESS PHOTO CONFIGURATION LOAD',
+    },
+    ES_ETL_CHECK_RUN_DAG_ID: {
+        'emoji': ':test_tube:',
+        'dag_name': 'ETL CHECK RUN FOR STAGING',
     },
 }
 
