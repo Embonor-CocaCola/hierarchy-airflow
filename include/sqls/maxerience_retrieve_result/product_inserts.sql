@@ -81,8 +81,14 @@ SELECT
     created_by_user_id,
     created_on,
     modified_by_user_id,
-    modified_on
-    sku
+    modified_on,
+    sku,
+    "name",
+    "group",
+    "category",
+    local_category_name,
+    is_foreign,
+    flavour_name
 FROM tmp_product_typed
 ON CONFLICT(id) DO UPDATE SET
     identity = EXCLUDED.identity,
