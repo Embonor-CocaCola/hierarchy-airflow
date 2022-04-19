@@ -97,7 +97,7 @@ To create separate users in order to store airflow related tables in one schema 
 ```postgresql
 CREATE USER airflow WITH ENCRYPTED PASSWORD 'somepass';
 ALTER SCHEMA airflow OWNER TO airflow;
-ALTER ROLE airflow SET search_path = 'airflow,public';
+ALTER ROLE airflow SET search_path = airflow,public;
 
 GRANT ALL PRIVILEGES ON DATABASE expos_service TO airflow;
 
