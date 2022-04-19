@@ -10,7 +10,7 @@ parquet_type_metadata_map = {
         'columns': ['id::integer', 'identity::jsonb', 'display::jsonb', 'details::jsonb', 'recognition_details::jsonb',
                     'created_by_user_id::integer', 'created_on::timestamp',
                     'modified_by_user_id::integer', 'modified_on::timestamp',
-                    'sku::integer', 'name::text', 'group::text', 'category::text', 'local_category_name::text',
+                    'sku::integer', 'name::text', '"group"::text', 'category::text', 'local_category_name::text',
                     'is_foreign::boolean', 'flavour_name::text',
                     ],
     },
