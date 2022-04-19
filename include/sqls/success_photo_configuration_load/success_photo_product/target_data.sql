@@ -1,5 +1,3 @@
-BEGIN;
-
 TRUNCATE TABLE success_photo_product;
 
 INSERT INTO success_photo_product (
@@ -25,5 +23,3 @@ FROM
     airflow.success_photo_product_conform STAGED
     INNER JOIN cluster ON cluster.weight = STAGED.cluster
 ;
-
-COMMIT;
