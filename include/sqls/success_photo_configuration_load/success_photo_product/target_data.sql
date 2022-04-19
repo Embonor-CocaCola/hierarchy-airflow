@@ -1,4 +1,4 @@
-TRUNCATE TABLE success_photo_product;
+DELETE FROM success_photo_product;
 
 INSERT INTO success_photo_product (
     skus,
