@@ -90,6 +90,7 @@ SELECT
     is_foreign,
     flavour_name
 FROM tmp_product_typed
+WHERE manufacturer != 'Embol'
 ON CONFLICT(id) DO UPDATE SET
     identity = EXCLUDED.identity,
     display = EXCLUDED.display,
@@ -116,7 +117,7 @@ WHERE
     TARGET.id IN (
             SELECT p.id FROM product p
                 LEFT JOIN tmp_product_typed pt
-                ON pt.id = p.id
+                ON pt.id = p.id AND pt.manufacturer != 'Embol'
                 WHERE pt.id IS NULL
         )
     AND TARGET.id NOT IN (18, 54)

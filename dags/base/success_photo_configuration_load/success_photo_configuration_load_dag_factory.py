@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 import os
 from airflow.models import DAG
 from airflow.operators.python import PythonOperator
+from airflow.providers.postgres.operators.postgres import PostgresOperator
 
 from base.utils.slack import build_status_msg, send_slack_notification
 from base.utils.table_names import TableNameManager
@@ -9,7 +10,7 @@ from base.utils.tables_insert_taskgroup import TablesInsertTaskGroup
 from base.utils.load_csv_into_temp_tables_taskgroup import LoadCsvIntoTempTablesTaskGroup
 from base.success_photo_configuration_load.download_csv_task_group import DownloadCsvTaskGroup
 from config.common.settings import SHOULD_NOTIFY
-from config.expos_service.settings import ES_SQL_PATH, airflow_root_dir
+from config.expos_service.settings import ES_SQL_PATH, airflow_root_dir, ES_AIRFLOW_DATABASE_CONN_ID
 from config.success_photo_configuration_load.settings import (
     SPCL_DAG_ID,
     SPCL_DAG_START_DATE_VALUE,
@@ -141,10 +142,19 @@ class SuccessPhotoConfigurationLoadDagFactory:
                 stage='target',
             ).build()
 
+            update_and_refresh_data = PostgresOperator(
+                task_id='update_and_refresh_data',
+                postgres_conn_id=ES_AIRFLOW_DATABASE_CONN_ID,
+                sql="""
+                    REFRESH MATERIALIZED VIEW sku_family_compliance;
+                    CALL update_success_photo_products();
+                """,
+            )
+
             if SHOULD_NOTIFY:
                 notify_etl_start >> download_csvs
 
             download_csvs >> load_into_tmp_tables >> raw_tables_insert >> typed_tables_insert
-            typed_tables_insert >> conform_tables_insert >> target_tables_insert
+            typed_tables_insert >> conform_tables_insert >> target_tables_insert >> update_and_refresh_data
 
         return dag

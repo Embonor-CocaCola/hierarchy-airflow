@@ -76,4 +76,5 @@ def product_row_to_db_record(row, **kwargs):
         null_safe(row['LocalProductCategoryName']),
         null_safe(row['IsForeign']),
         null_safe(row['FlavourName']),
+        null_safe(row['Manufacturer']),
     )
