@@ -1,7 +1,7 @@
 ingress:
   web:
     hosts:
-      - airflow2.staging.embonorservices.cl
+      - airflow2.production.embonorservices.cl
 
 env:
   - name: STAGE
