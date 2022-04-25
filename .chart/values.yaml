@@ -32,10 +32,10 @@ workers:
   resources:
     limits:
      cpu: 200m
-     memory: 256Mi
+     memory: 2048Mi
     requests:
      cpu: 150m
-     memory: 192Mi
+     memory: 1536Mi
 ingress:
   enabled: true
   web:
