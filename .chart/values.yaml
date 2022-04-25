@@ -29,6 +29,13 @@ webserver:
 workers:
   persistence:
     fixPermissions: true
+  resources:
+    limits:
+     cpu: 200m
+     memory: 2048Mi
+    requests:
+     cpu: 150m
+     memory: 1536Mi
 ingress:
   enabled: true
   web:
