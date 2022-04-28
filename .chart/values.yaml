@@ -44,6 +44,9 @@ ingress:
       kubernetes.io/ingress.class: traefik
     path: /
 config:
+  core:
+    sql_alchemy_connect_args: config.keepalives.keepalive_kwargs
+    dagbag_import_timeout: 120.0
   api:
     auth_backend: airflow.api.auth.backend.basic_auth
 statsd:
