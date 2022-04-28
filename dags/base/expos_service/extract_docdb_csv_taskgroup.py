@@ -1,9 +1,6 @@
-import json
-from io import StringIO
 from contextlib import ExitStack
 from logging import info
 
-import pandas
 from airflow.models.dag import DAG
 from airflow.operators.python import PythonOperator
 from airflow.utils.task_group import TaskGroup
@@ -52,11 +49,16 @@ class ExtractDocumentDbCsvTaskGroup:
         )
 
     def convert_fields_to_json(self, value):
+        import json
+
         if type(value) in [list, dict]:
             return json.dumps(value, ensure_ascii=True)
         return value
 
     def extract_csv(self, collection_name: str, filters):
+        import pandas
+        from io import StringIO
+
         with self.mongo_tunnel if IS_LOCAL_RUN else ExitStack():
             info(
                 f'Starting extraction from document db collection: {collection_name}...')
