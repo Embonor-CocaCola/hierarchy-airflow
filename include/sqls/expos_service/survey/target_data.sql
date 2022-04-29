@@ -63,3 +63,16 @@ WHERE
     )
 ;
 ANALYZE survey;
+
+WITH answer_counts AS (
+   select
+        count(a.id) ans_count,
+        s.id survey_id
+    from survey s
+    left join answer a on a.survey_id = s.id
+    group by s.id
+)
+UPDATE survey TARGET
+SET answer_count = ac.ans_count
+from answer_counts ac
+where ac.survey_id = TARGET.id;
