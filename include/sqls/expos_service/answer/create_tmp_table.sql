@@ -11,5 +11,6 @@ CREATE TABLE airflow.tmp_answer (
     skipsSurvey TEXT,
     surveyId TEXT,
     surveyedId TEXT,
-    updatedAt TEXT
+    updatedAt TEXT,
+    time_elapsed TEXT
 );
