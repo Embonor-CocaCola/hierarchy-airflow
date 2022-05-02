@@ -22,7 +22,7 @@ CREATE OR REPLACE FUNCTION find_question_id_from_portals(in_array jsonb, id_to_f
                         FOR question IN SELECT * FROM jsonb_array_elements(questions)
                         LOOP
                            IF question->>'id' = id_to_find THEN
-                                found_id := question->'question'->>'$oid';
+                                found_id := question->>'question';
                                 SELECT id INTO found_id FROM airflow.question_typed WHERE source_id = found_id
                                     AND job_id = current_job_id;
                                 RETURN found_id;
@@ -32,6 +32,6 @@ CREATE OR REPLACE FUNCTION find_question_id_from_portals(in_array jsonb, id_to_f
                     END LOOP;
 
                 END LOOP;
-                RAISE EXCEPTION 'Requested question_id not found: %s', id_to_find;
+                RAISE EXCEPTION 'Requested question_id not found: %', id_to_find;
             END;
                 $$ LANGUAGE plpgsql;

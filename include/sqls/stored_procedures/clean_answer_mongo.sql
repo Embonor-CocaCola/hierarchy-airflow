@@ -11,7 +11,10 @@ CREATE OR REPLACE FUNCTION clean_answer_collection_ids(in_array jsonb)
                     elem_as_str := elem :: text;
                     elem_as_str := replace(elem_as_str, '_id', 'id');
                     elem := elem_as_str :: jsonb;
-                    new_arr := new_arr || (elem || jsonb_build_object('questionId', elem->'questionId'->>'$oid', 'id', elem->'id'->>'$oid'));
+                    new_arr := new_arr || (elem || jsonb_build_object(
+                        'questionId', COALESCE(elem->'questionId'->>'$oid', elem->>'questionId'),
+                        'id', COALESCE(elem->'id'->>'$oid', elem->>'id')
+                     ));
                 END LOOP;
                 RETURN new_arr;
             END;

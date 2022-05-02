@@ -17,7 +17,7 @@ def execute_query(collection_name: str, conn_id: str, db_name: str, tunnel, filt
         )
         collection = mongo_hook.get_collection(
             mongo_collection=collection_name, mongo_db=db_name)
-        cursor = collection.find(filters)
+        cursor = collection.find(filter=filters)
         results = list(cursor)
         cursor.close()
         mongo_hook.close_conn()
