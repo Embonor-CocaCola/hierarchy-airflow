@@ -50,9 +50,7 @@ config:
   api:
     auth_backend: airflow.api.auth.backend.basic_auth
   scheduler:
-    scheduler_health_check_threshold: 120
+    scheduler_health_check_threshold: '120'
+    min_file_process_interval: '60'
 statsd:
   enabled: false
-env:
-  - name: AIRFLOW__SCHEDULER__SCHEDULER_HEALTH_CHECK_THRESHOLD
-    value: 120
