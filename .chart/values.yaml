@@ -49,6 +49,8 @@ config:
     dagbag_import_timeout: 120.0
   api:
     auth_backend: airflow.api.auth.backend.basic_auth
+  scheduler:
+    scheduler_health_check_threshold: 120
 statsd:
   enabled: false
 env:
