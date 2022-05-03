@@ -47,8 +47,8 @@ ANALYZE survey;
 UPDATE survey TARGET
 SET
     skip_reason = CASE
-                    WHEN ans.values->>0 LIKE '%encuentra con reja%' THEN 'gated'
-                    WHEN ans.values->>0 LIKE '%encuentra cerrado%' THEN 'closed'
+                    WHEN ans.values->>0 LIKE '%%encuentra con reja%%' THEN 'gated'
+                    WHEN ans.values->>0 LIKE '%%encuentra cerrado%%' THEN 'closed'
                     ELSE 'INVALID_REASON'
                 END,
     skips_survey = true
@@ -58,8 +58,8 @@ WHERE
     ans.survey_id = TARGET.id
     AND TARGET.skip_reason IS NULL
     AND (
-        ans.values->>0 LIKE '%encuentra con reja%' OR
-        ans.values->>0 LIKE '%encuentra cerrado%'
+        ans.values->>0 LIKE '%%encuentra con reja%%' OR
+        ans.values->>0 LIKE '%%encuentra cerrado%%'
     )
 ;
 ANALYZE survey;
