@@ -13,9 +13,9 @@ CREATE OR REPLACE PROCEDURE calculate_answer_based_data()
         )
         SELECT
             CASE
-                WHEN count(*) FILTER ( WHERE q.heading ilike '%Se encuentra% Embonor en primera posición?' and a.values->>0 = 'true') = 1
+                WHEN count(*) FILTER ( WHERE q.heading ilike '%Se encuentra% Embonor en primera posición?%' and a.values->>0 = 'true') = 1
             THEN true
-                WHEN count(*) FILTER ( WHERE q.heading ilike '%Se encuentra% Embonor en primera posición?' and a.values->>0 = 'false') = 1
+                WHEN count(*) FILTER ( WHERE q.heading ilike '%Se encuentra% Embonor en primera posición?%' and a.values->>0 = 'false') = 1
             THEN false
             END
             is_first_position,
