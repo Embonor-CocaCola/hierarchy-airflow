@@ -239,7 +239,7 @@ class EtlDagFactory:
                 task_id='precalculate_answers',
                 postgres_conn_id=ES_AIRFLOW_DATABASE_CONN_ID,
                 sql="""
-                    CALL calculate_answer_based_data();
+                    REFRESH MATERIALIZED VIEW CONCURRENTLY preprocessed_answers;
                 """,
             )
 

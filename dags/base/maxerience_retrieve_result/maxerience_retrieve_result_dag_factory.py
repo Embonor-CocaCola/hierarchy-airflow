@@ -132,7 +132,10 @@ class MaxerienceRetrieveResultDagFactory:
                 task_id='preprocess_ir_data',
                 postgres_conn_id=ES_AIRFLOW_DATABASE_CONN_ID,
                 sql="""
-                    CALL calculate_ir_based_data();
+                    REFRESH MATERIALIZED VIEW CONCURRENTLY preprocessed_success_photo;
+                    REFRESH MATERIALIZED VIEW CONCURRENTLY preprocessed_essentials;
+                    REFRESH MATERIALIZED VIEW CONCURRENTLY preprocessed_sovi;
+                    REFRESH MATERIALIZED VIEW CONCURRENTLY preprocessed_edf;
                 """,
             )
 
