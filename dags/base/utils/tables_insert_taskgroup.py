@@ -8,10 +8,10 @@ from config.expos_service.settings import ES_AIRFLOW_DATABASE_CONN_ID, ES_STAGE
 from operators.postgres.query_with_params import PostgresOperatorWithParams
 
 
-class TablesInsertTaskGroup:
+class TableOperationsTaskGroup:
     def __init__(
         self,
-        tables_to_insert: list[str],
+        table_list: list[str],
         stage: str,
         sql_folder,
         job_id=None,
@@ -19,15 +19,15 @@ class TablesInsertTaskGroup:
         conn_id=ES_AIRFLOW_DATABASE_CONN_ID,
     ):
 
-        if not tables_to_insert:
-            raise ValueError('missing parameter tables_to_insert')
+        if not table_list:
+            raise ValueError('missing parameter table_list')
 
         self.conn_id = conn_id
         self.sequential = sequential
         self.stage = stage
         self.sql_folder = sql_folder
-        self.tables_to_insert = tables_to_insert
-        self.task_group = TaskGroup(group_id=f'{stage}_tables_insert')
+        self.tables_to_insert = table_list
+        self.task_group = TaskGroup(group_id=f'{stage}_table_operations')
         self.job_id = job_id
 
     def create_insert_task(self, table_name: str):
@@ -36,7 +36,7 @@ class TablesInsertTaskGroup:
             params_key, {})
         return PostgresOperatorWithParams(
             postgres_conn_id=self.conn_id,
-            task_id=f'insert_{self.stage}_{table_name}',
+            task_id=f'{self.stage}_{table_name}',
             task_group=self.task_group,
             sql=os.path.join(
                 self.sql_folder, table_name, f'{self.stage}_data.sql',

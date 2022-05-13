@@ -6,7 +6,7 @@ from airflow.providers.postgres.operators.postgres import PostgresOperator
 
 from base.utils.slack import build_status_msg, send_slack_notification
 from base.utils.table_names import TableNameManager
-from base.utils.tables_insert_taskgroup import TablesInsertTaskGroup
+from base.utils.tables_insert_taskgroup import TableOperationsTaskGroup
 from base.utils.load_csv_into_temp_tables_taskgroup import LoadCsvIntoTempTablesTaskGroup
 from base.success_photo_configuration_load.download_csv_task_group import DownloadCsvTaskGroup
 from config.common.settings import SHOULD_NOTIFY
@@ -118,26 +118,26 @@ class SuccessPhotoConfigurationLoadDagFactory:
                 delimiter=';',
             ).build()
 
-            raw_tables_insert = TablesInsertTaskGroup(
-                tables_to_insert=_table_manager.get_normalized_names(),
+            raw_tables_insert = TableOperationsTaskGroup(
+                table_list=_table_manager.get_normalized_names(),
                 sql_folder='success_photo_configuration_load',
                 stage='raw',
             ).build()
 
-            typed_tables_insert = TablesInsertTaskGroup(
-                tables_to_insert=_table_manager.get_normalized_names(),
+            typed_tables_insert = TableOperationsTaskGroup(
+                table_list=_table_manager.get_normalized_names(),
                 sql_folder='success_photo_configuration_load',
                 stage='typed',
             ).build()
 
-            conform_tables_insert = TablesInsertTaskGroup(
-                tables_to_insert=_conform_operations,
+            conform_tables_insert = TableOperationsTaskGroup(
+                table_list=_conform_operations,
                 sql_folder='success_photo_configuration_load',
                 stage='conform',
             ).build()
 
-            target_tables_insert = TablesInsertTaskGroup(
-                tables_to_insert=_target_operations,
+            target_tables_insert = TableOperationsTaskGroup(
+                table_list=_target_operations,
                 sql_folder='success_photo_configuration_load',
                 stage='target',
             ).build()

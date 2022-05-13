@@ -10,7 +10,7 @@ from base.expos_service.clean_data_taskgroup import CleanDataTaskGroup
 from base.expos_service.download_csvs_from_s3_taskgroup import DownloadCsvsFromS3TaskGroup
 from base.utils.load_csv_into_temp_tables_taskgroup import LoadCsvIntoTempTablesTaskGroup
 from base.expos_service.send_broken_hierarchy_data import send_broken_hierarchy_data
-from base.utils.tables_insert_taskgroup import TablesInsertTaskGroup
+from base.utils.tables_insert_taskgroup import TableOperationsTaskGroup
 from base.expos_service.extract_docdb_csv_taskgroup import \
     ExtractDocumentDbCsvTaskGroup
 from base.expos_service.extract_pg_csv_taskgroup import \
@@ -38,6 +38,7 @@ from config.expos_service.settings import (
     ES_PG_TABLES_TO_EXTRACT,
     ES_ETL_CONFORM_OPERATIONS_ORDER, ES_ETL_STAGED_OPERATIONS_ORDER, ES_ETL_TARGET_OPERATIONS_ORDER,
     ES_FETCH_OLD_EVALUATIONS_KEY, ES_ETL_CHECK_RUN_DAG_ID, ES_ETL_CHECK_RUN_DAG_SCHEDULE_INTERVAL,
+    ES_ETL_POSTPROCESSING_OPERATIONS_ORDER,
 )
 
 from operators.postgres.create_job import PostgresOperatorCreateJob
@@ -92,6 +93,7 @@ class EtlDagFactory:
         _conform_operations = ES_ETL_CONFORM_OPERATIONS_ORDER
         _staged_operations = ES_ETL_STAGED_OPERATIONS_ORDER
         _target_operations = ES_ETL_TARGET_OPERATIONS_ORDER
+        _postprocessing_operations = ES_ETL_POSTPROCESSING_OPERATIONS_ORDER
         _table_manager = TableNameManager(_tables_to_insert)
 
         pg_tunnel = Tunneler(
@@ -186,30 +188,30 @@ class EtlDagFactory:
                 check_run=self.check_run,
             ).build()
 
-            raw_tables_insert = TablesInsertTaskGroup(
-                tables_to_insert=_table_manager.get_normalized_names(),
+            raw_tables_insert = TableOperationsTaskGroup(
+                table_list=_table_manager.get_normalized_names(),
                 sql_folder='expos_service',
                 stage='raw',
                 job_id=_job_id,
             ).build()
 
-            typed_tables_insert = TablesInsertTaskGroup(
-                tables_to_insert=_table_manager.get_normalized_names(),
+            typed_tables_insert = TableOperationsTaskGroup(
+                table_list=_table_manager.get_normalized_names(),
                 sql_folder='expos_service',
                 stage='typed',
                 job_id=_job_id,
             ).build()
 
-            conform_tables_insert = TablesInsertTaskGroup(
-                tables_to_insert=_conform_operations,
+            conform_tables_insert = TableOperationsTaskGroup(
+                table_list=_conform_operations,
                 sql_folder='expos_service',
                 stage='conform',
                 sequential=True,
                 job_id=_job_id,
             ).build()
 
-            staged_tables_insert = TablesInsertTaskGroup(
-                tables_to_insert=_staged_operations,
+            staged_tables_insert = TableOperationsTaskGroup(
+                table_list=_staged_operations,
                 sql_folder='expos_service',
                 stage='staged',
                 sequential=True,
@@ -217,10 +219,18 @@ class EtlDagFactory:
             ).build()
 
             target_tables_insert = DummyOperator(task_id='dummy_target_inserts') if self.check_run \
-                else TablesInsertTaskGroup(
-                tables_to_insert=_target_operations,
+                else TableOperationsTaskGroup(
+                table_list=_target_operations,
                 sql_folder='expos_service',
                 stage='target',
+                sequential=True,
+                job_id=_job_id,
+            ).build()
+
+            postprocessing_tables = TableOperationsTaskGroup(
+                table_list=_postprocessing_operations,
+                sql_folder='expos_service',
+                stage='postprocessing',
                 sequential=True,
                 job_id=_job_id,
             ).build()
@@ -265,7 +275,7 @@ class EtlDagFactory:
                 create_job_task >> download_csvs_from_s3 >> load_into_tmp_tables
 
             load_into_tmp_tables >> raw_tables_insert >> typed_tables_insert >> conform_tables_insert >>\
-                staged_tables_insert >> target_tables_insert >>\
+                staged_tables_insert >> target_tables_insert >> postprocessing_tables >>\
                 precalculate_answers >> report_broken_hierarchy >> clean_data
 
             if _fetch_old_surveys:

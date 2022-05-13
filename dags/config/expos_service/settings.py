@@ -67,5 +67,10 @@ ES_ETL_TARGET_OPERATIONS_ORDER = os.environ.get(
     'plant,branch_office,chief,supervisor,vendor,cluster,customer,vendor_customer,question,survey,answer',
 ).split(',')
 
+ES_ETL_POSTPROCESSING_OPERATIONS_ORDER = os.environ.get(
+    'ES_ETL_TARGET_OPERATIONS_ORDER',
+    'survey',
+).split(',')
+
 ES_STAGE = os.environ.get('STAGE', 'development')
 ES_FETCH_OLD_EVALUATIONS_KEY = 'es_etl_fetch_old_self_evaluations'
