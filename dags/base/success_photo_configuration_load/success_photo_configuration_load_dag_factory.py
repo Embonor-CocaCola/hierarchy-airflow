@@ -146,7 +146,7 @@ class SuccessPhotoConfigurationLoadDagFactory:
                 task_id='update_and_refresh_data',
                 postgres_conn_id=ES_AIRFLOW_DATABASE_CONN_ID,
                 sql="""
-                    REFRESH MATERIALIZED VIEW sku_family_compliance;
+                    REFRESH MATERIALIZED VIEW CONCURRENTLY sku_family_compliance;
                     CALL update_success_photo_products();
                 """,
             )

@@ -134,6 +134,7 @@ class MaxerienceRetrieveResultDagFactory:
                 task_id='preprocess_ir_data',
                 postgres_conn_id=ES_AIRFLOW_DATABASE_CONN_ID,
                 sql="""
+                    REFRESH MATERIALIZED VIEW CONCURRENTLY sku_family_compliance;
                     REFRESH MATERIALIZED VIEW CONCURRENTLY preprocessed_success_photo;
                     REFRESH MATERIALIZED VIEW CONCURRENTLY preprocessed_essentials;
                     REFRESH MATERIALIZED VIEW CONCURRENTLY preprocessed_sovi;
