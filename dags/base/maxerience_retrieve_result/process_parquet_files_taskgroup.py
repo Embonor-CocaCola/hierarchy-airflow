@@ -52,7 +52,7 @@ class ProcessParquetFilesTaskGroup:
             print(f'Attempting to download parquet file from {parquet_file_uri}')
             response = requests.get(parquet_file_uri)
             print('Obtained response! Converting to pyarrow table...')
-            table_batches = pq.read_table(io.BytesIO(response.content)).to_batches()
+            table_batches = pq.read_table(io.BytesIO(response.content)).to_batches(max_chunksize=100)
 
             if os.path.exists(csv_path):
                 os.remove(csv_path)
