@@ -47,9 +47,12 @@ class ProcessParquetFilesTaskGroup:
             parquet_filename = parquet[1]
             parquet_id = parquet[0]
             parquet_file_uri = f'{MRR_REST_BASE_URL}embonor/{parquet_filename}?{self.sas_key_for_download}'
+            print(f'Attempting to download parquet file from {parquet_file_uri}')
             response = requests.get(parquet_file_uri)
+            print('Obtained response! Converting to dataframe...')
             dataframe = pq.read_table(io.BytesIO(response.content)).to_pandas()
 
+            print(f'Opening {csv_path} in write mode...')
             with open(csv_path, 'w') as file:
                 for row in dataframe.to_dict(orient='records'):
                     row_data = list(metadata['row_to_record'](row, parquet_id=parquet_id))
