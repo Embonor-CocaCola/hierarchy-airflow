@@ -1,5 +1,10 @@
 -- WARNING: Be careful when updating this function because it is called to populate two materialized
 -- views for Expos-Service. If you change a column name, be sure to also change it in the code!
+
+BEGIN;
+
+DROP FUNCTION get_sovi_calculations() CASCADE;
+
 CREATE OR REPLACE FUNCTION get_sovi_calculations()
     RETURNS TABLE
             (
@@ -39,6 +44,9 @@ CREATE OR REPLACE FUNCTION get_sovi_calculations()
                 ms_ssd_cola_total         smallint,
                 ms_ssd_flavor_co          smallint,
                 ms_ssd_flavor_total       smallint,
+                unrecognized_products     smallint,
+                empty_products            smallint,
+                total_products            smallint,
                 survey_id                 uuid
             )
 AS
@@ -193,6 +201,9 @@ BEGIN
                         FILTER ( WHERE p.category = 'SSD' AND
                                        p.group like 'MS%' AND p.flavour_name != 'Cola'), 0)::smallint
                     ms_ssd_flavor_total,
+               COALESCE(count(p.id) FILTER ( WHERE rp.product_id = 54), 0)::smallint unrecognized_products,
+               COALESCE(count(p.id) FILTER ( WHERE rp.product_id = 18), 0)::smallint empty_products,
+               COALESCE(count(p.id), 0)::smallint total_products,
                s.id survey_id
         FROM survey s
                  INNER JOIN analyzed_photo ap on s.id = ap.survey_id
@@ -202,3 +213,8 @@ BEGIN
 END;
 $$
     LANGUAGE 'plpgsql';
+
+CREATE MATERIALIZED VIEW "public"."preprocessed_sovi" AS select * from get_sovi_calculations();
+CREATE UNIQUE INDEX uidx_preprocessed_sovi_survey_id ON public.preprocessed_sovi (survey_id);
+
+COMMIT;

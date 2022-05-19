@@ -80,7 +80,8 @@ class MaxerienceRetrieveResultDagFactory:
             created_at_datetime = datetime.strptime(
                 created_at, '%a, %d %b %Y %H:%M:%S %Z')  # ie: Wed, 19 Jan 2022 01:42:40 GMT
             content_type = url.split('/')[2]
-            insert_data.append((str(uuid.uuid4()), created_at_datetime, content_type, url))
+            insert_data.append(
+                (str(uuid.uuid4()), created_at_datetime, content_type, url))
 
         self.create_parquet_file(insert_data)
 
@@ -126,7 +127,8 @@ class MaxerienceRetrieveResultDagFactory:
                 python_callable=self.fetch_and_save_parquet_filenames,
             )
 
-            process_parquet_files = ProcessParquetFilesTaskGroup(dag=_dag, group_id='process_parquet_files').build()
+            process_parquet_files = ProcessParquetFilesTaskGroup(
+                dag=_dag, group_id='process_parquet_files').build()
 
             preprocess_ir_data = PostgresOperator(
                 task_id='preprocess_ir_data',
@@ -139,9 +141,17 @@ class MaxerienceRetrieveResultDagFactory:
                 """,
             )
 
+            preprocess_survey_metadata = PostgresOperator(
+                task_id='preprocess_survey_metadata',
+                postgres_conn_id=ES_AIRFLOW_DATABASE_CONN_ID,
+                sql="""
+                    CALL calculate_survey_metadata();
+                """,
+            )
+
             if SHOULD_NOTIFY:
                 notify_mrr_dag_start >> fetch_last_parquet_files
 
-            fetch_last_parquet_files >> process_parquet_files >> preprocess_ir_data
+            fetch_last_parquet_files >> process_parquet_files >> preprocess_ir_data >> preprocess_survey_metadata
 
         return _dag
