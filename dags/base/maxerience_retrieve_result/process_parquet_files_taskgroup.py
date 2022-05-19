@@ -49,17 +49,21 @@ class ProcessParquetFilesTaskGroup:
             parquet_file_uri = f'{MRR_REST_BASE_URL}embonor/{parquet_filename}?{self.sas_key_for_download}'
             print(f'Attempting to download parquet file from {parquet_file_uri}')
             response = requests.get(parquet_file_uri)
-            print('Obtained response! Converting to dataframe...')
-            dataframe = pq.read_table(io.BytesIO(response.content)).to_pandas()
+            print('Obtained response! Converting to pyarrow table...')
+            table_batches = pq.read_table(io.BytesIO(response.content)).to_batches()
 
             print(f'Opening {csv_path} in write mode...')
             with open(csv_path, 'w') as file:
-                for row in dataframe.to_dict(orient='records'):
-                    row_data = list(metadata['row_to_record'](row, parquet_id=parquet_id))
-                    file.write(','.join(map(lambda value: f'|{str(value)}|', row_data)))
-                    file.write('\n')
+                print('Opened file successfully. Attempting to iterate over pyarrow table...')
+                for batch in table_batches:
+                    print('processing table batch...')
+                    d = batch.to_pylist()
+                    for row in d:
+                        row_data = list(metadata['row_to_record'](row, parquet_id=parquet_id))
+                        file.write(','.join(map(lambda value: f'|{str(value)}|', row_data)))
+                        file.write('\n')
 
-            print(f'Attempting to insert {len(dataframe.index)} records...')
+            print('Attempting to insert records...')
             copy_csv_to_table(table=metadata['table_name'], filepath=csv_path, columns=metadata['columns'])
 
             with open(
