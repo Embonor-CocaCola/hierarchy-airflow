@@ -1,3 +1,5 @@
+import os
+
 import requests
 from airflow.models.dag import DAG
 from airflow.operators.python import PythonOperator
@@ -52,10 +54,17 @@ class ProcessParquetFilesTaskGroup:
             print('Obtained response! Converting to pyarrow table...')
             table_batches = pq.read_table(io.BytesIO(response.content)).to_batches()
 
-            print(f'Opening {csv_path} in write mode...')
-            with open(csv_path, 'w') as file:
-                print('Opened file successfully. Attempting to iterate over pyarrow table...')
-                for batch in table_batches:
+            if os.path.exists(csv_path):
+                os.remove(csv_path)
+                print('Previous csv file deleted successfully')
+            else:
+                print('There was no previous csv file')
+
+            for batch in table_batches:
+
+                print(f'Opening {csv_path} in append mode...')
+                with open(csv_path, 'a') as file:
+                    print('Opened file successfully. Attempting to iterate over pyarrow table...')
                     print('processing table batch...')
                     d = batch.to_pylist()
                     for row in d:
