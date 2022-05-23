@@ -45,10 +45,12 @@ SET
     supervisor_id = STAGED.supervisor_id,
     deleted_at = STAGED.deleted_at
 FROM
-    airflow.vendor_staged STAGED
+    airflow.vendor_staged STAGED,
+    supervisor sup
 WHERE
-    STAGED.job_id = %(job_id)s :: BIGINT
-    AND STAGED.source_id = TARGET.source_id
+    STAGED.job_id = %(job_id)s :: BIGINT AND
+    STAGED.source_id = TARGET.source_id AND
+    STAGED.supervisor_id = sup.id
     AND (
         STAGED.name IS DISTINCT FROM TARGET.name OR
         STAGED.email IS DISTINCT FROM TARGET.email OR
