@@ -3,7 +3,7 @@
 
 BEGIN;
 
-DROP FUNCTION get_sovi_calculations() CASCADE;
+DROP FUNCTION IF EXISTS get_sovi_calculations() CASCADE;
 
 CREATE OR REPLACE FUNCTION get_sovi_calculations()
     RETURNS TABLE
