@@ -7,7 +7,7 @@ def extract_info_from_question_heading(heading):
         return {'scene': 1, 'sub_scene': 1}
     elif 'equipos de frío de la competencia' in heading:
         return {'scene': 1, 'sub_scene': 2}
-    elif 'Cuatripendón y el Afiche Single Serve implementados en el exterior' in heading:
+    elif 'implementados en el exterior del punto de venta' in heading:
         return {'scene': 3, 'sub_scene': 6}
     else:
         raise ValueError(f'Unrecognized scene and sub_scene from question heading: {heading}')

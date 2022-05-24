@@ -83,16 +83,11 @@ BEGIN
                    THEN false
                END
                filled_75_percent,
-           CASE
-               WHEN count(*) FILTER ( WHERE q.heading =
-                                            '¿Están el Cuatripendón y el Afiche Single Serve implementados en el exterior del punto de venta? Si/No, Incluir una foto' and
-                                            a.values ->> 0 = 'true') = 1
-                   THEN true
-               WHEN count(*) FILTER ( WHERE q.heading =
-                                            '¿Están el Cuatripendón y el Afiche Single Serve implementados en el exterior del punto de venta? Si/No, Incluir una foto' and
-                                            a.values ->> 0 = 'false') = 1
-                   THEN false
-               END
+           CASE WHEN count(*) FILTER ( WHERE q.heading ilike '¿Están el % implementados en el exterior del punto de venta? Si/No, Incluir una foto' and a.values->>0 = 'true') = 1
+            THEN true
+            WHEN count(*) FILTER ( WHERE q.heading ilike '¿Están el % implementados en el exterior del punto de venta? Si/No, Incluir una foto' and a.values->>0 = 'false') = 1
+            THEN false
+            END
                has_outside_banners,
            s.id
     FROM survey s
