@@ -12,15 +12,15 @@ AS
 $$
 BEGIN
     RETURN QUERY
-        SELECT CASE count(distinct p.id) FILTER ( WHERE ap.scene_type = '1' AND ap.sub_scene_type = '1' AND
+        SELECT CASE count(rp.id) FILTER ( WHERE ap.scene_type = '1' AND ap.sub_scene_type = '1' AND
                                                         p.is_foreign is true)::smallint
                    WHEN 0::smallint THEN true
                    ELSE false END
                     is_pure,
-               count(distinct p.id) FILTER ( WHERE ap.scene_type = '1' AND ap.sub_scene_type = '1' AND
+               count(rp.id) FILTER ( WHERE ap.scene_type = '1' AND ap.sub_scene_type = '1' AND
                                                    (p.is_foreign is not true OR p.id = 54))::smallint
                     co_cooler_co_products,
-               count(distinct p.id) FILTER ( WHERE ap.scene_type = '1' AND ap.sub_scene_type = '1' AND
+               count(rp.id) FILTER ( WHERE ap.scene_type = '1' AND ap.sub_scene_type = '1' AND
                                                    (p.is_foreign is true OR p.id = 18))::smallint
                     co_cooler_non_co_products,
                s.id survey_id
