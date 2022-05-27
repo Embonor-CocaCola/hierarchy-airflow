@@ -67,7 +67,7 @@ class MaxerienceLoadDagFactory:
             'start_date': _start_date,
             'provide_context': True,
             'execution_timeout': timedelta(minutes=10),
-            'retries': 2,
+            'retries': 0,
             'retry_delay': timedelta(seconds=5),
             'on_failure_callback': MaxerienceLoadDagFactory.on_failure_callback,
         }
