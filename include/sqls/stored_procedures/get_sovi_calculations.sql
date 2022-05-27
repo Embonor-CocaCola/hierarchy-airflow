@@ -47,8 +47,8 @@ CREATE OR REPLACE FUNCTION get_sovi_calculations()
                 unrecognized_products     smallint,
                 empty_products            smallint,
                 total_products            smallint,
-                total_non_beverage smallint,
-                total_co_products smallint,
+                total_non_beverage        smallint,
+                total_co_products         smallint,
                 total_competitor_products smallint,
                 survey_id                 uuid
             )
@@ -209,7 +209,7 @@ BEGIN
                COALESCE(count(rp.id), 0)::smallint total_products,
                COALESCE(count(rp.id) FILTER ( where rp.product_id = 805535 ), 0)::smallint total_non_beverage,
                COALESCE(COUNT(rp.id) FILTER (WHERE p.is_foreign is not true and p.category is not null) , 0)::smallint total_co_products,
-               COALESCE(COUNT(rp.id) FILTER (WHERE p.is_foreign is true and p.category is not null) , 0)::smallint total_competitor_products,
+               COALESCE(COUNT(rp.id) FILTER (WHERE p.is_foreign is true and p.category is not null and p.id != 805535) , 0)::smallint total_competitor_products,
                s.id survey_id
         FROM survey s
                  INNER JOIN analyzed_photo ap on s.id = ap.survey_id

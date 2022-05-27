@@ -1,14 +1,9 @@
-import os
-from logging import info
-
 from airflow.models.dag import DAG
 from airflow.operators.python import PythonOperator
-from airflow.providers.amazon.aws.hooks.s3 import S3Hook
 from airflow.utils.task_group import TaskGroup
 
+from base.utils.s3 import download_file_from_s3
 from base.utils.tasks import arrange_task_list_sequentially
-from config.common.settings import airflow_root_dir
-from config.success_photo_configuration_load.settings import SPCL_S3_CONN_ID
 
 
 class DownloadCsvsFromS3TaskGroup:
@@ -22,32 +17,12 @@ class DownloadCsvsFromS3TaskGroup:
         self.dag = dag
         self.group_id = group_id
 
-    def download_file(self, file_name: str):
-        info(f'Starting download of csv: {file_name}.csv')
-
-        s3_hook = S3Hook(
-            SPCL_S3_CONN_ID,
-        )
-
-        tmp_filename = s3_hook.download_file(
-            key=f'etl_csvs/{file_name}.csv',
-            bucket_name='expos-bucket',
-            local_path=os.path.join(airflow_root_dir, 'data'),
-        )
-
-        os.rename(
-            os.path.join(airflow_root_dir, 'data', tmp_filename),
-            os.path.join(airflow_root_dir, 'data', f'{file_name}.csv'),
-        )
-
-        info('Download finished')
-
     def create_download_task(self, file_name: str, task_group: TaskGroup):
         return PythonOperator(
             task_id=f'download_{file_name}_csv_from_s3',
             task_group=task_group,
-            python_callable=self.download_file,
-            op_args=[file_name],
+            python_callable=download_file_from_s3,
+            op_args=[file_name, 'etl_csvs'],
         )
 
     def build(self):

@@ -22,7 +22,7 @@ INSERT INTO airflow.vendor_staged (
     job_id,
     id
 )
-SELECT
+SELECT distinct on (VEC.id)
     VEC.source_id,
     VPC.vendor_name,
     VEC.rut,

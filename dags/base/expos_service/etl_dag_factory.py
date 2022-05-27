@@ -8,6 +8,7 @@ from airflow.providers.postgres.operators.postgres import PostgresOperator
 
 from base.expos_service.clean_data_taskgroup import CleanDataTaskGroup
 from base.expos_service.download_csvs_from_s3_taskgroup import DownloadCsvsFromS3TaskGroup
+from base.expos_service.load_missing_hierarchy_from_s3_taskgroup import LoadMissingHierarchyFromS3TaskGroup
 from base.utils.load_csv_into_temp_tables_taskgroup import LoadCsvIntoTempTablesTaskGroup
 from base.expos_service.send_broken_hierarchy_data import send_broken_hierarchy_data
 from base.utils.tables_insert_taskgroup import TableOperationsTaskGroup
@@ -181,6 +182,11 @@ class EtlDagFactory:
                     file_names=_pg_table_list + _mongo_collection_list,
                 ).build()
 
+            load_missing_hierarchy_from_s3 = LoadMissingHierarchyFromS3TaskGroup(
+                group_id='load_missing_hierarchy_from_s3',
+                dag=_dag,
+            ).build()
+
             load_into_tmp_tables = LoadCsvIntoTempTablesTaskGroup(
                 tables_to_insert=_tables_to_insert,
                 task_group_id='create_and_load_tmp_tables_from_csv',
@@ -269,13 +275,13 @@ class EtlDagFactory:
 
             if SHOULD_UPLOAD_TO_S3 or self.check_run:
                 create_job_task >> health_checks_task >> get_self_evaluation_survey_id >> \
-                    [extract_from_pg, extract_from_mongo] >>\
+                    load_missing_hierarchy_from_s3 >> [extract_from_pg, extract_from_mongo] >>\
                     upload_csvs_to_s3 >> load_into_tmp_tables
             else:
-                create_job_task >> download_csvs_from_s3 >> load_into_tmp_tables
+                create_job_task >> load_missing_hierarchy_from_s3 >> download_csvs_from_s3 >> load_into_tmp_tables
 
-            load_into_tmp_tables >> raw_tables_insert >> typed_tables_insert >> conform_tables_insert >>\
-                staged_tables_insert >> target_tables_insert >> postprocessing_tables >>\
+            load_into_tmp_tables >> raw_tables_insert >> typed_tables_insert >>\
+                conform_tables_insert >> staged_tables_insert >> target_tables_insert >> postprocessing_tables >>\
                 precalculate_answers >> report_broken_hierarchy >> clean_data
 
             if _fetch_old_surveys:

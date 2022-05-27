@@ -13,6 +13,7 @@ original_table_name_to_new_name_map = {
     'VendorTypes': 'vendor_type',
     'Dictionary': 'dictionary',
     'SuccessPhotoProduct': 'success_photo_product',
+    'missing_hierarchy': 'missing_hierarchy',
 }
 
 table_name_to_columns = {
