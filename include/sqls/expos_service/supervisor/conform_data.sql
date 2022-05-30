@@ -19,7 +19,7 @@ INSERT INTO airflow.supervisor_conform (
 )
 SELECT
     supervisor_id,
-    supervisor_name,
+    INITCAP(supervisor_name),
     plant_id,
     supervisor_code,
     supervisor_location,

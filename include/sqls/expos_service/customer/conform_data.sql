@@ -45,7 +45,7 @@ INSERT INTO airflow.customer_conform (
 SELECT
     source_id,
     price_list,
-    name,
+    INITCAP(name),
     dni,
     email,
     street,

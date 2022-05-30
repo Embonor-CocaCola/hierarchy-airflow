@@ -20,7 +20,7 @@ INSERT INTO airflow.vendor_conform (
 )
 SELECT
     source_id,
-    name,
+    INITCAP(name),
     rut,
     email,
     phone,

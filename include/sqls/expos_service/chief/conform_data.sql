@@ -21,12 +21,12 @@ INSERT INTO airflow.chief_conform (
 )
 SELECT
     chief_id,
-    chief_name,
+    INITCAP(chief_name),
     plant_id,
     chief_code,
-    chief_location,
+    INITCAP(chief_location),
     chief_rut,
-    role,
+    INITCAP(role),
     chief_unit,
 
     now(),

@@ -17,7 +17,7 @@ INSERT INTO airflow.branch_office_conform (
 )
 SELECT
     source_id,
-    name,
+    INITCAP(name),
     plant_id,
 
     now(),

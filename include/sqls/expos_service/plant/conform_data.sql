@@ -13,7 +13,7 @@ INSERT INTO airflow.plant_conform (
 )
 SELECT
     source_id,
-    name,
+    INITCAP(name),
 
     now(),
     now(),
