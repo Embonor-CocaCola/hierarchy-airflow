@@ -59,7 +59,7 @@ SELECT
     uuid_generate_v4()
 FROM
     airflow.tmp_missing_hierarchy tmh
-    INNER JOIN airflow.vendor_raw vr ON tmh.vendor_rut ilike vr.rut
+    INNER JOIN airflow.vendor_raw vr ON vr.rut ~ ('^[0]?' || tmh.vendor_rut || '$')
     INNER JOIN airflow.branch_office_raw br on vr.branch_office = br.source_id
 WHERE
     vr.job_id = %(job_id)s :: BIGINT AND
