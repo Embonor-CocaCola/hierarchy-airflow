@@ -76,3 +76,18 @@ secret:
   - envName: "SPCL_S3_CONN_URI"
     secretName: "airflow-envars"
     secretKey: "SPCL_S3_CONN_URI"
+
+tolerations:
+  - key: "purpose"
+    operator: "Equal"
+    value: "airflow"
+    effect: "NoSchedule"
+affinity:
+  nodeAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: purpose
+          operator: In
+          values:
+          - airflow
