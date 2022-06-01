@@ -3,4 +3,4 @@ from base.success_photo_configuration_load.success_photo_configuration_load_dag_
     SuccessPhotoConfigurationLoadDagFactory,
 )
 
-dag: DAG = SuccessPhotoConfigurationLoadDagFactory().build()
+dag: DAG = SuccessPhotoConfigurationLoadDagFactory.build()

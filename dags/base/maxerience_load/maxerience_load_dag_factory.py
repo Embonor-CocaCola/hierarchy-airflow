@@ -1,7 +1,6 @@
 import json
 import uuid
 from datetime import datetime, timedelta
-from pathlib import Path
 
 import psycopg2
 import requests
@@ -10,20 +9,22 @@ from airflow.operators.python import PythonOperator
 from airflow.sensors.sql import SqlSensor
 
 from base.maxerience_load.get_photos_to_upload_taskgroup import GetPhotosToUploadTaskGroup
+from base.maxerience_load.utils.close_complete_sessions import close_complete_sessions
+from base.maxerience_load.utils.create_analyzed_photo import create_analyzed_photo
+from base.maxerience_load.utils.create_survey_analysis import create_survey_analysis
+from base.maxerience_load.utils.get_ir_api_key import get_ir_api_key
 from base.utils.build_maxerience_payload import build_maxerience_payload
+from base.utils.conditional_operator import conditional_operator
 from base.utils.ml_scene_info import extract_info_from_question_heading
-from base.utils.query_with_return import parameterized_query
-from base.utils.slack import send_slack_notification, build_status_msg
+from base.utils.slack import send_slack_notification, build_status_msg, notify_start_task
+from config.common.defaults import default_task_kwargs, default_dag_kwargs
 from config.common.settings import SHOULD_NOTIFY, EXPOS_DATABASE_CONN_ID
-from config.expos_service.settings import airflow_root_dir, ES_STAGE
+from config.expos_service.settings import ES_STAGE
 from config.maxerience_load.settings import (
     ML_DAG_START_DATE_VALUE,
     ML_DAG_SCHEDULE_INTERVAL,
-    ML_SQL_PATH,
     ML_DAG_ID,
     ML_MAXERIENCE_BASE_URL,
-    ML_MAXERIENCE_USER,
-    ML_MAXERIENCE_PASS,
 )
 
 
@@ -63,23 +64,16 @@ class MaxerienceLoadDagFactory:
         _start_date = datetime.strptime(
             ML_DAG_START_DATE_VALUE, '%Y-%m-%d')
         _default_args = {
-            'owner': 'airflow',
+            **default_task_kwargs,
             'start_date': _start_date,
-            'provide_context': True,
             'execution_timeout': timedelta(minutes=10),
-            'retries': 0,
-            'retry_delay': timedelta(seconds=5),
-            'on_failure_callback': MaxerienceLoadDagFactory.on_failure_callback,
         }
 
         with DAG(
                 ML_DAG_ID,
+                **default_dag_kwargs,
                 schedule_interval=ML_DAG_SCHEDULE_INTERVAL,
                 default_args=_default_args,
-                template_searchpath=ML_SQL_PATH,
-                max_active_runs=1,
-                catchup=False,
-                on_success_callback=MaxerienceLoadDagFactory.on_success_callback,
                 user_defined_filters={
                     'fromjson': lambda s: json.loads(s), 'replace_single_quotes': lambda s: s.replace("'", '"'),
                 },
@@ -94,19 +88,7 @@ class MaxerienceLoadDagFactory:
                 execution_timeout=None,
             )
 
-            if SHOULD_NOTIFY:
-                notify_ml_dag_start = PythonOperator(
-                    task_id='notify_etl_start',
-                    op_kwargs={
-                        'payload': build_status_msg(
-                            dag_id=ML_DAG_ID,
-                            status='started',
-                            mappings={'run_id': '{{ run_id }}'},
-                        ),
-                        'notification_type': 'success'},
-                    python_callable=send_slack_notification,
-                    dag=_dag,
-                )
+            notify_ml_dag_start = notify_start_task(_dag)
 
             get_photos = GetPhotosToUploadTaskGroup(
                 dag=_dag,
@@ -121,88 +103,25 @@ class MaxerienceLoadDagFactory:
                 dag=_dag,
             )
 
-            get_api_key = PythonOperator(
+            get_api_key = conditional_operator(
                 task_id='get_api_key',
-                python_callable=self.get_api_key,
+                operator=PythonOperator,
+                condition=ES_STAGE == 'production',
+                python_callable=get_ir_api_key,
                 dag=_dag,
             )
 
-            close_complete_sessions = PythonOperator(
+            close_complete_sessions_task = PythonOperator(
                 task_id='close_complete_sessions',
-                python_callable=self.close_complete_sessions,
+                python_callable=close_complete_sessions,
                 execution_timeout=None,
                 dag=_dag,
             )
 
-            if SHOULD_NOTIFY:
-                es_etl_finished_sensor >> notify_ml_dag_start >> get_api_key
-            else:
-                es_etl_finished_sensor >> get_api_key
-
-            get_api_key >> get_photos >> download_and_upload_photos >> close_complete_sessions
+            es_etl_finished_sensor >> notify_ml_dag_start >> get_api_key >> get_photos >> download_and_upload_photos >>\
+                close_complete_sessions_task
 
         return _dag
-
-    def close_complete_sessions(self):
-        base_url = ML_MAXERIENCE_BASE_URL
-        auth_token = Variable.get('ml_auth_token')
-
-        with open(
-                f'{airflow_root_dir}/include/sqls/maxerience_load/get_completed_surveys_for_closing.sql', 'r',
-        ) as file:
-            sql = file.read()
-        sessions = parameterized_query(sql, wrap=False)
-
-        with open(f'{airflow_root_dir}/include/sqls/maxerience_load/update_survey_analysis_completed.sql', 'r') as file:
-            sql = file.read()
-
-        for session in sessions:
-            _, total_images, survey_id, session_start, visit_date, session_end = session
-            print(f'Attempting to close session {session}')
-            response = requests.post(
-                f'{base_url}/uploadSessionSceneImages',
-                files={
-                    'authToken': (None, auth_token),
-                    'data': (None, json.dumps({
-                        'session': [
-                            {
-                                'sessionUid': str(survey_id),
-                                'sessionStartTime': int(session_start),
-                                'sessionEndTime': int(session_end),
-                                'outletCode': '123321',
-                                'visitDate': visit_date,
-                                'scene': [],
-                                'localTimeZone': 'CL',
-                                'surveyStatus': 1,
-                                'totalscene': int(total_images),
-                                'totalSceneImages': int(total_images),
-                            },
-                        ],
-                    })),
-                },
-            )
-            print('Response ready')
-            json_response = response.json()
-            print(json_response)
-
-            if json_response['success']:
-                print('updating survey_analysis')
-                parameterized_query(sql, templates_dict={
-                    'survey_id': survey_id,
-                })
-
-    def get_api_key(self):
-        if ES_STAGE == 'production':
-            response = requests.post(f'{ML_MAXERIENCE_BASE_URL}/login', files={
-                'username': (None, ML_MAXERIENCE_USER),
-                'password': (None, ML_MAXERIENCE_PASS),
-            })
-            json_response = response.json()
-            if not json_response['success']:
-                raise RuntimeError(
-                    'Log in request failed. Could not get API KEY.')
-
-            Variable.set('ml_auth_token', json_response['authToken'])
 
     def download_and_upload_photos(self, ti):
         photos_to_download = ti.xcom_pull(
@@ -253,7 +172,7 @@ class MaxerienceLoadDagFactory:
                     print('Response ready')
                     json_response = r.json()
                     print(json_response)
-                    self.create_analyzed_photo(
+                    create_analyzed_photo(
                         scene_info=scene_info,
                         scene_id=scene_id,
                         survey_id=survey_id,
@@ -263,45 +182,7 @@ class MaxerienceLoadDagFactory:
                     )
 
             try:
-                self.create_survey_analysis(
+                create_survey_analysis(
                     survey_id)
             except psycopg2.Error:
                 pass
-
-    def create_survey_analysis(self, survey_id):
-        analysis_id = str(uuid.uuid4())
-
-        with open(
-                Path(airflow_root_dir) / 'include' / 'sqls' / 'maxerience_load' / 'create_survey_analysis.sql',
-                'r',
-        ) as file:
-            sql = file.read()
-            parameterized_query(
-                sql=sql,
-                templates_dict={
-                    'survey_id': survey_id,
-                    'analysis_id': analysis_id,
-                },
-                is_procedure=True,
-            )
-
-        return analysis_id
-
-    def create_analyzed_photo(self, scene_info, scene_id, survey_id, question_id, origin_url, sent_ok):
-        with open(
-                Path(airflow_root_dir) / 'include' / 'sqls' / 'maxerience_load' / 'create_analyzed_photo.sql',
-                'r',
-        ) as file:
-            sql = file.read()
-            parameterized_query(
-                sql=sql,
-                templates_dict={
-                    'scene_type': scene_info['scene'],
-                    'sub_scene_type': scene_info['sub_scene'],
-                    'survey_id': survey_id,
-                    'scene_id': scene_id,
-                    'question_id': question_id,
-                    'origin_url': origin_url,
-                    'sent_ok': sent_ok,
-                },
-            )

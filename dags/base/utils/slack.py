@@ -1,9 +1,13 @@
 import json
 
 import requests
+from airflow import DAG
+from airflow.operators.python import PythonOperator
 
 import config.common.settings as config
+from base.utils.conditional_operator import conditional_operator
 from config.expos_service.settings import ES_STAGE, ES_ETL_DAG_ID, ES_ETL_CHECK_RUN_DAG_ID
+from config.maintenance.settings import MTNC_DAG_ID
 from config.maxerience_load.settings import ML_DAG_ID
 from config.maxerience_load_retry.settings import MLR_DAG_ID
 from config.maxerience_retrieve_result.settings import MRR_DAG_ID
@@ -38,6 +42,10 @@ details_by_dag = {
     ES_ETL_CHECK_RUN_DAG_ID: {
         'emoji': ':test_tube:',
         'dag_name': 'ETL CHECK RUN FOR STAGING',
+    },
+    MTNC_DAG_ID: {
+        'emoji': ':screwdriver:',
+        'dag_name': 'MAINTENANCE DAG',
     },
 }
 
@@ -106,3 +114,48 @@ def send_file_content_to_channels(file_content, channels, initial_comment, title
         'Authorization': f'Bearer {config.SLACK_EXPOS_BOT_TOKEN}',
     })
     print(response.json())
+
+
+def on_failure_callback(context):
+    if not config.SHOULD_NOTIFY:
+        return
+    ti = context['task_instance']
+    run_id = context['run_id']
+    dag_id = context['dag'].dag_id
+    send_slack_notification(notification_type='alert',
+                            payload=build_status_msg(
+                                dag_id=dag_id,
+                                status='failed',
+                                mappings={'run_id': run_id, 'task_id': ti.task_id},
+                            ))
+
+
+def on_success_callback(context):
+    if not config.SHOULD_NOTIFY:
+        return
+    run_id = context['run_id']
+    dag_id = context['dag'].dag_id
+    send_slack_notification(notification_type='success',
+                            payload=build_status_msg(
+                                dag_id=dag_id,
+                                status='finished',
+                                mappings={'run_id': run_id},
+                            ))
+
+
+def notify_start_task(dag: DAG):
+
+    return conditional_operator(
+        task_id='notify_etl_start',
+        condition=config.SHOULD_NOTIFY,
+        operator=PythonOperator,
+        op_kwargs={
+            'payload': build_status_msg(
+                dag_id=dag.dag_id,
+                status='started',
+                mappings={'run_id': '{{ run_id }}'},
+            ),
+            'notification_type': 'success'},
+        python_callable=send_slack_notification,
+        dag=dag,
+    )

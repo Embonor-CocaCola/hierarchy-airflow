@@ -9,6 +9,7 @@ from airflow.providers.postgres.operators.postgres import PostgresOperator
 from base.expos_service.clean_data_taskgroup import CleanDataTaskGroup
 from base.expos_service.download_csvs_from_s3_taskgroup import DownloadCsvsFromS3TaskGroup
 from base.expos_service.load_missing_hierarchy_from_s3_taskgroup import LoadMissingHierarchyFromS3TaskGroup
+from base.utils.conditional_operator import conditional_operator
 from base.utils.load_csv_into_temp_tables_taskgroup import LoadCsvIntoTempTablesTaskGroup
 from base.expos_service.send_broken_hierarchy_data import send_broken_hierarchy_data
 from base.utils.tables_insert_taskgroup import TableOperationsTaskGroup
@@ -19,10 +20,11 @@ from base.expos_service.extract_pg_csv_taskgroup import \
 from base.expos_service.health_checks_taskgroup import HealthChecksTaskGroup
 from base.expos_service.upload_csvs_to_s3_taskgroup import UploadCsvsToS3TaskGroup
 from base.utils.mongo import execute_query
-from base.utils.slack import build_status_msg, send_slack_notification
+from base.utils.slack import notify_start_task
 from base.utils.table_names import TableNameManager
 from base.utils.tunneler import Tunneler
-from config.common.settings import SHOULD_NOTIFY, SHOULD_UPLOAD_TO_S3
+from config.common.defaults import default_task_kwargs, default_dag_kwargs
+from config.common.settings import SHOULD_UPLOAD_TO_S3
 from config.expos_service.settings import (
     ES_AIRFLOW_DATABASE_CONN_ID,
     ES_ETL_DAG_ID,
@@ -33,7 +35,7 @@ from config.expos_service.settings import (
     ES_EMBONOR_MONGO_CONN_ID,
     ES_EMBONOR_MONGO_DB_NAME,
     ES_REMOTE_RDS_HOST,
-    ES_REMOTE_RDS_PORT, ES_SQL_PATH,
+    ES_REMOTE_RDS_PORT,
     IS_LOCAL_RUN,
     ES_MONGO_COLLECTIONS_TO_EXTRACT,
     ES_PG_TABLES_TO_EXTRACT,
@@ -46,31 +48,6 @@ from operators.postgres.create_job import PostgresOperatorCreateJob
 
 
 class EtlDagFactory:
-
-    def on_failure_callback(self, context):
-        if not SHOULD_NOTIFY:
-            return
-        ti = context['task_instance']
-        run_id = context['run_id']
-        send_slack_notification(notification_type='alert',
-                                payload=build_status_msg(
-                                    dag_id=self.dag_id,
-                                    status='failed',
-                                    mappings={'run_id': run_id, 'task_id': ti.task_id},
-                                ))
-
-    def on_success_callback(self, context):
-        if not SHOULD_NOTIFY:
-            return
-
-        run_id = context['run_id']
-        send_slack_notification(notification_type='success',
-                                payload=build_status_msg(
-                                    dag_id=self.dag_id,
-                                    status='finished',
-                                    mappings={'run_id': run_id},
-                                ))
-
     def __init__(self, check_run=False):
         self.check_run = check_run
         self.dag_id = ES_ETL_CHECK_RUN_DAG_ID if check_run else ES_ETL_DAG_ID
@@ -80,13 +57,10 @@ class EtlDagFactory:
         _start_date = datetime.strptime(
             ES_ETL_DAG_START_DATE_VALUE, '%Y-%m-%d')
         _default_args = {
-            'owner': 'airflow',
+            **default_task_kwargs,
             'start_date': _start_date,
-            'provide_context': True,
-            'execution_timeout': timedelta(seconds=240),
             'retries': 2,
             'retry_delay': timedelta(seconds=5),
-            'on_failure_callback': self.on_failure_callback,
         }
         _pg_table_list = ES_PG_TABLES_TO_EXTRACT
         _mongo_collection_list = ES_MONGO_COLLECTIONS_TO_EXTRACT
@@ -104,12 +78,9 @@ class EtlDagFactory:
 
         with DAG(
                 self.dag_id,
+                **default_dag_kwargs,
                 schedule_interval=self.schedule_interval,
                 default_args=_default_args,
-                template_searchpath=ES_SQL_PATH,
-                max_active_runs=1,
-                on_success_callback=self.on_success_callback,
-                catchup=False,
                 user_defined_filters={
                     'oid_from_dict': lambda dict: dict[0]['_id']['$oid'],
                     'from_json': lambda jsonstr: json.loads(jsonstr),
@@ -123,19 +94,8 @@ class EtlDagFactory:
             )
 
             _job_id = PostgresOperatorCreateJob.get_job_id(_dag.dag_id, create_job_task.task_id)
-            if SHOULD_NOTIFY:
-                notify_etl_start = PythonOperator(
-                    task_id='notify_etl_start',
-                    op_kwargs={
-                        'payload': build_status_msg(
-                            dag_id=self.dag_id,
-                            status='started',
-                            mappings={'run_id': '{{ run_id }}'},
-                        ),
-                        'notification_type': 'success'},
-                    python_callable=send_slack_notification,
-                    dag=_dag,
-                )
+
+            notify_etl_start = notify_start_task(_dag)
 
             _survey_filters = {'name': 'Autoevaluación'}
             _fetch_old_surveys = Variable.get(ES_FETCH_OLD_EVALUATIONS_KEY) == 'True'
@@ -143,44 +103,67 @@ class EtlDagFactory:
             if not _fetch_old_surveys:
                 _survey_filters['paused'] = False
 
-            if SHOULD_UPLOAD_TO_S3 or self.check_run:
-                health_checks_task = HealthChecksTaskGroup(
-                    _dag, group_id='health_checks', pg_tunnel=pg_tunnel).build()
+            health_checks_task = conditional_operator(
+                dag=_dag,
+                group_id='health_checks',
+                pg_tunnel=pg_tunnel,
+                operator=HealthChecksTaskGroup,
+                condition=SHOULD_UPLOAD_TO_S3 or self.check_run,
+                should_build=True,
+            )
 
-                get_self_evaluation_survey_id = PythonOperator(
-                    task_id='get_self_evaluation_survey_id',
-                    python_callable=execute_query,
-                    do_xcom_push=True,
-                    op_kwargs={
-                        'collection_name': 'surveys',
-                        'conn_id': ES_EMBONOR_MONGO_CONN_ID,
-                        'db_name': ES_EMBONOR_MONGO_DB_NAME,
-                        'filters': _survey_filters,
-                        'tunnel': mongo_tunnel,
-                    },
-                )
+            get_self_evaluation_survey_id = conditional_operator(
+                operator=PythonOperator,
+                condition=SHOULD_UPLOAD_TO_S3 or self.check_run,
+                task_id='get_self_evaluation_survey_id',
+                python_callable=execute_query,
+                do_xcom_push=True,
+                op_kwargs={
+                    'collection_name': 'surveys',
+                    'conn_id': ES_EMBONOR_MONGO_CONN_ID,
+                    'db_name': ES_EMBONOR_MONGO_DB_NAME,
+                    'filters': _survey_filters,
+                    'tunnel': mongo_tunnel,
+                },
+            )
 
-                upload_csvs_to_s3 = DummyOperator(task_id='dummy_upload_to_s3') if self.check_run \
-                    else UploadCsvsToS3TaskGroup(
-                    _dag,
-                    group_id='upload_csvs_to_s3',
-                    file_names=_pg_table_list + _mongo_collection_list,
-                ).build()
-                extract_from_pg = ExtractPostgresCsvTaskGroup(
-                    _dag, group_id='extract_from_pg', pg_tunnel=pg_tunnel, table_list=_pg_table_list).build()
+            upload_csvs_to_s3 = conditional_operator(
+                condition=SHOULD_UPLOAD_TO_S3 and not self.check_run,
+                operator=UploadCsvsToS3TaskGroup,
+                dag=_dag,
+                group_id='upload_csvs_to_s3',
+                file_names=_pg_table_list + _mongo_collection_list,
+                should_build=True,
+            )
 
-                extract_from_mongo = ExtractDocumentDbCsvTaskGroup(
-                    _dag,
-                    group_id='extract_from_document_db',
-                    mongo_tunnel=mongo_tunnel,
-                    collection_list=_mongo_collection_list,
-                ).build()
-            else:
-                download_csvs_from_s3 = DownloadCsvsFromS3TaskGroup(
-                    _dag,
-                    group_id='download_csvs_from_s3',
-                    file_names=_pg_table_list + _mongo_collection_list,
-                ).build()
+            extract_from_pg = conditional_operator(
+                dag=_dag,
+                group_id='extract_from_pg',
+                pg_tunnel=pg_tunnel,
+                table_list=_pg_table_list,
+                should_build=True,
+                condition=SHOULD_UPLOAD_TO_S3 or self.check_run,
+                operator=ExtractPostgresCsvTaskGroup,
+            )
+
+            extract_from_mongo = conditional_operator(
+                dag=_dag,
+                operator=ExtractDocumentDbCsvTaskGroup,
+                condition=SHOULD_UPLOAD_TO_S3 or self.check_run,
+                should_build=True,
+                group_id='extract_from_document_db',
+                mongo_tunnel=mongo_tunnel,
+                collection_list=_mongo_collection_list,
+            )
+
+            download_csvs_from_s3 = conditional_operator(
+                dag=_dag,
+                operator=DownloadCsvsFromS3TaskGroup,
+                condition=not SHOULD_UPLOAD_TO_S3 and not self.check_run,
+                group_id='download_csvs_from_s3',
+                should_build=True,
+                file_names=_pg_table_list + _mongo_collection_list,
+            )
 
             load_missing_hierarchy_from_s3 = LoadMissingHierarchyFromS3TaskGroup(
                 group_id='load_missing_hierarchy_from_s3',
@@ -241,15 +224,16 @@ class EtlDagFactory:
                 job_id=_job_id,
             ).build()
 
-            if _fetch_old_surveys:
-                process_old_evaluations_data = PostgresOperator(
-                    task_id='process_old_evaluations_data',
-                    postgres_conn_id=ES_AIRFLOW_DATABASE_CONN_ID,
-                    sql="""
-                        VACUUM ANALYZE answer;
-                        CALL process_old_survey_data();
-                    """,
-                )
+            process_old_evaluations_data = conditional_operator(
+                task_id='process_old_evaluations_data',
+                postgres_conn_id=ES_AIRFLOW_DATABASE_CONN_ID,
+                sql="""
+                                VACUUM ANALYZE answer;
+                                CALL process_old_survey_data();
+                            """,
+                operator=PostgresOperator,
+                condition=_fetch_old_surveys,
+            )
 
             precalculate_answers = PostgresOperator(
                 task_id='precalculate_answers',
@@ -270,20 +254,10 @@ class EtlDagFactory:
                 job_id=_job_id,
             ).build()
 
-            if SHOULD_NOTIFY:
-                notify_etl_start >> create_job_task
-
-            if SHOULD_UPLOAD_TO_S3 or self.check_run:
-                create_job_task >> health_checks_task >> get_self_evaluation_survey_id >> \
-                    load_missing_hierarchy_from_s3 >> [extract_from_pg, extract_from_mongo] >>\
-                    upload_csvs_to_s3 >> load_into_tmp_tables
-            else:
-                create_job_task >> load_missing_hierarchy_from_s3 >> download_csvs_from_s3 >> load_into_tmp_tables
-
-            load_into_tmp_tables >> raw_tables_insert >> typed_tables_insert >>\
+            notify_etl_start >> create_job_task >> load_missing_hierarchy_from_s3 >> health_checks_task >> \
+                get_self_evaluation_survey_id >> [extract_from_pg, extract_from_mongo] >> upload_csvs_to_s3 >> \
+                download_csvs_from_s3 >> load_into_tmp_tables >> raw_tables_insert >> typed_tables_insert >>\
                 conform_tables_insert >> staged_tables_insert >> target_tables_insert >> postprocessing_tables >>\
-                precalculate_answers >> report_broken_hierarchy >> clean_data
+                precalculate_answers >> report_broken_hierarchy >> clean_data >> process_old_evaluations_data
 
-            if _fetch_old_surveys:
-                clean_data >> process_old_evaluations_data
         return _dag

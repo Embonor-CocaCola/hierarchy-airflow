@@ -1,16 +1,15 @@
-from datetime import datetime, timedelta
+from datetime import datetime
 import os
 from airflow.models import DAG
-from airflow.operators.python import PythonOperator
 from airflow.providers.postgres.operators.postgres import PostgresOperator
 
-from base.utils.slack import build_status_msg, send_slack_notification
+from base.utils.slack import notify_start_task
 from base.utils.table_names import TableNameManager
 from base.utils.tables_insert_taskgroup import TableOperationsTaskGroup
 from base.utils.load_csv_into_temp_tables_taskgroup import LoadCsvIntoTempTablesTaskGroup
 from base.success_photo_configuration_load.download_csv_task_group import DownloadCsvTaskGroup
-from config.common.settings import SHOULD_NOTIFY
-from config.expos_service.settings import ES_SQL_PATH, airflow_root_dir, ES_AIRFLOW_DATABASE_CONN_ID
+from config.common.defaults import default_task_kwargs, default_dag_kwargs
+from config.expos_service.settings import airflow_root_dir, ES_AIRFLOW_DATABASE_CONN_ID
 from config.success_photo_configuration_load.settings import (
     SPCL_DAG_ID,
     SPCL_DAG_START_DATE_VALUE,
@@ -21,47 +20,17 @@ from config.success_photo_configuration_load.settings import (
 
 
 class SuccessPhotoConfigurationLoadDagFactory:
-    @ staticmethod
-    def on_failure_callback(context):
-        if not SHOULD_NOTIFY:
-            return
-        ti = context['task_instance']
-        run_id = context['run_id']
-        send_slack_notification(notification_type='alert',
-                                payload=build_status_msg(
-                                    dag_id=SPCL_DAG_ID,
-                                    status='failed',
-                                    mappings={'run_id': run_id,
-                                              'task_id': ti.task_id},
-                                ))
-
-    @ staticmethod
-    def on_success_callback(context):
-        if not SHOULD_NOTIFY:
-            return
-
-        run_id = context['run_id']
-        send_slack_notification(notification_type='success',
-                                payload=build_status_msg(
-                                    dag_id=SPCL_DAG_ID,
-                                    status='finished',
-                                    mappings={'run_id': run_id},
-                                ))
-
     def __init__(self):
         pass
 
-    def build(self) -> DAG:
+    @staticmethod
+    def build() -> DAG:
         _start_date = datetime.strptime(
             SPCL_DAG_START_DATE_VALUE, '%Y-%m-%d')
         _default_args = {
-            'owner': 'airflow',
+            **default_task_kwargs,
             'start_date': _start_date,
-            'provide_context': True,
-            'execution_timeout': timedelta(minutes=10),
-            'retries': 1,
-            'retry_delay': timedelta(seconds=15),
-            'on_failure_callback': SuccessPhotoConfigurationLoadDagFactory.on_failure_callback,
+
         }
         _table_list = SPCL_TABLES_TO_EXTRACT
         _table_manager = TableNameManager(_table_list)
@@ -81,27 +50,12 @@ class SuccessPhotoConfigurationLoadDagFactory:
 
         with DAG(
             SPCL_DAG_ID,
+            **default_dag_kwargs,
             schedule_interval=SPCL_DAG_SCHEDULE_INTERVAL,
             default_args=_default_args,
-            template_searchpath=ES_SQL_PATH,
-            max_active_runs=1,
-            catchup=False,
-            on_success_callback=SuccessPhotoConfigurationLoadDagFactory.on_success_callback,
         ) as dag:
 
-            if SHOULD_NOTIFY:
-                notify_etl_start = PythonOperator(
-                    task_id='notify_etl_start',
-                    op_kwargs={
-                        'payload': build_status_msg(
-                            dag_id=SPCL_DAG_ID,
-                            status='started',
-                            mappings={'run_id': '{{ run_id }}'},
-                        ),
-                        'notification_type': 'success'},
-                    python_callable=send_slack_notification,
-                    dag=dag,
-                )
+            notify_etl_start = notify_start_task(dag)
 
             download_csvs = DownloadCsvTaskGroup(
                 bucket_name=_bucket_name,
@@ -151,10 +105,7 @@ class SuccessPhotoConfigurationLoadDagFactory:
                 """,
             )
 
-            if SHOULD_NOTIFY:
-                notify_etl_start >> download_csvs
-
-            download_csvs >> load_into_tmp_tables >> raw_tables_insert >> typed_tables_insert
-            typed_tables_insert >> conform_tables_insert >> target_tables_insert >> update_and_refresh_data
+            notify_etl_start >> download_csvs >> load_into_tmp_tables >> raw_tables_insert >> typed_tables_insert >>\
+                conform_tables_insert >> target_tables_insert >> update_and_refresh_data
 
         return dag
