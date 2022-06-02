@@ -19,7 +19,7 @@ SELECT
     TVP.vendor_id,
     COALESCE(s.id, TSP.id),
     COALESCE(p.id, TPL.id),
-    TVP.vendor_name,
+    INITCAP(TVP.vendor_name),
 
     now(),
     now(),
