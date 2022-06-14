@@ -26,6 +26,10 @@ webserver:
     lastName: user
     password: admin
   args: ["bash", "-c", "sh /opt/airflow/include/db/init.sh && python /opt/airflow/dags/config/init.py && airflow webserver"]
+  livenessProbe:
+    initialDelaySeconds: 35
+  readinessProbe:
+    initialDelaySeconds: 30
 workers:
   persistence:
     fixPermissions: true
