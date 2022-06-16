@@ -7,7 +7,7 @@ CREATE TABLE airflow.tmp_question (
    createdAt TEXT,
    heading TEXT,
    inputExpirationDays TEXT,
-   {{ params.additional_columns }}
+   observation TEXT,
    options TEXT,
    subType TEXT,
    type TEXT,

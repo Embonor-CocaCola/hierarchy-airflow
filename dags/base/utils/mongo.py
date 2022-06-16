@@ -28,10 +28,11 @@ def execute_query(collection_name: str, conn_id: str, db_name: str, tunnel, filt
 def get_filters_per_docdb_collection(dag_id):
     return {
         'answers': {
-            'surveyId': """{{ task_instance.xcom_pull(dag_id="%s", task_ids="%s") | from_json | oid_from_dict }}""" % (
+            'survey': {'$in': """{{ task_instance.xcom_pull(dag_id="%s", task_ids="%s") | from_json |
+            object_ids_from_array }}""" % (
                 dag_id,
                 'get_self_evaluation_survey_id',
-            ),
+            )},
         },
     }
 

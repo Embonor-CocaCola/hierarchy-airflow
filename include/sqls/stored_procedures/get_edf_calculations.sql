@@ -1,7 +1,7 @@
 -- WARNING: Be careful when updating this function because it is called to populate two materialized
 -- views for Expos-Service. If you change a column name, be sure to also change it in the code!
     BEGIN;
-    DROP MATERIALIZED VIEW IF EXISTS public.preprocessed_edf;
+    DROP MATERIALIZED VIEW IF EXISTS public.preprocessed_edf CASCADE;
 
     DROP FUNCTION IF EXISTS get_edf_calculations();
 
@@ -63,4 +63,6 @@
     CREATE MATERIALIZED VIEW public."preprocessed_edf" AS
     select *
     from get_edf_calculations();
+    CREATE UNIQUE INDEX uidx_preprocessed_edf_survey_id ON public.preprocessed_edf (survey_id);
+
     COMMIT;

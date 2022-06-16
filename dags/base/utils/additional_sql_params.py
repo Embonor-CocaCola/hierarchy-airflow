@@ -1,13 +1,4 @@
 additional_params = {
-    'development.questions.temp': {
-        'additional_columns': 'observation TEXT,',
-    },
-    'staging.questions.temp': {
-        'additional_columns': '',
-    },
-    'production.questions.temp': {
-        'additional_columns': 'observation TEXT,',
-    },
     'development.surveys.temp': {
         'additional_columns':
         """
@@ -15,6 +6,10 @@ additional_params = {
             name TEXT,
             paused TEXT,
             period TEXT,
+            portals TEXT,
+            updated_at TEXT,
+            valid_since TEXT,
+            valid_until TEXT
         """,
     },
     'staging.surveys.temp': {
@@ -22,8 +17,14 @@ additional_params = {
         """
             answers_goal_number TEXT,
             created_at TEXT,
+            is_required TEXT,
             name TEXT,
             paused TEXT,
+            portals TEXT,
+            updated_at TEXT,
+            valid_since TEXT,
+            valid_until TEXT,
+            workgroup TEXT
         """,
     },
     'production.surveys.temp': {
@@ -33,6 +34,10 @@ additional_params = {
             created_at TEXT,
             name TEXT,
             paused TEXT,
+            portals TEXT,
+            updated_at TEXT,
+            valid_since TEXT,
+            valid_until TEXT
         """,
     },
 }

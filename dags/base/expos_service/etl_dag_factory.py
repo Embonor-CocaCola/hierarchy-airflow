@@ -5,6 +5,7 @@ from airflow.models import DAG, Variable
 from airflow.operators.dummy import DummyOperator
 from airflow.operators.python import PythonOperator
 from airflow.providers.postgres.operators.postgres import PostgresOperator
+from bson.objectid import ObjectId
 
 from base.expos_service.clean_data_taskgroup import CleanDataTaskGroup
 from base.expos_service.download_csvs_from_s3_taskgroup import DownloadCsvsFromS3TaskGroup
@@ -84,7 +85,9 @@ class EtlDagFactory:
                 user_defined_filters={
                     'oid_from_dict': lambda dict: dict[0]['_id']['$oid'],
                     'from_json': lambda jsonstr: json.loads(jsonstr),
+                    'object_ids_from_array': lambda arr: list(map(lambda record: ObjectId(record['_id']['$oid']), arr)),
                 },
+                render_template_as_native_obj=True,
         ) as _dag:
             create_job_task = PostgresOperatorCreateJob(
                 task_id='create_job',
