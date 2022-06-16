@@ -215,6 +215,7 @@ BEGIN
                  INNER JOIN analyzed_photo ap on s.id = ap.survey_id
                  INNER JOIN recognized_product rp on ap.id = rp.analyzed_photo_id
                  INNER JOIN product p on rp.product_id = p.id
+        WHERE ap.scene_type IN ('1','2') -- exclude POP photos
         GROUP BY s.id;
 END;
 $$
