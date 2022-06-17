@@ -83,7 +83,7 @@ class EtlDagFactory:
                 schedule_interval=self.schedule_interval,
                 default_args=_default_args,
                 user_defined_filters={
-                    'oid_from_dict': lambda dict: dict[0]['_id']['$oid'],
+                    'oids_from_array': lambda arr: list(map(lambda record: record['_id']['$oid'], arr)),
                     'from_json': lambda jsonstr: json.loads(jsonstr),
                     'object_ids_from_array': lambda arr: list(map(lambda record: ObjectId(record['_id']['$oid']), arr)),
                 },

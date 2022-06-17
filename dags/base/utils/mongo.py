@@ -25,10 +25,25 @@ def execute_query(collection_name: str, conn_id: str, db_name: str, tunnel, filt
     return json_dump_docs(results)
 
 
-def get_filters_per_docdb_collection(dag_id):
+def get_production_filters(dag_id):
     return {
         'answers': {
-            'survey' if ES_STAGE != 'production' else 'surveyId': {
+            'surveyId': {
+                '$in':
+                    """{{ task_instance.xcom_pull(dag_id="%s", task_ids="%s") | from_json | oids_from_array }}"""
+                    % (
+                        dag_id,
+                        'get_self_evaluation_survey_id',
+                    ),
+            },
+        },
+    }
+
+
+def get_preproduction_filters(dag_id):
+    return {
+        'answers': {
+            'survey': {
                 '$in':
                     """{{ task_instance.xcom_pull(dag_id="%s", task_ids="%s") | from_json | object_ids_from_array }}"""
                     % (
@@ -38,6 +53,10 @@ def get_filters_per_docdb_collection(dag_id):
             },
         },
     }
+
+
+def get_filters_per_docdb_collection(dag_id):
+    return get_production_filters(dag_id) if ES_STAGE == 'production' else get_preproduction_filters(dag_id)
 
 
 def json_dump_docs(query_result):
