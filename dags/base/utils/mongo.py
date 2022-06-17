@@ -3,7 +3,7 @@ from contextlib import ExitStack
 from airflow.providers.mongo.hooks.mongo import MongoHook
 from bson import json_util
 
-from config.expos_service.settings import IS_LOCAL_RUN
+from config.expos_service.settings import IS_LOCAL_RUN, ES_STAGE
 
 
 def execute_query(collection_name: str, conn_id: str, db_name: str, tunnel, filters=None):
@@ -28,11 +28,14 @@ def execute_query(collection_name: str, conn_id: str, db_name: str, tunnel, filt
 def get_filters_per_docdb_collection(dag_id):
     return {
         'answers': {
-            'survey': {'$in': """{{ task_instance.xcom_pull(dag_id="%s", task_ids="%s") | from_json |
-            object_ids_from_array }}""" % (
-                dag_id,
-                'get_self_evaluation_survey_id',
-            )},
+            'survey' if ES_STAGE != 'production' else 'surveyId': {
+                '$in':
+                    """{{ task_instance.xcom_pull(dag_id="%s", task_ids="%s") | from_json | object_ids_from_array }}"""
+                    % (
+                        dag_id,
+                        'get_self_evaluation_survey_id',
+                    ),
+            },
         },
     }
 
