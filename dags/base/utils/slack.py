@@ -11,6 +11,7 @@ from config.maintenance.settings import MTNC_DAG_ID
 from config.maxerience_load.settings import ML_DAG_ID
 from config.maxerience_load_retry.settings import MLR_DAG_ID
 from config.maxerience_retrieve_result.settings import MRR_DAG_ID
+from config.run_sqls.settings import RSQLS_DAG_ID
 from config.success_photo_configuration_load.settings import SPCL_DAG_ID
 
 webhooks_by_type = {
@@ -46,6 +47,10 @@ details_by_dag = {
     MTNC_DAG_ID: {
         'emoji': ':screwdriver:',
         'dag_name': 'MAINTENANCE DAG',
+    },
+    RSQLS_DAG_ID: {
+        'emoji': ':sql:',
+        'dag_name': 'RUN SQL PROCEDURES',
     },
 }
 

@@ -29,7 +29,7 @@
                        ELSE false END
                         is_pure,
                    count(rp.id) FILTER ( WHERE ap.scene_type = '1' AND ap.sub_scene_type = '1' AND
-                                               (p.is_foreign is not true OR p.id = 54))::smallint
+                                               (p.is_foreign is false OR p.id = 54))::smallint
                         co_cooler_co_products,
                    count(rp.id) FILTER ( WHERE ap.scene_type = '1' AND ap.sub_scene_type = '1' AND
                                                (p.is_foreign is true OR p.id = 18))::smallint
@@ -49,7 +49,7 @@
                    count(rp.id) FILTER ( WHERE ap.scene_type = '1' AND ap.sub_scene_type = '1' ) :: smallint
                         co_cooler_total_products,
                    count(rp.id) FILTER ( WHERE ap.scene_type = '1' AND ap.sub_scene_type = '2' ) :: smallint
-                        co_cooler_total_products,
+                        pe_cooler_total_products,
                    s.id survey_id
             FROM survey s
                      INNER JOIN analyzed_photo ap on s.id = ap.survey_id
@@ -64,5 +64,8 @@
     select *
     from get_edf_calculations();
     CREATE UNIQUE INDEX uidx_preprocessed_edf_survey_id ON public.preprocessed_edf (survey_id);
+
+    CREATE MATERIALIZED VIEW public.survey_photo_score as select * from get_survey_photo_score();
+    CREATE UNIQUE INDEX uidx_survey_photo_score_survey_id ON public.survey_photo_score(survey_id);
 
     COMMIT;

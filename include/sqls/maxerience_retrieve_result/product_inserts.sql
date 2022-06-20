@@ -35,23 +35,38 @@ VALUES (
     null
        ), (
     54,
-    '{"name": "Foreign", "sku": "0"}',
+    '{"name": "Unrecognized", "sku": "0"}',
     '{}',
     '{}',
-    '{"is_foreign": true}',
+    '{}',
     1,
     now() :: timestamp,
     1,
     now():: timestamp,
     0,
+    'Unrecognized',
     null,
     null,
     null,
     null,
-    true,
     null
 )
-ON CONFLICT(id) DO NOTHING
+ON CONFLICT(id) DO UPDATE SET
+    identity = EXCLUDED.identity,
+    display = EXCLUDED.display,
+    details = EXCLUDED.details,
+    recognition_details = EXCLUDED.recognition_details,
+    created_by_user_id = EXCLUDED.created_by_user_id,
+    created_on = EXCLUDED.created_on,
+    modified_by_user_id = EXCLUDED.modified_by_user_id,
+    modified_on = EXCLUDED.modified_on,
+    sku = EXCLUDED.sku,
+    "name" = EXCLUDED."name",
+    "group" = EXCLUDED."group",
+    "category" = EXCLUDED."category",
+    local_category_name = EXCLUDED.local_category_name,
+    is_foreign = EXCLUDED.is_foreign,
+    flavour_name = EXCLUDED.flavour_name
 ;
 
 INSERT INTO product (

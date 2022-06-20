@@ -89,7 +89,7 @@ BEGIN
             THEN false
             END
                has_outside_banners,
-           s.id
+           s.id survey_id
     FROM survey s
              INNER JOIN answer a on s.id = a.survey_id
              INNER JOIN question q on q.id = a.question_id
