@@ -79,6 +79,7 @@ class MaxerienceRetrieveResultDagFactory:
                     REFRESH MATERIALIZED VIEW CONCURRENTLY preprocessed_essentials;
                     REFRESH MATERIALIZED VIEW CONCURRENTLY preprocessed_sovi;
                     REFRESH MATERIALIZED VIEW CONCURRENTLY preprocessed_edf;
+                    REFRESH MATERIALIZED VIEW CONCURRENTLY survey_photo_score;
                 """,
             )
 
