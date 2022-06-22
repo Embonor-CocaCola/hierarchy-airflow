@@ -195,7 +195,10 @@
     $$
         LANGUAGE 'plpgsql';
 
-    CREATE MATERIALIZED VIEW preprocessed_success_photo AS SELECT * FROM get_aggregated_compliance(false);
-    CREATE MATERIALIZED VIEW preprocessed_essentials AS SELECT * FROM get_aggregated_compliance(true);
+    CREATE MATERIALIZED VIEW public.preprocessed_success_photo AS SELECT * FROM get_aggregated_compliance(false);
+    CREATE UNIQUE INDEX uidx_preprocessed_success_photo_survey_id ON public.preprocessed_success_photo(survey_id);
+
+    CREATE MATERIALIZED VIEW public.preprocessed_essentials AS SELECT * FROM get_aggregated_compliance(true);
+    CREATE UNIQUE INDEX uidx_preprocessed_essentials_survey_id ON public.preprocessed_essentials(survey_id);
 
     COMMIT;
