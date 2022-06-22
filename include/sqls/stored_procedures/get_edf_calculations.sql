@@ -64,8 +64,4 @@
     select *
     from get_edf_calculations();
     CREATE UNIQUE INDEX uidx_preprocessed_edf_survey_id ON public.preprocessed_edf (survey_id);
-
-    CREATE MATERIALIZED VIEW public.survey_photo_score as select * from get_survey_photo_score();
-    CREATE UNIQUE INDEX uidx_survey_photo_score_survey_id ON public.survey_photo_score(survey_id);
-
     COMMIT;

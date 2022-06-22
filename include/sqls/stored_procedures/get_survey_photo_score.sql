@@ -1,5 +1,8 @@
 -- WARNING: Be careful when updating this function because it is called to populate a materialized
 -- view for Expos-Service. If you change a column name, be sure to also change it in the code!
+BEGIN;
+DROP FUNCTION IF EXISTS get_survey_photo_score() CASCADE;
+
 CREATE OR REPLACE FUNCTION get_survey_photo_score()
     RETURNS TABLE
             (
@@ -43,3 +46,7 @@ BEGIN
 END;
 $$
     LANGUAGE 'plpgsql';
+
+CREATE MATERIALIZED VIEW public.survey_photo_score AS SELECT * FROM get_survey_photo_score();
+CREATE UNIQUE INDEX uidx_survey_photo_score_survey_id ON public.survey_photo_score(survey_id);
+COMMIT;
