@@ -4,6 +4,8 @@
 BEGIN;
 
 DROP FUNCTION IF EXISTS get_sovi_calculations() CASCADE;
+DROP MATERIALIZED VIEW IF EXISTS public.preprocessed_sovi CASCADE;
+DROP MATERIALIZED VIEW IF EXISTS airflow.preprocessed_sovi CASCADE;
 
 CREATE OR REPLACE FUNCTION get_sovi_calculations()
     RETURNS TABLE

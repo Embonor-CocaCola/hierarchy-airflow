@@ -25,6 +25,9 @@ class Graph:
     def add_node(self, name, metadata):
         self.graph[name] = {'metadata': metadata, 'edges': []}
 
+    def get_node(self, name):
+        return self.graph[name]['metadata']
+
     def add_edge(self, origin: str, dest: str):
         if not self.graph[origin]:
             raise ValueError(f'Node name does not exist in current graph: {origin}')

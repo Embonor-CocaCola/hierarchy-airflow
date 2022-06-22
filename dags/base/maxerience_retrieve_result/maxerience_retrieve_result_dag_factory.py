@@ -8,6 +8,7 @@ from airflow.providers.postgres.operators.postgres import PostgresOperator
 from psycopg2.extensions import register_adapter
 from psycopg2.extras import Json
 from base.maxerience_retrieve_result.process_parquet_files_taskgroup import ProcessParquetFilesTaskGroup
+from base.maxerience_retrieve_result.refresh_mat_views_taskgroup import RefreshMatViewsTaskGroup
 from base.maxerience_retrieve_result.utils.create_parquet_file import create_parquet_file
 from base.utils.slack import notify_start_task
 from config.common.defaults import default_task_kwargs, default_dag_kwargs
@@ -70,18 +71,10 @@ class MaxerienceRetrieveResultDagFactory:
             process_parquet_files = ProcessParquetFilesTaskGroup(
                 dag=_dag, group_id='process_parquet_files').build()
 
-            preprocess_ir_data = PostgresOperator(
-                task_id='preprocess_ir_data',
-                postgres_conn_id=ES_AIRFLOW_DATABASE_CONN_ID,
-                sql="""
-                    REFRESH MATERIALIZED VIEW CONCURRENTLY sku_family_compliance;
-                    REFRESH MATERIALIZED VIEW CONCURRENTLY preprocessed_success_photo;
-                    REFRESH MATERIALIZED VIEW CONCURRENTLY preprocessed_essentials;
-                    REFRESH MATERIALIZED VIEW CONCURRENTLY preprocessed_sovi;
-                    REFRESH MATERIALIZED VIEW CONCURRENTLY preprocessed_edf;
-                    REFRESH MATERIALIZED VIEW CONCURRENTLY survey_photo_score;
-                """,
-            )
+            preprocess_ir_data = RefreshMatViewsTaskGroup(
+                group_id='refresh_materialized_views',
+                dag=_dag,
+            ).build()
 
             preprocess_survey_metadata = PostgresOperator(
                 task_id='preprocess_survey_metadata',

@@ -1,5 +1,6 @@
 BEGIN;
     DROP MATERIALIZED VIEW IF EXISTS public.sku_family_compliance CASCADE;
+    DROP MATERIALIZED VIEW IF EXISTS airflow.sku_family_compliance CASCADE;
 
     DROP FUNCTION IF EXISTS get_sku_family_compliance() CASCADE;
 
@@ -48,6 +49,6 @@ BEGIN;
     END;
     $$ language 'plpgsql';
 
-    CREATE MATERIALIZED VIEW sku_family_compliance AS SELECT * FROM get_sku_family_compliance();
-    CREATE UNIQUE INDEX uidx_sku_family_compliance_survey_id_spp_id ON sku_family_compliance(survey_id, success_photo_product_id);
+    CREATE MATERIALIZED VIEW public.sku_family_compliance AS SELECT * FROM get_sku_family_compliance();
+    CREATE UNIQUE INDEX uidx_sku_family_compliance_survey_id_spp_id ON public.sku_family_compliance(survey_id, success_photo_product_id);
 COMMIT;

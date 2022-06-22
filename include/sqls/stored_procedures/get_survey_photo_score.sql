@@ -2,6 +2,8 @@
 -- view for Expos-Service. If you change a column name, be sure to also change it in the code!
 BEGIN;
 DROP FUNCTION IF EXISTS get_survey_photo_score() CASCADE;
+DROP MATERIALIZED VIEW IF EXISTS public.survey_photo_score CASCADE;
+DROP MATERIALIZED VIEW IF EXISTS airflow.survey_photo_score CASCADE;
 
 CREATE OR REPLACE FUNCTION get_survey_photo_score()
     RETURNS TABLE

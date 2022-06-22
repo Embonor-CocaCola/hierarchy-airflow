@@ -5,6 +5,11 @@
 
     DROP FUNCTION get_aggregated_compliance(only_essentials BOOLEAN) CASCADE;
 
+    DROP MATERIALIZED VIEW IF EXISTS public.preprocessed_essentials CASCADE;
+    DROP MATERIALIZED VIEW IF EXISTS public.preprocessed_success_photo CASCADE;
+    DROP MATERIALIZED VIEW IF EXISTS airflow.preprocessed_essentials CASCADE;
+    DROP MATERIALIZED VIEW IF EXISTS airflow.preprocessed_success_photo CASCADE;
+
     CREATE OR REPLACE FUNCTION get_aggregated_compliance(only_essentials BOOLEAN)
         RETURNS TABLE
                 (

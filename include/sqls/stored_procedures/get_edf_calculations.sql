@@ -2,6 +2,7 @@
 -- views for Expos-Service. If you change a column name, be sure to also change it in the code!
     BEGIN;
     DROP MATERIALIZED VIEW IF EXISTS public.preprocessed_edf CASCADE;
+    DROP MATERIALIZED VIEW IF EXISTS airflow.preprocessed_edf CASCADE;
 
     DROP FUNCTION IF EXISTS get_edf_calculations();
 
