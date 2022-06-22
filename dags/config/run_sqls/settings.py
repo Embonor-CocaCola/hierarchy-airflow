@@ -44,4 +44,7 @@ SQL_DEPENDENCY_GRAPH = [
     {
         'name': 'update_success_photo_products', 'edges': [],
     },
+    {
+        'name': 'get_sku_family_compliance', 'edges': [],
+    },
 ]
