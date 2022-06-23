@@ -7,7 +7,7 @@ BEGIN;
     CREATE OR REPLACE FUNCTION get_sku_family_compliance()
         RETURNS TABLE
                 (
-                    present_facings          smallint,
+                    present_facings          numeric,
                     required_facings         smallint,
                     is_essential             boolean,
                     survey_id                uuid,
@@ -35,7 +35,7 @@ BEGIN;
                                where p.sku = ANY (spp.skus)
                                ), spp.required_facings)
                        END present_facings,
-                   spp.required_facings,
+                   spp.required_facings::smallint,
                    spp.is_essential,
                    s.id    survey_id,
                    spp.id  success_photo_product_id

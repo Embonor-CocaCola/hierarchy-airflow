@@ -15,7 +15,6 @@ class Graph:
             for node in graph_dict:
                 edges = node.get('edges', None)
                 name = node.get('name', None)
-                print(edges)
                 if edges is None:
                     raise ValueError(f'Edges not found in node {node}')
 
