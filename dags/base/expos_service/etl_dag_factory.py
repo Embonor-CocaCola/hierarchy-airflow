@@ -211,7 +211,7 @@ class EtlDagFactory:
 
             target_tables_insert = conditional_operator(
                 dag=_dag,
-                operator=DownloadCsvsFromS3TaskGroup,
+                operator=TableOperationsTaskGroup,
                 condition=not self.check_run or ES_STAGE == 'development',
                 table_list=_target_operations,
                 sql_folder='expos_service',

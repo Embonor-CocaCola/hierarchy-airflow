@@ -8,7 +8,7 @@ from airflow.operators.python import PythonOperator, ShortCircuitOperator
 from base.utils.query_with_return import parameterized_query
 from base.utils.slack import notify_start_task
 from config.common.defaults import default_task_kwargs, default_dag_kwargs
-from config.common.settings import airflow_root_dir
+from config.common.settings import airflow_root_dir, SURVEY_SERVICE_BASE_URL
 from config.reset_rejected_surveys.settings import RRS_DAG_ID, RRS_DAG_SCHEDULE_INTERVAL, RRS_DAG_START_DATE_VALUE
 
 
@@ -74,7 +74,7 @@ class ResetRejectedSurveysDagFactory:
     def reset_surveys(ti):
         to_reset = ti.xcom_pull(task_ids=ResetRejectedSurveysDagFactory.get_surveys_task_id)
         result = requests.post(
-            'https://api.staging.embonorservices.cl/surveys-service/answers/reject',
+            f'{SURVEY_SERVICE_BASE_URL}/answers/reject',
             json=to_reset,
         )
         return result.json()
