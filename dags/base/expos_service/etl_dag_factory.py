@@ -210,7 +210,6 @@ class EtlDagFactory:
             ).build()
 
             target_tables_insert = conditional_operator(
-                dag=_dag,
                 operator=TableOperationsTaskGroup,
                 condition=not self.check_run or ES_STAGE == 'development',
                 table_list=_target_operations,
