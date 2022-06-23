@@ -1,6 +1,6 @@
 import json
 import uuid
-from datetime import datetime, timedelta
+from datetime import datetime
 
 import psycopg2
 import requests
@@ -16,9 +16,9 @@ from base.maxerience_load.utils.get_ir_api_key import get_ir_api_key
 from base.utils.build_maxerience_payload import build_maxerience_payload
 from base.utils.conditional_operator import conditional_operator
 from base.utils.ml_scene_info import extract_info_from_question_heading
-from base.utils.slack import send_slack_notification, build_status_msg, notify_start_task
+from base.utils.slack import notify_start_task
 from config.common.defaults import default_task_kwargs, default_dag_kwargs
-from config.common.settings import SHOULD_NOTIFY, EXPOS_DATABASE_CONN_ID
+from config.common.settings import EXPOS_DATABASE_CONN_ID
 from config.expos_service.settings import ES_STAGE
 from config.maxerience_load.settings import (
     ML_DAG_START_DATE_VALUE,
@@ -33,40 +33,12 @@ class MaxerienceLoadDagFactory:
         self._get_photos_group_id = 'get_photos_to_upload'
         self._get_questions_photos_id = 'get_questions_photos'
 
-    @staticmethod
-    def on_failure_callback(context):
-        if not SHOULD_NOTIFY:
-            return
-        ti = context['task_instance']
-        run_id = context['run_id']
-        send_slack_notification(notification_type='alert',
-                                payload=build_status_msg(
-                                    dag_id=ML_DAG_ID,
-                                    status='failed',
-                                    mappings={'run_id': run_id,
-                                              'task_id': ti.task_id},
-                                ))
-
-    @staticmethod
-    def on_success_callback(context):
-        if not SHOULD_NOTIFY:
-            return
-
-        run_id = context['run_id']
-        send_slack_notification(notification_type='success',
-                                payload=build_status_msg(
-                                    dag_id=ML_DAG_ID,
-                                    status='finished',
-                                    mappings={'run_id': run_id},
-                                ))
-
     def build(self) -> DAG:
         _start_date = datetime.strptime(
             ML_DAG_START_DATE_VALUE, '%Y-%m-%d')
         _default_args = {
             **default_task_kwargs,
             'start_date': _start_date,
-            'execution_timeout': timedelta(minutes=10),
         }
 
         with DAG(

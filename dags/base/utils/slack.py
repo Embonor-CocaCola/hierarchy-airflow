@@ -11,6 +11,7 @@ from config.maintenance.settings import MTNC_DAG_ID
 from config.maxerience_load.settings import ML_DAG_ID
 from config.maxerience_load_retry.settings import MLR_DAG_ID
 from config.maxerience_retrieve_result.settings import MRR_DAG_ID
+from config.reset_rejected_surveys.settings import RRS_DAG_ID
 from config.run_sqls.settings import RSQLS_DAG_ID
 from config.success_photo_configuration_load.settings import SPCL_DAG_ID
 
@@ -51,6 +52,10 @@ details_by_dag = {
     RSQLS_DAG_ID: {
         'emoji': ':sql:',
         'dag_name': 'RUN SQL PROCEDURES',
+    },
+    RRS_DAG_ID: {
+        'emoji': ':repeat_one:',
+        'dag_name': 'RESET REJECTED SURVEYS',
     },
 }
 

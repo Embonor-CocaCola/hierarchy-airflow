@@ -2,7 +2,6 @@ import json
 from datetime import datetime, timedelta
 
 from airflow.models import DAG, Variable
-from airflow.operators.dummy import DummyOperator
 from airflow.operators.python import PythonOperator
 from airflow.providers.postgres.operators.postgres import PostgresOperator
 from bson.objectid import ObjectId
@@ -42,7 +41,7 @@ from config.expos_service.settings import (
     ES_PG_TABLES_TO_EXTRACT,
     ES_ETL_CONFORM_OPERATIONS_ORDER, ES_ETL_STAGED_OPERATIONS_ORDER, ES_ETL_TARGET_OPERATIONS_ORDER,
     ES_FETCH_OLD_EVALUATIONS_KEY, ES_ETL_CHECK_RUN_DAG_ID, ES_ETL_CHECK_RUN_DAG_SCHEDULE_INTERVAL,
-    ES_ETL_POSTPROCESSING_OPERATIONS_ORDER,
+    ES_ETL_POSTPROCESSING_OPERATIONS_ORDER, ES_STAGE,
 )
 
 from operators.postgres.create_job import PostgresOperatorCreateJob
@@ -210,14 +209,17 @@ class EtlDagFactory:
                 job_id=_job_id,
             ).build()
 
-            target_tables_insert = DummyOperator(task_id='dummy_target_inserts') if self.check_run \
-                else TableOperationsTaskGroup(
+            target_tables_insert = conditional_operator(
+                dag=_dag,
+                operator=DownloadCsvsFromS3TaskGroup,
+                condition=not self.check_run or ES_STAGE == 'development',
                 table_list=_target_operations,
                 sql_folder='expos_service',
                 stage='target',
                 sequential=True,
                 job_id=_job_id,
-            ).build()
+                should_build=True,
+            )
 
             postprocessing_tables = TableOperationsTaskGroup(
                 table_list=_postprocessing_operations,

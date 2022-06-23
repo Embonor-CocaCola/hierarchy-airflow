@@ -24,7 +24,8 @@ env:
     value: https://irclientdataexportpp.blob.core.windows.net/
   - name: SLACK_ETL_SUCCESS_CHANNEL
     value: C036G7G8GJ2
-
+  - name: SURVEYS_SERVICE_BASE_URL
+    value: https://api.staging.embonorservices.cl/surveys-service
 secret:
   - envName: "EMBONOR_MONGO_CONN_URI"
     secretName: "airflow-envars"
