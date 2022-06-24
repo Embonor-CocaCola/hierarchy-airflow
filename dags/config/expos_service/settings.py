@@ -36,7 +36,7 @@ ES_ETL_CHECK_RUN_DAG_ID = 'expos_etl_check_run'
 ES_ETL_CHECK_RUN_DAG_SCHEDULE_INTERVAL = os.environ.get('ES_ETL_DAG_SCHEDULE_INTERVAL', '59 23 * * 0')
 
 ES_SSH_CONN_ID = 'ssh_conn'
-ES_SSH_CONN_URI = f'{os.environ.get("SSH_CONN_URI")}&key_file={os.environ.get("SSH_PEM_FILE_PATH")}'
+ES_SSH_CONN_URI = f'{os.environ.get("SSH_CONN_URI")}&private_key={os.environ.get("SSH_PRIVATE_KEY", "")}'
 
 IS_LOCAL_RUN = os.environ.get('IS_LOCAL_RUN', False)
 AUTH_USER = os.environ.get('AUTH_USER')

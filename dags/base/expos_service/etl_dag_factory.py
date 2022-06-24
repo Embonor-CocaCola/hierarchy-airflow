@@ -72,9 +72,9 @@ class EtlDagFactory:
         _table_manager = TableNameManager(_tables_to_insert)
 
         pg_tunnel = Tunneler(
-            ES_REMOTE_RDS_PORT, ES_REMOTE_RDS_HOST, 5433) if IS_LOCAL_RUN else None
+            ES_REMOTE_RDS_PORT, ES_REMOTE_RDS_HOST, 5433) if IS_LOCAL_RUN or ES_STAGE == 'development' else None
         mongo_tunnel = Tunneler(
-            ES_REMOTE_MONGO_PORT, ES_REMOTE_MONGO_HOST, 27018) if IS_LOCAL_RUN else None
+            ES_REMOTE_MONGO_PORT, ES_REMOTE_MONGO_HOST, 27018) if IS_LOCAL_RUN or ES_STAGE == 'development' else None
 
         with DAG(
                 self.dag_id,
