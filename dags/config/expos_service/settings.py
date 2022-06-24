@@ -1,4 +1,5 @@
 import os
+import urllib.parse
 
 airflow_root_dir = os.environ.get('AIRFLOW_HOME')
 
@@ -36,7 +37,8 @@ ES_ETL_CHECK_RUN_DAG_ID = 'expos_etl_check_run'
 ES_ETL_CHECK_RUN_DAG_SCHEDULE_INTERVAL = os.environ.get('ES_ETL_DAG_SCHEDULE_INTERVAL', '59 23 * * 0')
 
 ES_SSH_CONN_ID = 'ssh_conn'
-ES_SSH_CONN_URI = f'{os.environ.get("SSH_CONN_URI")}&private_key={os.environ.get("SSH_PRIVATE_KEY", "")}'
+ES_SSH_PRIVATE_KEY = urllib.parse.quote_plus(os.environ.get('SSH_PRIVATE_KEY', '').replace(r'\n', '\n'))
+ES_SSH_CONN_URI = f'{os.environ.get("SSH_CONN_URI")}&private_key={ES_SSH_PRIVATE_KEY}'
 
 IS_LOCAL_RUN = os.environ.get('IS_LOCAL_RUN', False)
 AUTH_USER = os.environ.get('AUTH_USER')
