@@ -28,6 +28,10 @@ env:
     value: https://api.staging.embonorservices.cl/surveys-service
   - name: SSH_CONN_URI
     value: ssh://ec2-user:@ec2-3-87-56-126.compute-1.amazonaws.com:22?conn_timeout=180
+  - name: EMBONOR_RDS_HOST
+    value: embonorstagingrds-read.c95d90uys8a7.us-east-1.rds.amazonaws.com
+  - name: EMBONOR_MONGO_HOST
+    value: mongo-staging.cluster-c95d90uys8a7.us-east-1.docdb.amazonaws.com
 secret:
   - envName: "EMBONOR_MONGO_CONN_URI"
     secretName: "airflow-envars"
