@@ -74,3 +74,6 @@ secret:
   - envName: "SPCL_S3_CONN_URI"
     secretName: "airflow-envars"
     secretKey: "SPCL_S3_CONN_URI"
+  - envName: "SSH_PRIVATE_KEY"
+    secretName: "airflow-envars"
+    secretKey: "SSH_PRIVATE_KEY"
