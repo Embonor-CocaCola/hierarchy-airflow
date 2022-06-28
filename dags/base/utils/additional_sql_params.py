@@ -16,6 +16,7 @@ additional_params = {
         'additional_columns':
         """
             answers_goal_number TEXT,
+            country TEXT,
             created_at TEXT,
             is_required TEXT,
             name TEXT,
