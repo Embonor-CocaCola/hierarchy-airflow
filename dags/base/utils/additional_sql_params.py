@@ -16,6 +16,7 @@ additional_params = {
         """,
     },
     'development.answers.temp': {
+        'additional_columns':
         """
             surveyedId TEXT, -- customerId
             latitude TEXT,
@@ -44,6 +45,7 @@ additional_params = {
         """,
     },
     'staging.answers.temp': {
+        'additional_columns':
         """
             surveyedId TEXT, -- customerId
             latitude TEXT,
@@ -69,6 +71,7 @@ additional_params = {
         """,
     },
     'production.answers.temp': {
+        'additional_columns':
         """
             latitude TEXT,
             longitude TEXT,
