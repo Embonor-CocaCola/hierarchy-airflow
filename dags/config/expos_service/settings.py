@@ -1,8 +1,6 @@
 import os
 import urllib.parse
 
-from config.common.settings import airflow_root_dir
-
 ES_EMBONOR_SERVICES_BASE_URL = os.environ.get('EMBONOR_SERVICES_BASE_URL')
 ES_EMBONOR_SERVICES_BASE_URL_CONN_ID = 'embonor_services_base_conn'
 ES_AIRFLOW_DATABASE_CONN_ID = 'airflow_db_conn'
@@ -30,7 +28,6 @@ ES_REMOTE_RDS_PASS = os.environ.get('EMBONOR_RDS_PASS')
 ES_ETL_DAG_ID = 'expos_etl'
 ES_ETL_DAG_START_DATE_VALUE = os.environ.get('ES_ETL_DAG_START_DATE_VALUE', '2021-11-24')
 ES_ETL_DAG_SCHEDULE_INTERVAL = os.environ.get('ES_ETL_DAG_SCHEDULE_INTERVAL', '30 11 * * *')  # everyday at 11:30 UTC
-ES_SQL_PATH = os.path.join(airflow_root_dir, 'include', 'sqls')
 ES_ETL_CHECK_RUN_DAG_ID = 'expos_etl_check_run'
 
 # every sunday at 23:59 UTC
@@ -40,7 +37,6 @@ ES_SSH_CONN_ID = 'ssh_conn'
 ES_SSH_PRIVATE_KEY = urllib.parse.quote_plus(os.environ.get('SSH_PRIVATE_KEY', '').replace(r'\n', '\n'))
 ES_SSH_CONN_URI = f'{os.environ.get("SSH_CONN_URI")}&private_key={ES_SSH_PRIVATE_KEY}'
 
-IS_LOCAL_RUN = os.environ.get('IS_LOCAL_RUN', False)
 AUTH_USER = os.environ.get('AUTH_USER')
 AUTH_PASS = os.environ.get('AUTH_PASS')
 

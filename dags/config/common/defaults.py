@@ -1,10 +1,10 @@
 from datetime import timedelta
 
 from base.utils.slack import on_success_callback, on_failure_callback
-from config.expos_service.settings import ES_SQL_PATH
+from config.common.settings import SQL_PATH
 
 default_dag_kwargs = {
-    'template_searchpath': ES_SQL_PATH,
+    'template_searchpath': SQL_PATH,
     'max_active_runs': 1,
     'on_success_callback': on_success_callback,
     'catchup': False,
