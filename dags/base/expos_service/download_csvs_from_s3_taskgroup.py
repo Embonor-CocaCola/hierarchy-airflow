@@ -1,9 +1,11 @@
+from airflow.models import Variable
 from airflow.models.dag import DAG
 from airflow.operators.python import PythonOperator
 from airflow.utils.task_group import TaskGroup
 
 from base.utils.s3 import download_file_from_s3
 from base.utils.tasks import arrange_task_list_sequentially
+from config.expos_service.settings import ES_STAGE_TO_DOWNLOAD_CSVS_FROM_KEY
 
 
 class DownloadCsvsFromS3TaskGroup:
@@ -13,6 +15,7 @@ class DownloadCsvsFromS3TaskGroup:
         if not dag:
             raise ValueError('dag parameter is missing')
 
+        self.stage_to_download = Variable.get(ES_STAGE_TO_DOWNLOAD_CSVS_FROM_KEY)
         self.file_names = file_names
         self.dag = dag
         self.group_id = group_id
@@ -22,7 +25,7 @@ class DownloadCsvsFromS3TaskGroup:
             task_id=f'download_{file_name}_csv_from_s3',
             task_group=task_group,
             python_callable=download_file_from_s3,
-            op_args=[file_name, 'etl_csvs'],
+            op_args=[file_name, f'etl_csvs/{self.stage_to_download}'],
         )
 
     def build(self):

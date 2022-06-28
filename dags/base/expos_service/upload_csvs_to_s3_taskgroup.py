@@ -7,7 +7,7 @@ from airflow.providers.amazon.aws.hooks.s3 import S3Hook
 from airflow.utils.task_group import TaskGroup
 
 from base.utils.tasks import arrange_task_list_sequentially
-from config.common.settings import airflow_root_dir
+from config.common.settings import airflow_root_dir, STAGE
 from config.success_photo_configuration_load.settings import SPCL_S3_CONN_ID
 
 
@@ -30,7 +30,7 @@ class UploadCsvsToS3TaskGroup:
         )
         s3_hook.load_file(
             filename=os.path.join(airflow_root_dir, 'data', f'{file_name}.csv'),
-            key=f'etl_csvs/{file_name}.csv',
+            key=f'etl_csvs/{STAGE}/{file_name}.csv',
             bucket_name='expos-bucket',
             replace=True,
         )

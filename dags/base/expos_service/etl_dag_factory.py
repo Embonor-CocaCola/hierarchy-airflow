@@ -24,7 +24,7 @@ from base.utils.slack import notify_start_task
 from base.utils.table_names import TableNameManager
 from base.utils.tunneler import Tunneler
 from config.common.defaults import default_task_kwargs, default_dag_kwargs
-from config.common.settings import SHOULD_UPLOAD_TO_S3, STAGE, SHOULD_USE_TUNNEL
+from config.common.settings import SHOULD_UPLOAD_TO_S3, SHOULD_USE_TUNNEL
 from config.expos_service.settings import (
     ES_AIRFLOW_DATABASE_CONN_ID,
     ES_ETL_DAG_ID,
@@ -129,7 +129,7 @@ class EtlDagFactory:
             )
 
             upload_csvs_to_s3 = conditional_operator(
-                condition=SHOULD_UPLOAD_TO_S3 and not self.check_run,
+                condition=SHOULD_UPLOAD_TO_S3 or self.check_run,
                 operator=UploadCsvsToS3TaskGroup,
                 dag=_dag,
                 group_id='upload_csvs_to_s3',
@@ -210,7 +210,7 @@ class EtlDagFactory:
 
             target_tables_insert = conditional_operator(
                 operator=TableOperationsTaskGroup,
-                condition=not self.check_run or STAGE == 'development',
+                condition=not self.check_run,
                 table_list=_target_operations,
                 sql_folder='expos_service',
                 stage='target',

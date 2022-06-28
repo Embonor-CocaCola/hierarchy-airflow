@@ -5,7 +5,7 @@ STAGE = os.environ.get('STAGE', 'development')
 
 IS_LOCAL_EXECUTION = os.environ.get('IS_LOCAL_RUN', False)
 SHOULD_NOTIFY = STAGE in ['staging', 'production'] and not IS_LOCAL_EXECUTION
-SHOULD_USE_TUNNEL = STAGE in ['local', 'development'] or IS_LOCAL_EXECUTION
+SHOULD_USE_TUNNEL = STAGE in ['local'] or IS_LOCAL_EXECUTION
 
 SLACK_SUCCESS_CHANNEL_URL = os.environ.get('SLACK_SUCCESS_CHANNEL_URL')
 SLACK_FAILURE_CHANNEL_URL = os.environ.get('SLACK_FAILURE_CHANNEL_URL')

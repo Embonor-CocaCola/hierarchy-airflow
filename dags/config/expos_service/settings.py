@@ -71,3 +71,4 @@ ES_ETL_POSTPROCESSING_OPERATIONS_ORDER = os.environ.get(
 ).split(',')
 
 ES_FETCH_OLD_EVALUATIONS_KEY = 'es_etl_fetch_old_self_evaluations'
+ES_STAGE_TO_DOWNLOAD_CSVS_FROM_KEY = 'es_stage_to_download_csvs_from'

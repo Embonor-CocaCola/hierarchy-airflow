@@ -141,5 +141,6 @@ if __name__ == '__main__':
     _variable_config = {
         'ml_auth_token': '6362F8A5-F441-4943-9C81-3D96229E8BDE',
         es_config.ES_FETCH_OLD_EVALUATIONS_KEY: False,
+        es_config.ES_STAGE_TO_DOWNLOAD_CSVS_FROM_KEY: 'production',
     }
     _initialize(_db_config, _conn_config, _variable_config)
