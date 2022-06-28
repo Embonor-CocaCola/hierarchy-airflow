@@ -1,10 +1,12 @@
 import os
 
+from airflow.models import Variable
+
 from base.utils.additional_sql_params import additional_params
 from base.utils.table_names import TableNameManager
 from airflow.utils.task_group import TaskGroup
 
-from config.expos_service.settings import ES_AIRFLOW_DATABASE_CONN_ID
+from config.expos_service.settings import ES_AIRFLOW_DATABASE_CONN_ID, ES_STAGE_TO_DOWNLOAD_CSVS_FROM_KEY
 from config.common.settings import STAGE, airflow_root_dir
 from operators.postgres.copy_expert import PostgresOperatorCopyExpert
 from operators.postgres.query_with_params import PostgresOperatorWithParams
@@ -23,6 +25,7 @@ class LoadCsvIntoTempTablesTaskGroup:
         self.sql_folder = sql_folder
         self.delimiter = delimiter
         self.check_run = check_run
+        self.csvs_stage = Variable.get(ES_STAGE_TO_DOWNLOAD_CSVS_FROM_KEY)
 
     def create_insert_task(self, original_table_name: str):
         table_names = self.table_name_manager.get_variations(original_table_name)
@@ -54,7 +57,7 @@ class LoadCsvIntoTempTablesTaskGroup:
         return task_group
 
     def create_params_key(self, original_table_name, check_run: bool):
-        return '.'.join([STAGE if check_run else 'production', original_table_name, 'temp'])
+        return '.'.join([STAGE if check_run else self.csvs_stage, original_table_name, 'temp'])
 
     def build(self):
         with self.task_group as tg:
