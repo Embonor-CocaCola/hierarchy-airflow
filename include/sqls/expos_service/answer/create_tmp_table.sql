@@ -5,12 +5,5 @@ CREATE TABLE airflow.tmp_answer (
     id TEXT,
     answers TEXT,
     createdAt TEXT,
-    latitude TEXT,
-    longitude TEXT,
-    pollsterId TEXT,
-    skipsSurvey TEXT,
-    surveyId TEXT,
-    surveyedId TEXT,
-    updatedAt TEXT,
-    time_elapsed TEXT
+    {{ params.additional_columns }}
 );

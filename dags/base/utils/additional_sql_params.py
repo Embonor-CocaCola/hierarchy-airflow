@@ -15,6 +15,18 @@ additional_params = {
             workgroup TEXT
         """,
     },
+    'development.answers.temp': {
+        """
+            surveyedId TEXT, -- customerId
+            latitude TEXT,
+            longitude TEXT,
+            skipsSurvey TEXT,
+            surveyId TEXT,
+            time_elapsed TEXT,
+            updatedAt TEXT,
+            pollsterId TEXT -- vendorId
+        """,
+    },
     'staging.surveys.temp': {
         'additional_columns':
         """
@@ -31,6 +43,18 @@ additional_params = {
             workgroup TEXT
         """,
     },
+    'staging.answers.temp': {
+        """
+            surveyedId TEXT, -- customerId
+            latitude TEXT,
+            longitude TEXT,
+            skipsSurvey TEXT,
+            surveyId TEXT,
+            time_elapsed TEXT,
+            updatedAt TEXT,
+            pollsterId TEXT -- vendorId
+        """,
+    },
     'production.surveys.temp': {
         'additional_columns':
         """
@@ -42,6 +66,18 @@ additional_params = {
             updated_at TEXT,
             valid_since TEXT,
             valid_until TEXT
+        """,
+    },
+    'production.answers.temp': {
+        """
+            latitude TEXT,
+            longitude TEXT,
+            pollsterId TEXT,
+            skipsSurvey TEXT,
+            surveyId TEXT,
+            surveyedId TEXT,
+            time_elapsed TEXT,
+            updatedAt TEXT
         """,
     },
 }
