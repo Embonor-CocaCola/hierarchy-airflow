@@ -24,7 +24,7 @@ from base.utils.slack import notify_start_task
 from base.utils.table_names import TableNameManager
 from base.utils.tunneler import Tunneler
 from config.common.defaults import default_task_kwargs, default_dag_kwargs
-from config.common.settings import SHOULD_UPLOAD_TO_S3
+from config.common.settings import SHOULD_UPLOAD_TO_S3, STAGE, SHOULD_USE_TUNNEL
 from config.expos_service.settings import (
     ES_AIRFLOW_DATABASE_CONN_ID,
     ES_ETL_DAG_ID,
@@ -36,12 +36,11 @@ from config.expos_service.settings import (
     ES_EMBONOR_MONGO_DB_NAME,
     ES_REMOTE_RDS_HOST,
     ES_REMOTE_RDS_PORT,
-    IS_LOCAL_RUN,
     ES_MONGO_COLLECTIONS_TO_EXTRACT,
     ES_PG_TABLES_TO_EXTRACT,
     ES_ETL_CONFORM_OPERATIONS_ORDER, ES_ETL_STAGED_OPERATIONS_ORDER, ES_ETL_TARGET_OPERATIONS_ORDER,
     ES_FETCH_OLD_EVALUATIONS_KEY, ES_ETL_CHECK_RUN_DAG_ID, ES_ETL_CHECK_RUN_DAG_SCHEDULE_INTERVAL,
-    ES_ETL_POSTPROCESSING_OPERATIONS_ORDER, ES_STAGE,
+    ES_ETL_POSTPROCESSING_OPERATIONS_ORDER,
 )
 
 from operators.postgres.create_job import PostgresOperatorCreateJob
@@ -72,9 +71,9 @@ class EtlDagFactory:
         _table_manager = TableNameManager(_tables_to_insert)
 
         pg_tunnel = Tunneler(
-            ES_REMOTE_RDS_PORT, ES_REMOTE_RDS_HOST, 5433) if IS_LOCAL_RUN or ES_STAGE == 'development' else None
+            ES_REMOTE_RDS_PORT, ES_REMOTE_RDS_HOST, 5433) if SHOULD_USE_TUNNEL else None
         mongo_tunnel = Tunneler(
-            ES_REMOTE_MONGO_PORT, ES_REMOTE_MONGO_HOST, 27018) if IS_LOCAL_RUN or ES_STAGE == 'development' else None
+            ES_REMOTE_MONGO_PORT, ES_REMOTE_MONGO_HOST, 27018) if SHOULD_USE_TUNNEL else None
 
         with DAG(
                 self.dag_id,
@@ -211,7 +210,7 @@ class EtlDagFactory:
 
             target_tables_insert = conditional_operator(
                 operator=TableOperationsTaskGroup,
-                condition=not self.check_run or ES_STAGE == 'development',
+                condition=not self.check_run or STAGE == 'development',
                 table_list=_target_operations,
                 sql_folder='expos_service',
                 stage='target',

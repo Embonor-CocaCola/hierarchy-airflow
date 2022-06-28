@@ -4,7 +4,8 @@ from airflow.utils.task_group import TaskGroup
 
 from base.utils.additional_sql_params import additional_params
 from base.utils.tasks import arrange_task_list_sequentially
-from config.expos_service.settings import ES_AIRFLOW_DATABASE_CONN_ID, ES_STAGE
+from config.expos_service.settings import ES_AIRFLOW_DATABASE_CONN_ID
+from config.common.settings import STAGE
 from operators.postgres.query_with_params import PostgresOperatorWithParams
 
 
@@ -46,7 +47,7 @@ class TableOperationsTaskGroup:
         )
 
     def create_params_key(self, table_name):
-        return '.'.join([ES_STAGE, table_name, self.stage])
+        return '.'.join([STAGE, table_name, self.stage])
 
     def build(self):
         tasks = list(map(lambda table_name: self.create_insert_task(

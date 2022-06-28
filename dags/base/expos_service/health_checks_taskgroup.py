@@ -9,10 +9,9 @@ from base.utils.postgres import (
     perform_pg_query,
     pg_online_check_result,
 )
+from config.common.settings import SHOULD_USE_TUNNEL
 from config.expos_service.settings import (
-
     ES_EMBONOR_PG_CONN_ID,
-    IS_LOCAL_RUN,
 )
 
 
@@ -30,7 +29,7 @@ class HealthChecksTaskGroup:
         self.pg_tunnel = pg_tunnel
 
     def check_pg_online_status(self) -> None:
-        with self.pg_tunnel if IS_LOCAL_RUN else ExitStack():
+        with self.pg_tunnel if SHOULD_USE_TUNNEL else ExitStack():
             perform_pg_query(ES_EMBONOR_PG_CONN_ID, PG_IS_ONLINE_QUERY,
                              pg_online_check_result)
 

@@ -11,7 +11,7 @@ import pyarrow.parquet as pq
 from base.maxerience_retrieve_result.utils.parquet_type_metadata_map import parquet_type_metadata_map
 from base.utils.query_with_return import parameterized_query, copy_csv_to_table
 from base.utils.tasks import arrange_task_list_sequentially
-from config.expos_service.settings import airflow_root_dir
+from config.common.settings import airflow_root_dir
 from config.maxerience_retrieve_result.settings import MRR_REST_BASE_URL, MRR_SAS_KEY
 
 

@@ -5,7 +5,7 @@ from airflow.utils.task_group import TaskGroup
 import uuid
 
 from base.utils.query_with_return import parameterized_query
-from config.expos_service.settings import airflow_root_dir
+from config.common.settings import airflow_root_dir
 
 
 class GetPhotosToUploadTaskGroup:

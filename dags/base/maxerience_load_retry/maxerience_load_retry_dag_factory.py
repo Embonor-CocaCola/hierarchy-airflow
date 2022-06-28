@@ -9,7 +9,7 @@ from base.maxerience_load_retry.utils.retry_uploads import retry_uploads
 from base.utils.conditional_operator import conditional_operator
 from base.utils.slack import notify_start_task
 from config.common.defaults import default_dag_kwargs, default_task_kwargs
-from config.expos_service.settings import ES_STAGE
+from config.common.settings import STAGE
 from config.maxerience_load_retry.settings import (
     MLR_DAG_ID,
     MLR_DAG_SCHEDULE_INTERVAL,
@@ -42,7 +42,7 @@ class MaxerienceLoadRetryDagFactory:
             get_api_key_task = conditional_operator(
                 task_id='get_api_key',
                 operator=PythonOperator,
-                condition=ES_STAGE == 'production',
+                condition=STAGE == 'production',
                 python_callable=get_ir_api_key,
                 dag=_dag,
             )

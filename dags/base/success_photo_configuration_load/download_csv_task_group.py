@@ -3,7 +3,7 @@ from airflow.utils.task_group import TaskGroup
 from airflow.operators.python import PythonOperator
 from airflow.providers.amazon.aws.hooks.s3 import S3Hook
 
-from config.expos_service.settings import airflow_root_dir
+from config.common.settings import airflow_root_dir
 from base.utils.tasks import arrange_task_list_sequentially
 
 

@@ -9,7 +9,8 @@ from base.utils.tables_insert_taskgroup import TableOperationsTaskGroup
 from base.utils.load_csv_into_temp_tables_taskgroup import LoadCsvIntoTempTablesTaskGroup
 from base.success_photo_configuration_load.download_csv_task_group import DownloadCsvTaskGroup
 from config.common.defaults import default_task_kwargs, default_dag_kwargs
-from config.expos_service.settings import airflow_root_dir, ES_AIRFLOW_DATABASE_CONN_ID
+from config.expos_service.settings import ES_AIRFLOW_DATABASE_CONN_ID
+from config.common.settings import airflow_root_dir
 from config.success_photo_configuration_load.settings import (
     SPCL_DAG_ID,
     SPCL_DAG_START_DATE_VALUE,

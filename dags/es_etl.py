@@ -1,5 +1,5 @@
 from airflow import DAG
 from base.expos_service.etl_dag_factory import EtlDagFactory
-from config.expos_service.settings import ES_STAGE
+from config.common.settings import STAGE
 
-dag: DAG = EtlDagFactory(check_run=ES_STAGE == 'development').build()
+dag: DAG = EtlDagFactory(check_run=STAGE == 'development').build()

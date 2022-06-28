@@ -3,14 +3,14 @@ from contextlib import ExitStack
 from airflow.providers.mongo.hooks.mongo import MongoHook
 from bson import json_util
 
-from config.expos_service.settings import IS_LOCAL_RUN, ES_STAGE
+from config.common.settings import STAGE, SHOULD_USE_TUNNEL
 
 
 def execute_query(collection_name: str, conn_id: str, db_name: str, tunnel, filters=None):
     if filters is None:
         filters = {}
 
-    with tunnel if IS_LOCAL_RUN else ExitStack():
+    with tunnel if SHOULD_USE_TUNNEL else ExitStack():
 
         mongo_hook = MongoHook(
             mongo_conn_id=conn_id,
@@ -56,7 +56,7 @@ def get_preproduction_filters(dag_id):
 
 
 def get_filters_per_docdb_collection(dag_id):
-    return get_production_filters(dag_id) if ES_STAGE == 'production' else get_preproduction_filters(dag_id)
+    return get_production_filters(dag_id) if STAGE == 'production' else get_preproduction_filters(dag_id)
 
 
 def json_dump_docs(query_result):

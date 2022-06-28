@@ -8,9 +8,9 @@ from airflow.utils.task_group import TaskGroup
 
 from base.utils.tasks import arrange_task_list_sequentially
 from base.utils.tunneler import Tunneler
+from config.common.settings import SHOULD_USE_TUNNEL
 from config.expos_service.settings import (
     ES_EMBONOR_PG_CONN_ID,
-    IS_LOCAL_RUN,
 )
 
 
@@ -20,7 +20,7 @@ class ExtractPostgresCsvTaskGroup:
             raise ValueError('group_id parameter is missing')
         if not dag:
             raise ValueError('dag parameter is missing')
-        if IS_LOCAL_RUN and not pg_tunnel:
+        if SHOULD_USE_TUNNEL and not pg_tunnel:
             raise ValueError('pg_tunnel must be supplied for local runs')
 
         self.dag = dag
@@ -29,7 +29,7 @@ class ExtractPostgresCsvTaskGroup:
         self.pg_tunnel = pg_tunnel
 
     def extract_csv(self, table_name):
-        with self.pg_tunnel if (IS_LOCAL_RUN) else ExitStack():
+        with self.pg_tunnel if SHOULD_USE_TUNNEL else ExitStack():
             info(f'Starting extraction from postgres table: {table_name}...')
 
             pg_hook = PostgresHook(postgres_conn_id=ES_EMBONOR_PG_CONN_ID,

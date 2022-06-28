@@ -1,6 +1,6 @@
 import os
 
-from config.expos_service.settings import airflow_root_dir
+from config.common.settings import airflow_root_dir
 
 MRR_DAG_ID = 'maxerience_retrieve_result'
 MRR_DAG_START_DATE_VALUE = os.environ.get('MRR_DAG_START_DATE', '2022-02-23')

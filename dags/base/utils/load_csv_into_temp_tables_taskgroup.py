@@ -4,7 +4,8 @@ from base.utils.additional_sql_params import additional_params
 from base.utils.table_names import TableNameManager
 from airflow.utils.task_group import TaskGroup
 
-from config.expos_service.settings import ES_AIRFLOW_DATABASE_CONN_ID, ES_STAGE, airflow_root_dir
+from config.expos_service.settings import ES_AIRFLOW_DATABASE_CONN_ID
+from config.common.settings import STAGE, airflow_root_dir
 from operators.postgres.copy_expert import PostgresOperatorCopyExpert
 from operators.postgres.query_with_params import PostgresOperatorWithParams
 from base.utils.tasks import arrange_task_list_sequentially
@@ -53,7 +54,7 @@ class LoadCsvIntoTempTablesTaskGroup:
         return task_group
 
     def create_params_key(self, original_table_name, check_run: bool):
-        return '.'.join([ES_STAGE if check_run else 'production', original_table_name, 'temp'])
+        return '.'.join([STAGE if check_run else 'production', original_table_name, 'temp'])
 
     def build(self):
         with self.task_group as tg:

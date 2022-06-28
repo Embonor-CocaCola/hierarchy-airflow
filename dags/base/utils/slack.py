@@ -6,7 +6,8 @@ from airflow.operators.python import PythonOperator
 
 import config.common.settings as config
 from base.utils.conditional_operator import conditional_operator
-from config.expos_service.settings import ES_STAGE, ES_ETL_DAG_ID, ES_ETL_CHECK_RUN_DAG_ID
+from config.expos_service.settings import ES_ETL_DAG_ID, ES_ETL_CHECK_RUN_DAG_ID
+from config.common.settings import STAGE
 from config.maintenance.settings import MTNC_DAG_ID
 from config.maxerience_load.settings import ML_DAG_ID
 from config.maxerience_load_retry.settings import MLR_DAG_ID
@@ -100,7 +101,7 @@ def build_status_msg(dag_id, status, mappings):
                 'elements': [
                     {
                         'type': 'mrkdwn',
-                        'text': f'Environment: *{ES_STAGE}*',
+                        'text': f'Environment: *{STAGE}*',
                     },
                 ],
             },

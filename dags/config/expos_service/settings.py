@@ -1,7 +1,7 @@
 import os
 import urllib.parse
 
-airflow_root_dir = os.environ.get('AIRFLOW_HOME')
+from config.common.settings import airflow_root_dir
 
 ES_EMBONOR_SERVICES_BASE_URL = os.environ.get('EMBONOR_SERVICES_BASE_URL')
 ES_EMBONOR_SERVICES_BASE_URL_CONN_ID = 'embonor_services_base_conn'
@@ -74,5 +74,4 @@ ES_ETL_POSTPROCESSING_OPERATIONS_ORDER = os.environ.get(
     'survey',
 ).split(',')
 
-ES_STAGE = os.environ.get('STAGE', 'development')
 ES_FETCH_OLD_EVALUATIONS_KEY = 'es_etl_fetch_old_self_evaluations'

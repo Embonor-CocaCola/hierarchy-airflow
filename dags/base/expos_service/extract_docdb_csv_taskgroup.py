@@ -8,10 +8,10 @@ from airflow.utils.task_group import TaskGroup
 from base.utils.mongo import execute_query, get_filters_per_docdb_collection
 from base.utils.tasks import arrange_task_list_sequentially
 from base.utils.tunneler import Tunneler
+from config.common.settings import SHOULD_USE_TUNNEL
 from config.expos_service.settings import (
     ES_EMBONOR_MONGO_CONN_ID,
     ES_EMBONOR_MONGO_DB_NAME,
-    IS_LOCAL_RUN,
 )
 
 
@@ -21,7 +21,7 @@ class ExtractDocumentDbCsvTaskGroup:
             raise ValueError('group_id parameter is missing')
         if not dag:
             raise ValueError('dag parameter is missing')
-        if IS_LOCAL_RUN and not mongo_tunnel:
+        if SHOULD_USE_TUNNEL and not mongo_tunnel:
             raise ValueError('mongo_tunnel must be supplied for local runs')
 
         self.dag = dag
@@ -59,7 +59,7 @@ class ExtractDocumentDbCsvTaskGroup:
         import pandas
         from io import StringIO
 
-        with self.mongo_tunnel if IS_LOCAL_RUN else ExitStack():
+        with self.mongo_tunnel if SHOULD_USE_TUNNEL else ExitStack():
             info(
                 f'Starting extraction from document db collection: {collection_name}...')
 

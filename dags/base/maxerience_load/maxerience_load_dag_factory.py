@@ -18,8 +18,7 @@ from base.utils.conditional_operator import conditional_operator
 from base.utils.ml_scene_info import extract_info_from_question_heading
 from base.utils.slack import notify_start_task
 from config.common.defaults import default_task_kwargs, default_dag_kwargs
-from config.common.settings import EXPOS_DATABASE_CONN_ID
-from config.expos_service.settings import ES_STAGE
+from config.common.settings import EXPOS_DATABASE_CONN_ID, STAGE
 from config.maxerience_load.settings import (
     ML_DAG_START_DATE_VALUE,
     ML_DAG_SCHEDULE_INTERVAL,
@@ -78,7 +77,7 @@ class MaxerienceLoadDagFactory:
             get_api_key = conditional_operator(
                 task_id='get_api_key',
                 operator=PythonOperator,
-                condition=ES_STAGE == 'production',
+                condition=STAGE == 'production',
                 python_callable=get_ir_api_key,
                 dag=_dag,
             )
