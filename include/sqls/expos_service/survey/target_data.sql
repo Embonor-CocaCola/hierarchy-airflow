@@ -1,5 +1,6 @@
 INSERT INTO survey (
     source_id,
+    source_survey_id,
     skips_survey,
     vendor_id,
     customer_id,
@@ -9,6 +10,7 @@ INSERT INTO survey (
 )
 SELECT
     STAGED.source_id,
+    STAGED.source_survey_id,
     STAGED.skips_survey,
     STAGED.vendor_id,
     STAGED.customer_id,

@@ -5,6 +5,7 @@ WHERE
 
 INSERT INTO airflow.survey_conform (
     source_id,
+    source_survey_id,
     skips_survey,
     vendor_id,
     customer_id,
@@ -17,6 +18,7 @@ INSERT INTO airflow.survey_conform (
 )
 SELECT
     source_id,
+    survey_id,
     skips_survey,
     pollster_id,
     surveyed_id,

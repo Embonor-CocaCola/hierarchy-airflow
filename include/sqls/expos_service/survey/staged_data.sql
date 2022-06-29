@@ -6,6 +6,7 @@ ANALYZE airflow.survey_staged;
 
 INSERT INTO airflow.survey_staged (
     source_id,
+    source_survey_id,
     skips_survey,
     vendor_id,
     customer_id,
@@ -18,6 +19,7 @@ INSERT INTO airflow.survey_staged (
 )
 SELECT
     SEC.source_id,
+    SEC.source_survey_id,
     SEC.skips_survey,
     COALESCE(v.id, VEC.id),
     COALESCE(c.id, CUC.id),

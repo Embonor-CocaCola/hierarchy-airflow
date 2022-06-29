@@ -65,6 +65,7 @@ class AnswerTyped(models.Model):
 
 class SurveyConform(models.Model):
     source_id = models.TextField()
+    source_survey_id = models.TextField(null=True)
     skips_survey = models.BooleanField()
     vendor_id = models.IntegerField()
     customer_id = models.IntegerField()
@@ -88,6 +89,7 @@ class SurveyConform(models.Model):
 
 class SurveyStaged(models.Model):
     source_id = models.TextField()
+    source_survey_id = models.TextField(null=True)
     skips_survey = models.BooleanField()
     vendor_id = models.ForeignKey(VendorStaged, on_delete=models.CASCADE, db_column='vendor_id', db_constraint=False)
     customer_id = models.ForeignKey(
