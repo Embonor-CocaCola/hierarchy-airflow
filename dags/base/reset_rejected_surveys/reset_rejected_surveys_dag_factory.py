@@ -72,7 +72,8 @@ class ResetRejectedSurveysDagFactory:
 
     @staticmethod
     def reset_surveys(ti):
-        to_reset = ti.xcom_pull(task_ids=ResetRejectedSurveysDagFactory.get_surveys_task_id)
+        query_result = ti.xcom_pull(task_ids=ResetRejectedSurveysDagFactory.get_surveys_task_id)
+        to_reset = query_result[0]
         result = requests.post(
             f'{SURVEY_SERVICE_BASE_URL}/answers/reject',
             json=to_reset,
@@ -81,14 +82,16 @@ class ResetRejectedSurveysDagFactory:
 
     @staticmethod
     def update_surveys(ti):
-        to_reset = ti.xcom_pull(task_ids=ResetRejectedSurveysDagFactory.get_surveys_task_id)
+        query_result = ti.xcom_pull(task_ids=ResetRejectedSurveysDagFactory.get_surveys_task_id)
         reset_response = ti.xcom_pull(task_ids=ResetRejectedSurveysDagFactory.reset_surveys_task_id)
+        to_reset = query_result[0]
+        survey_ids = query_result[1]
         to_update = []
         errors = []
 
         for idx, response in enumerate(reset_response):
             if response['success']:
-                to_update.append(to_reset[idx]['surveyId'])
+                to_update.append(survey_ids[idx])
             else:
                 errors.append({'error': response['message'], 'details': to_reset[idx]})
 
@@ -99,7 +102,6 @@ class ResetRejectedSurveysDagFactory:
 
         if not to_update:
             return
-
         with open(f'{airflow_root_dir}/include/sqls/reset_rejected_surveys/update_reset_surveys.sql', 'r') as file:
             sql = file.read()
             parameterized_query(
