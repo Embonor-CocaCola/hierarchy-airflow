@@ -40,7 +40,7 @@ class ResetRejectedSurveysDagFactory:
 
             check_obtained_surveys = ShortCircuitOperator(
                 task_id='check_obtained_surveys',
-                python_callable=lambda ti: ti.xcom_pull(task_ids=ResetRejectedSurveysDagFactory.get_surveys_task_id),
+                python_callable=lambda ti: ti.xcom_pull(task_ids=ResetRejectedSurveysDagFactory.get_surveys_task_id)[0],
             )
 
             reset_surveys = PythonOperator(
