@@ -33,7 +33,8 @@ UPDATE
 SET
     created_at = STAGED.external_created_at,
     vendor_id = STAGED.vendor_id,
-    customer_id = STAGED.customer_id
+    customer_id = STAGED.customer_id,
+    source_survey_id = STAGED.source_survey_id
 FROM
     airflow.survey_staged STAGED
 WHERE
@@ -42,6 +43,7 @@ WHERE
     AND (
         STAGED.external_created_at IS DISTINCT FROM TARGET.created_at OR
         STAGED.vendor_id IS DISTINCT FROM TARGET.vendor_id OR
-        STAGED.customer_id IS DISTINCT FROM TARGET.customer_id
+        STAGED.customer_id IS DISTINCT FROM TARGET.customer_id OR
+        STAGED.source_survey_id IS DISTINCT FROM TARGET.source_survey_id
     );
 ANALYZE survey;
