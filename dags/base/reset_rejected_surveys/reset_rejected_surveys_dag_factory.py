@@ -82,6 +82,8 @@ class ResetRejectedSurveysDagFactory:
 
     @staticmethod
     def update_surveys(ti):
+        import uuid
+
         query_result = ti.xcom_pull(task_ids=ResetRejectedSurveysDagFactory.get_surveys_task_id)
         reset_response = ti.xcom_pull(task_ids=ResetRejectedSurveysDagFactory.reset_surveys_task_id)
         to_reset = query_result[0]
@@ -91,7 +93,7 @@ class ResetRejectedSurveysDagFactory:
 
         for idx, response in enumerate(reset_response):
             if response['success']:
-                to_update.append(survey_ids[idx])
+                to_update.append(uuid.UUID(survey_ids[idx]))
             else:
                 errors.append({'error': response['message'], 'details': to_reset[idx]})
 
