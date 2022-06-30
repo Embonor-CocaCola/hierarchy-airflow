@@ -30,17 +30,17 @@ CREATE OR REPLACE FUNCTION clean_survey_collection_ids(in_array jsonb)
                         FOR question IN SELECT * FROM jsonb_array_elements(questions)
                         LOOP
                             new_questions := new_questions || (question || jsonb_build_object(
-                                'id', COALESCE(question->'id'->>'$oid', question->>'id'),
-                                'question', COALESCE(question->>'question', question->'id'->>'$oid')
+                                'id', stringify_oid(question->>'id'),
+                                'question', stringify_oid(question->>'question')
                             ));
                         END LOOP;
                         new_pages := new_pages || (page || jsonb_build_object(
-                            'id', COALESCE(page->'id'->>'$oid', page->>'id'),
+                            'id', stringify_oid(page->>'id'),
                             'questions', new_questions
                         ));
                     END LOOP;
                     new_portals := new_portals || (portal || jsonb_build_object(
-                        'id', COALESCE(portal->'id'->>'$oid', portal->>'id'),
+                        'id', stringify_oid(portal->>'id'),
                         'pages', new_pages
                     ));
                 END LOOP;

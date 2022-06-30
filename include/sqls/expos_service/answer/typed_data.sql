@@ -21,8 +21,8 @@ INSERT INTO airflow.answer_typed (
     id
 )
 SELECT
-    trim((raw.source_id:: jsonb)->>'$oid'),
-    trim(raw.survey_id),
+    stringify_oid(trim(raw.source_id)),
+    stringify_oid(trim(raw.survey_id)),
     trim(raw.latitude) :: FLOAT,
     trim(raw.longitude) :: FLOAT,
     CASE raw.skips_survey

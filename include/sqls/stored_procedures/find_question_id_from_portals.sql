@@ -21,8 +21,8 @@ CREATE OR REPLACE FUNCTION find_question_id_from_portals(in_array jsonb, id_to_f
                         questions := page->'questions';
                         FOR question IN SELECT * FROM jsonb_array_elements(questions)
                         LOOP
-                           IF question->>'id' = id_to_find THEN
-                                found_id := question->>'question';
+                           IF stringify_oid(question->>'id') = id_to_find THEN
+                                found_id := stringify_oid(question->>'question');
                                 SELECT id INTO found_id FROM airflow.question_typed WHERE source_id = found_id
                                     AND job_id = current_job_id;
                                 RETURN found_id;

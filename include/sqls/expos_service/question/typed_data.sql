@@ -19,7 +19,7 @@ INSERT INTO airflow.question_typed (
     id
 )
 SELECT
-    trim((source_id:: jsonb)->>'$oid'),
+    stringify_oid(trim(source_id)),
     COALESCE(trim(attach), '[]') :: jsonb,
     trim(heading),
     trim(options) :: jsonb,

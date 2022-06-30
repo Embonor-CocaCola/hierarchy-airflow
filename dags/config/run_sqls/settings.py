@@ -4,6 +4,9 @@ RSQLS_DAG_ID = 'run_sqls_dag'
 RSQLS_DAG_START_DATE_VALUE = os.environ.get('RSQLS_DAG_START_DATE', '2022-06-20')
 RSQLS_DAG_SCHEDULE_INTERVAL = os.environ.get('RSQLS_DAG_SCHEDULE_INTERVAL', None)  # Dag runs manually
 
+#  Adjacency list indicaating dependency of a sql script from other sql scripts.
+#  'edges' indicate dependency, e.g. if a sql named A has B in its edges, B must be executed first (A depends on B)
+#  in other words, A "uses" B.
 SQL_DEPENDENCY_GRAPH = [
     {
         'name': 'calculate_survey_metadata', 'edges': ['get_sovi_calculations'],
@@ -12,13 +15,16 @@ SQL_DEPENDENCY_GRAPH = [
         'name': 'get_sovi_calculations', 'edges': [], 'refresh_data': [{'table_name': 'preprocessed_sovi'}],
     },
     {
-        'name': 'clean_answer_mongo', 'edges': [],
+        'name': 'clean_answer_mongo', 'edges': ['stringify_oid'],
+    },
+    {
+        'name': 'clean_survey_mongo', 'edges': ['stringify_oid'],
     },
     {
         'name': 'create_survey_analysis', 'edges': [],
     },
     {
-        'name': 'find_question_id_from_portals', 'edges': [],
+        'name': 'find_question_id_from_portals', 'edges': ['stringify_oid'],
     },
     {
         'name': 'find_vendors_with_broken_hierarchy', 'edges': [],
@@ -52,5 +58,9 @@ SQL_DEPENDENCY_GRAPH = [
         'name': 'get_sku_family_compliance',
         'edges': [],
         'refresh_data': [{'table_name': 'sku_family_compliance'}],
+    },
+    {
+        'name': 'stringify_oid',
+        'edges': [],
     },
 ]

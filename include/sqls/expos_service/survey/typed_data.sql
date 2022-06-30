@@ -21,7 +21,7 @@ INSERT INTO airflow.survey_typed (
     id
 )
 SELECT
-    trim((source_id:: jsonb)->>'$oid'),
+    stringify_oid(trim(source_id)),
     trim(name),
     trim(paused) :: BOOLEAN,
     clean_survey_collection_ids(trim(portals) :: jsonb),
