@@ -28,7 +28,7 @@ env:
     value: https://api.staging.embonorservices.cl/surveys-service
   - name: AIRFLOW__SECRETS__BACKEND_KWARGS
     value: |2
-      {"connections_prefix": "airflow_service_stg/connections", "variables_prefix": "airflow_service_stg/variables"}
+      {"connections_prefix": "/stg/airflow_service/connections", "variables_prefix": "/stg/airflow_service/variables"}
 secret:
   - envName: "EXPOS_SQL_CONN_URI"
     secretName: "airflow-envars"
