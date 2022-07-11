@@ -39,7 +39,8 @@ x-airflow-common: &airflow-common
     AIRFLOW__CORE__LOAD_EXAMPLES: "false"
     AIRFLOW__API__AUTH_BACKEND: "airflow.api.auth.backend.basic_auth"
     AIRFLOW__CORE__DAGBAG_IMPORT_TIMEOUT: 120.0
-    AIRFLOW__CORE__SQL_ALCHEMY_CONNECT_ARGS: config.keepalives.keepalive_kwargs
+    AIRFLOW__CORE__DAGS_FOLDER: /opt/airflow/dags
+    AIRFLOW__CORE__SQL_ALCHEMY_CONNECT_ARGS: expos_pdv.config.keepalives.keepalive_kwargs
     _PIP_ADDITIONAL_REQUIREMENTS: ${_PIP_ADDITIONAL_REQUIREMENTS:-}
   volumes:
     - ./dags:/opt/airflow/dags
@@ -128,25 +129,25 @@ services:
 
   airflow-init:
     <<: *airflow-common
-    command: bash -c "sh /opt/airflow/include/db/init.sh && python /opt/airflow/dags/config/init.py && airflow version"
+    command: bash -c "sh /opt/airflow/include/expos_pdv/db/init.sh && python /opt/airflow/dags/expos_pdv/config/init.py && airflow version"
     environment:
       <<: *airflow-common-env
       _AIRFLOW_DB_UPGRADE: "true"
       _AIRFLOW_WWW_USER_CREATE: "true"
       _AIRFLOW_WWW_USER_USERNAME: ${_AIRFLOW_WWW_USER_USERNAME:-airflow}
       _AIRFLOW_WWW_USER_PASSWORD: ${_AIRFLOW_WWW_USER_PASSWORD:-airflow}
-
-  flower:
-    <<: *airflow-common
-    command: celery flower
-    ports:
-      - 5555:5555
-    healthcheck:
-      test: ["CMD", "curl", "--fail", "http://localhost:5555/"]
-      interval: 30s
-      timeout: 30s
-      retries: 5
-    restart: always
+#
+#  flower:
+#    <<: *airflow-common
+#    command: celery flower
+#    ports:
+#      - 5555:5555
+#    healthcheck:
+#      test: ["CMD", "curl", "--fail", "http://localhost:5555/"]
+#      interval: 30s
+#      timeout: 30s
+#      retries: 5
+#    restart: always
 
 volumes:
   postgres-db-volume:

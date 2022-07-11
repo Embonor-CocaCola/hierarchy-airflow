@@ -1,2 +1,2 @@
-config/*
-base/utils/*
+\w+/config/*
+\w+/base/utils/*

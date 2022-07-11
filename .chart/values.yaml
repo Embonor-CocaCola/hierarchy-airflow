@@ -25,7 +25,7 @@ webserver:
     firstName: admin
     lastName: user
     password: admin
-  args: ["bash", "-c", "sh /opt/airflow/include/db/init.sh && python /opt/airflow/dags/config/init.py && airflow webserver"]
+  args: ["airflow", "webserver"]
   livenessProbe:
     initialDelaySeconds: 35
   readinessProbe:
@@ -58,3 +58,16 @@ config:
     min_file_process_interval: '60'
 statsd:
   enabled: false
+env:
+  - name: AIRFLOW__SECRETS__BACKEND
+    value: airflow.providers.amazon.aws.secrets.secrets_manager.SecretsManagerBackend
+secret:
+  - envName: AWS_ACCESS_KEY_ID
+    secretName: airflow_aws_credentials
+    secretKey: AWS_ACCESS_KEY_ID
+  - envName: AWS_SECRET_ACCESS_KEY
+    secretName: airflow_aws_credentials
+    secretKey: AWS_SECRET_ACCESS_KEY
+  - envName: AWS_DEFAULT_REGION
+    secretName: airflow_aws_credentials
+    secretKey: AWS_DEFAULT_REGION

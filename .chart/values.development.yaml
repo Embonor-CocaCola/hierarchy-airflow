@@ -32,6 +32,9 @@ env:
     value: embonorstagingrds-read.c95d90uys8a7.us-east-1.rds.amazonaws.com
   - name: EMBONOR_MONGO_HOST
     value: mongo-staging.cluster-c95d90uys8a7.us-east-1.docdb.amazonaws.com
+  - name: AIRFLOW__SECRETS__BACKEND_KWARGS
+    value: |-2
+      {"connections_prefix": "airflow_service_dev/connections", "variables_prefix": "airflow_service_dev/variables"}
 secret:
   - envName: "EMBONOR_MONGO_CONN_URI"
     secretName: "airflow-envars"
