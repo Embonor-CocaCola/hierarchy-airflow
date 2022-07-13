@@ -3,6 +3,7 @@
 import datetime
 from django.db import migrations, models
 import django.db.models.deletion
+from expos.models import DateTimeWithoutTZField, AutoUUIDField
 
 
 class Migration(migrations.Migration):
@@ -19,9 +20,9 @@ class Migration(migrations.Migration):
             fields=[
                 ('source_id', models.IntegerField()),
                 ('name', models.TextField()),
-                ('created_at', include.db.expos.models.DateTimeWithoutTZField(default=datetime.datetime.now)),
-                ('updated_at', include.db.expos.models.DateTimeWithoutTZField(default=datetime.datetime.now)),
-                ('id', include.db.expos.models.AutoUUIDField(editable=False, primary_key=True, serialize=False)),
+                ('created_at', DateTimeWithoutTZField(default=datetime.datetime.now)),
+                ('updated_at', DateTimeWithoutTZField(default=datetime.datetime.now)),
+                ('id', AutoUUIDField(editable=False, primary_key=True, serialize=False)),
                 ('job_id', models.ForeignKey(db_column='job_id', on_delete=django.db.models.deletion.CASCADE, to='etl_job.etljob')),
             ],
             options={
@@ -34,9 +35,9 @@ class Migration(migrations.Migration):
             fields=[
                 ('source_id', models.TextField(blank=True, null=True)),
                 ('name', models.TextField(blank=True, null=True)),
-                ('created_at', include.db.expos.models.DateTimeWithoutTZField(default=datetime.datetime.now)),
-                ('updated_at', include.db.expos.models.DateTimeWithoutTZField(default=datetime.datetime.now)),
-                ('id', include.db.expos.models.AutoUUIDField(editable=False, primary_key=True, serialize=False)),
+                ('created_at', DateTimeWithoutTZField(default=datetime.datetime.now)),
+                ('updated_at', DateTimeWithoutTZField(default=datetime.datetime.now)),
+                ('id', AutoUUIDField(editable=False, primary_key=True, serialize=False)),
                 ('job_id', models.ForeignKey(db_column='job_id', on_delete=django.db.models.deletion.CASCADE, to='etl_job.etljob')),
             ],
             options={
@@ -49,9 +50,9 @@ class Migration(migrations.Migration):
             fields=[
                 ('source_id', models.IntegerField()),
                 ('name', models.TextField()),
-                ('created_at', include.db.expos.models.DateTimeWithoutTZField(default=datetime.datetime.now)),
-                ('updated_at', include.db.expos.models.DateTimeWithoutTZField(default=datetime.datetime.now)),
-                ('id', include.db.expos.models.AutoUUIDField(editable=False, primary_key=True, serialize=False)),
+                ('created_at', DateTimeWithoutTZField(default=datetime.datetime.now)),
+                ('updated_at', DateTimeWithoutTZField(default=datetime.datetime.now)),
+                ('id', AutoUUIDField(editable=False, primary_key=True, serialize=False)),
                 ('job_id', models.ForeignKey(db_column='job_id', on_delete=django.db.models.deletion.CASCADE, to='etl_job.etljob')),
             ],
             options={

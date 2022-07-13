@@ -1,6 +1,7 @@
 from django.db import models
-from include.expos_pdv import EtlJob
-from include.expos_pdv.db.expos.models import DateTimeWithoutTZField, AutoUUIDField
+
+from etl_job.models import ExposEtlJob
+from expos.models import DateTimeWithoutTZField, AutoUUIDField
 from datetime import datetime
 
 
@@ -8,7 +9,7 @@ class PlantRaw(models.Model):
     source_id = models.TextField(blank=True, null=True)
     name = models.TextField(blank=True, null=True)
     job_id = models.ForeignKey(
-        EtlJob,
+        ExposEtlJob,
         on_delete=models.CASCADE,
         db_column='job_id',
     )
@@ -18,6 +19,7 @@ class PlantRaw(models.Model):
     id = AutoUUIDField(primary_key=True, editable=False)
 
     class Meta:
+        app_label = 'plant'
         managed = True
         db_table = 'airflow\".\"plant_raw'
 
@@ -27,7 +29,7 @@ class PlantTyped(models.Model):
     name = models.TextField()
 
     job_id = models.ForeignKey(
-        EtlJob,
+        ExposEtlJob,
         on_delete=models.CASCADE,
         db_column='job_id',
     )
@@ -38,6 +40,7 @@ class PlantTyped(models.Model):
     id = models.UUIDField(primary_key=True)
 
     class Meta:
+        app_label = 'plant'
         managed = True
         db_table = 'airflow\".\"plant_typed'
 
@@ -47,7 +50,7 @@ class PlantConform(models.Model):
     name = models.TextField()
 
     job_id = models.ForeignKey(
-        EtlJob,
+        ExposEtlJob,
         on_delete=models.CASCADE,
         db_column='job_id',
     )
@@ -58,6 +61,7 @@ class PlantConform(models.Model):
     id = models.UUIDField(primary_key=True)
 
     class Meta:
+        app_label = 'plant'
         managed = True
         db_table = 'airflow\".\"plant_conform'
 
@@ -67,7 +71,7 @@ class PlantStaged(models.Model):
     name = models.TextField()
 
     job_id = models.ForeignKey(
-        EtlJob,
+        ExposEtlJob,
         on_delete=models.CASCADE,
         db_column='job_id',
     )
@@ -78,5 +82,6 @@ class PlantStaged(models.Model):
     id = models.UUIDField(primary_key=True)
 
     class Meta:
+        app_label = 'plant'
         managed = True
         db_table = 'airflow\".\"plant_staged'

@@ -4,7 +4,7 @@ import datetime
 import django.contrib.postgres.fields
 from django.db import migrations, models
 
-from include.expos_pdv.db.expos.models import DateTimeWithoutTZField, AutoUUIDField
+from expos.models import DateTimeWithoutTZField, AutoUUIDField
 
 
 class Migration(migrations.Migration):

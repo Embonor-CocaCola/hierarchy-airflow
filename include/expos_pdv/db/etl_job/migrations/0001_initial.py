@@ -5,6 +5,7 @@ from django.db import (
     migrations,
     models,
 )
+from expos.models import DateTimeWithoutTZField
 
 
 def get_raw_sql(filename):
@@ -31,7 +32,7 @@ class Migration(migrations.Migration):
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('dag_run_id', models.CharField(max_length=255)),
                 ('attempt', models.IntegerField(default=0)),
-                ('created_at', include.db.expos.models.DateTimeWithoutTZField(default=datetime.datetime.now, editable=False)),
+                ('created_at', DateTimeWithoutTZField(default=datetime.datetime.now, editable=False)),
             ],
             options={
                 'db_table': 'airflow"."etl_job',

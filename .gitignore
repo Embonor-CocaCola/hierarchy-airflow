@@ -150,3 +150,7 @@ dmypy.json
 data/
 logs/
 tmp/
+connections/*
+!connections/.gitkeep
+variables/*
+!variables/.gitkeep

@@ -27,7 +27,6 @@ from expos_pdv.config.common.defaults import default_task_kwargs, default_dag_kw
 
 from expos_pdv.config.common.settings import SHOULD_UPLOAD_TO_S3, SHOULD_USE_TUNNEL
 from expos_pdv.config.etl.settings import (
-    ES_AIRFLOW_DATABASE_CONN_ID,
     ES_ETL_DAG_ID,
     ES_ETL_DAG_SCHEDULE_INTERVAL,
     ES_ETL_DAG_START_DATE_VALUE,
@@ -41,7 +40,7 @@ from expos_pdv.config.etl.settings import (
     ES_PG_TABLES_TO_EXTRACT,
     ES_ETL_CONFORM_OPERATIONS_ORDER, ES_ETL_STAGED_OPERATIONS_ORDER, ES_ETL_TARGET_OPERATIONS_ORDER,
     ES_FETCH_OLD_EVALUATIONS_KEY, ES_ETL_CHECK_RUN_DAG_ID, ES_ETL_CHECK_RUN_DAG_SCHEDULE_INTERVAL,
-    ES_ETL_POSTPROCESSING_OPERATIONS_ORDER,
+    ES_ETL_POSTPROCESSING_OPERATIONS_ORDER, ES_EXPOS_DATABASE_CONN_ID,
 )
 
 from operators.postgres.create_job import PostgresOperatorCreateJob
@@ -92,7 +91,7 @@ class EtlDagFactory:
                 task_id='create_job',
                 sql='insert_job.sql',
                 dag=_dag,
-                postgres_conn_id=ES_AIRFLOW_DATABASE_CONN_ID,
+                postgres_conn_id=ES_EXPOS_DATABASE_CONN_ID,
             )
 
             _job_id = PostgresOperatorCreateJob.get_job_id(_dag.dag_id, create_job_task.task_id)
@@ -176,6 +175,7 @@ class EtlDagFactory:
                 tables_to_insert=_tables_to_insert,
                 task_group_id='create_and_load_tmp_tables_from_csv',
                 sql_folder='etl',
+                pg_conn_id=ES_EXPOS_DATABASE_CONN_ID,
                 check_run=self.check_run,
             ).build()
 
@@ -230,7 +230,7 @@ class EtlDagFactory:
 
             process_old_evaluations_data = conditional_operator(
                 task_id='process_old_evaluations_data',
-                postgres_conn_id=ES_AIRFLOW_DATABASE_CONN_ID,
+                postgres_conn_id=ES_EXPOS_DATABASE_CONN_ID,
                 sql="""
                                 VACUUM ANALYZE answer;
                                 CALL process_old_survey_data();
@@ -241,7 +241,7 @@ class EtlDagFactory:
 
             precalculate_answers = PostgresOperator(
                 task_id='precalculate_answers',
-                postgres_conn_id=ES_AIRFLOW_DATABASE_CONN_ID,
+                postgres_conn_id=ES_EXPOS_DATABASE_CONN_ID,
                 sql="""
                     REFRESH MATERIALIZED VIEW CONCURRENTLY preprocessed_answers;
                 """,

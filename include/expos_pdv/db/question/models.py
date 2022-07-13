@@ -1,7 +1,8 @@
 from django.db import models
-from include.expos_pdv.db.expos.models import DateTimeWithoutTZField, AutoUUIDField
+
+from etl_job.models import ExposEtlJob
+from expos.models import DateTimeWithoutTZField, AutoUUIDField
 from datetime import datetime
-from include.expos_pdv import EtlJob
 
 
 class QuestionRaw(models.Model):
@@ -15,7 +16,7 @@ class QuestionRaw(models.Model):
     external_updated_at = models.TextField(blank=True, null=True)
 
     job_id = models.ForeignKey(
-        EtlJob,
+        ExposEtlJob,
         on_delete=models.CASCADE,
         db_column='job_id',
     )
@@ -26,6 +27,7 @@ class QuestionRaw(models.Model):
     id = AutoUUIDField(primary_key=True, editable=False)
 
     class Meta:
+        app_label = 'question'
         managed = True
         db_table = 'airflow\".\"question_raw'
 
@@ -41,7 +43,7 @@ class QuestionTyped(models.Model):
     external_updated_at = DateTimeWithoutTZField()
 
     job_id = models.ForeignKey(
-        EtlJob,
+        ExposEtlJob,
         on_delete=models.CASCADE,
         db_column='job_id',
     )
@@ -52,6 +54,7 @@ class QuestionTyped(models.Model):
     id = AutoUUIDField(primary_key=True, editable=False)
 
     class Meta:
+        app_label = 'question'
         managed = True
         db_table = 'airflow\".\"question_typed'
 
@@ -67,7 +70,7 @@ class QuestionConform(models.Model):
     external_updated_at = DateTimeWithoutTZField()
 
     job_id = models.ForeignKey(
-        EtlJob,
+        ExposEtlJob,
         on_delete=models.CASCADE,
         db_column='job_id',
     )
@@ -78,6 +81,7 @@ class QuestionConform(models.Model):
     id = AutoUUIDField(primary_key=True, editable=False)
 
     class Meta:
+        app_label = 'question'
         managed = True
         db_table = 'airflow\".\"question_conform'
 
@@ -92,7 +96,7 @@ class QuestionStaged(models.Model):
     external_updated_at = DateTimeWithoutTZField()
 
     job_id = models.ForeignKey(
-        EtlJob,
+        ExposEtlJob,
         on_delete=models.CASCADE,
         db_column='job_id',
     )
@@ -103,5 +107,6 @@ class QuestionStaged(models.Model):
     id = AutoUUIDField(primary_key=True, editable=False)
 
     class Meta:
+        app_label = 'question'
         managed = True
         db_table = 'airflow\".\"question_staged'

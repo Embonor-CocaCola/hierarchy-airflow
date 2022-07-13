@@ -4,6 +4,7 @@ from airflow.utils.task_group import TaskGroup
 
 from expos_pdv.base.utils.load_csv_into_temp_tables_taskgroup import LoadCsvIntoTempTablesTaskGroup
 from expos_pdv.base.utils.s3 import download_file_from_s3
+from expos_pdv.config.etl.settings import ES_EXPOS_DATABASE_CONN_ID
 
 
 class LoadMissingHierarchyFromS3TaskGroup:
@@ -30,6 +31,7 @@ class LoadMissingHierarchyFromS3TaskGroup:
             tables_to_insert=['missing_hierarchy'],
             task_group_id='load_missing_hierarchy_into_tmp_tables',
             sql_folder='etl',
+            pg_conn_id=ES_EXPOS_DATABASE_CONN_ID,
             delimiter=',',
         ).build()
 

@@ -1,5 +1,4 @@
 import os
-import urllib.parse
 
 ES_EMBONOR_SERVICES_BASE_URL = os.environ.get('EMBONOR_SERVICES_BASE_URL')
 ES_EMBONOR_SERVICES_BASE_URL_CONN_ID = 'embonor_services_base_conn'
@@ -34,8 +33,6 @@ ES_ETL_CHECK_RUN_DAG_ID = 'expos_etl_check_run'
 ES_ETL_CHECK_RUN_DAG_SCHEDULE_INTERVAL = os.environ.get('ES_ETL_DAG_SCHEDULE_INTERVAL', '59 23 * * 0')
 
 ES_SSH_CONN_ID = 'ssh_conn'
-ES_SSH_PRIVATE_KEY = urllib.parse.quote_plus(os.environ.get('SSH_PRIVATE_KEY', '').replace(r'\n', '\n'))
-ES_SSH_CONN_URI = f'{os.environ.get("SSH_CONN_URI")}&private_key={ES_SSH_PRIVATE_KEY}'
 
 AUTH_USER = os.environ.get('AUTH_USER')
 AUTH_PASS = os.environ.get('AUTH_PASS')

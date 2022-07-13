@@ -1,15 +1,17 @@
 from django.db import models
-from include.expos_pdv.db.expos.models import DateTimeWithoutTZField, AutoUUIDField
+
+from etl_job.models import ExposEtlJob
+from expos.models import DateTimeWithoutTZField, AutoUUIDField
 from datetime import datetime
-from include.expos_pdv import EtlJob
-from include.expos_pdv import PlantStaged
+
+from plant.models import PlantStaged
 
 
 class BranchOfficeRaw(models.Model):
     source_id = models.TextField(blank=True, null=True)
     name = models.TextField(blank=True, null=True)
     job_id = models.ForeignKey(
-        EtlJob,
+        ExposEtlJob,
         on_delete=models.CASCADE,
         db_column='job_id',
     )
@@ -20,6 +22,7 @@ class BranchOfficeRaw(models.Model):
     id = AutoUUIDField(primary_key=True, editable=False)
 
     class Meta:
+        app_label = 'branch_office'
         managed = True
         db_table = 'airflow\".\"branch_office_raw'
 
@@ -28,7 +31,7 @@ class BranchOfficeTyped(models.Model):
     source_id = models.IntegerField()
     name = models.TextField()
     job_id = models.ForeignKey(
-        EtlJob,
+        ExposEtlJob,
         on_delete=models.CASCADE,
         db_column='job_id',
     )
@@ -39,6 +42,7 @@ class BranchOfficeTyped(models.Model):
     id = AutoUUIDField(primary_key=True)
 
     class Meta:
+        app_label = 'branch_office'
         managed = True
         db_table = 'airflow\".\"branch_office_typed'
 
@@ -47,7 +51,7 @@ class BranchOfficeConform(models.Model):
     source_id = models.IntegerField()
     name = models.TextField()
     job_id = models.ForeignKey(
-        EtlJob,
+        ExposEtlJob,
         on_delete=models.CASCADE,
         db_column='job_id',
     )
@@ -58,6 +62,7 @@ class BranchOfficeConform(models.Model):
     id = AutoUUIDField(primary_key=True)
 
     class Meta:
+        app_label = 'branch_office'
         managed = True
         db_table = 'airflow\".\"branch_office_conform'
 
@@ -66,7 +71,7 @@ class BranchOfficeStaged(models.Model):
     source_id = models.IntegerField()
     name = models.TextField()
     job_id = models.ForeignKey(
-        EtlJob,
+        ExposEtlJob,
         on_delete=models.CASCADE,
         db_column='job_id',
     )
@@ -77,5 +82,6 @@ class BranchOfficeStaged(models.Model):
     id = AutoUUIDField(primary_key=True)
 
     class Meta:
+        app_label = 'branch_office'
         managed = True
         db_table = 'airflow\".\"branch_office_staged'

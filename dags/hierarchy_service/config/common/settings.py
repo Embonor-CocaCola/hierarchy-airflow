@@ -1,7 +1,6 @@
 import os
 
 airflow_root_dir = os.environ.get('AIRFLOW_HOME')
-AIRFLOW_DATABASE_CONN_URI = os.environ.get('AIRFLOW__CORE__SQL_ALCHEMY_CONN')
 
 STAGE = os.environ.get('STAGE', 'development')
 IS_LOCAL_EXECUTION = os.environ.get('IS_LOCAL_RUN', False)

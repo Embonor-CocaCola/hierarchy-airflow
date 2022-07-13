@@ -1,8 +1,10 @@
 from django.db import models
-from include.expos_pdv.db.expos.models import DateTimeWithoutTZField, AutoUUIDField
+
+from etl_job.models import ExposEtlJob
+from expos.models import DateTimeWithoutTZField, AutoUUIDField
 from datetime import datetime
-from include.expos_pdv import EtlJob
-from include.expos_pdv import PlantStaged
+
+from plant.models import PlantStaged
 
 
 class ChiefPlantRaw(models.Model):
@@ -16,7 +18,7 @@ class ChiefPlantRaw(models.Model):
     chief_unit = models.TextField(blank=True, null=True)
 
     job_id = models.ForeignKey(
-        EtlJob,
+        ExposEtlJob,
         on_delete=models.CASCADE,
         db_column='job_id',
     )
@@ -27,6 +29,7 @@ class ChiefPlantRaw(models.Model):
     id = AutoUUIDField(primary_key=True, editable=False)
 
     class Meta:
+        app_label = 'chief_plant'
         managed = True
         db_table = 'airflow\".\"chief_plant_raw'
 
@@ -42,7 +45,7 @@ class ChiefPlantTyped(models.Model):
     chief_unit = models.TextField(blank=True, null=True)
 
     job_id = models.ForeignKey(
-        EtlJob,
+        ExposEtlJob,
         on_delete=models.CASCADE,
         db_column='job_id',
     )
@@ -53,6 +56,7 @@ class ChiefPlantTyped(models.Model):
     id = AutoUUIDField(primary_key=True, editable=False)
 
     class Meta:
+        app_label = 'chief_plant'
         managed = True
         db_table = 'airflow\".\"chief_plant_typed'
 
@@ -68,7 +72,7 @@ class ChiefConform(models.Model):
     unit = models.TextField(blank=True, null=True)
 
     job_id = models.ForeignKey(
-        EtlJob,
+        ExposEtlJob,
         on_delete=models.CASCADE,
         db_column='job_id',
     )
@@ -79,6 +83,7 @@ class ChiefConform(models.Model):
     id = models.UUIDField(primary_key=True, editable=False)
 
     class Meta:
+        app_label = 'chief_plant'
         managed = True
         db_table = 'airflow\".\"chief_conform'
 
@@ -94,7 +99,7 @@ class ChiefStaged(models.Model):
     unit = models.TextField(blank=True, null=True)
 
     job_id = models.ForeignKey(
-        EtlJob,
+        ExposEtlJob,
         on_delete=models.CASCADE,
         db_column='job_id',
     )
@@ -105,5 +110,6 @@ class ChiefStaged(models.Model):
     id = models.UUIDField(primary_key=True, editable=False)
 
     class Meta:
+        app_label = 'chief_plant'
         managed = True
         db_table = 'airflow\".\"chief_staged'

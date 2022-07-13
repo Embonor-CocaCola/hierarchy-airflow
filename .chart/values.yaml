@@ -40,6 +40,39 @@ workers:
     requests:
      cpu: 150m
      memory: 1536Mi
+  extraVolumes:
+    - name: connections
+      secret:
+        secretName: airflow-connections
+        optional: false
+    - name: variables
+      secret:
+        secretName: airflow-variables
+        optional: false
+  extraVolumeMounts:
+    - name: connections
+      mountPath: "/opt/airflow/connections"
+      readOnly: true
+    - name: variables
+      mountPath: "/opt/airflow/variables"
+      readOnly: true
+scheduler:
+  extraVolumes:
+    - name: connections
+      secret:
+        secretName: airflow-connections
+        optional: false
+    - name: variables
+      secret:
+        secretName: airflow-variables
+        optional: false
+  extraVolumeMounts:
+    - name: connections
+      mountPath: "/opt/airflow/connections"
+      readOnly: true
+    - name: variables
+      mountPath: "/opt/airflow/variables"
+      readOnly: true
 ingress:
   enabled: true
   web:
@@ -49,7 +82,7 @@ ingress:
     path: /
 config:
   core:
-    sql_alchemy_connect_args: expos_pdv.config.keepalives.keepalive_kwargs
+    sql_alchemy_connect_args: __config.keepalives.keepalive_kwargs
     dagbag_import_timeout: 120.0
   api:
     auth_backend: airflow.api.auth.backend.basic_auth
@@ -60,14 +93,7 @@ statsd:
   enabled: false
 env:
   - name: AIRFLOW__SECRETS__BACKEND
-    value: airflow.contrib.secrets.aws_systems_manager.SystemsManagerParameterStoreBackend
-secret:
-  - envName: AWS_ACCESS_KEY_ID
-    secretName: airflow_aws_credentials
-    secretKey: AWS_ACCESS_KEY_ID
-  - envName: AWS_SECRET_ACCESS_KEY
-    secretName: airflow_aws_credentials
-    secretKey: AWS_SECRET_ACCESS_KEY
-  - envName: AWS_DEFAULT_REGION
-    secretName: airflow_aws_credentials
-    secretKey: AWS_DEFAULT_REGION
+    value: reign_airflow_utils.secret_backends.FileSystemSecretsBackend
+  - name: AIRFLOW__SECRETS__BACKEND_KWARGS
+    value: |2
+      {"connections_path": "/opt/airflow/connections", "variables_path": "/opt/airflow/variables"}

@@ -1,11 +1,12 @@
 from django.db import models
 
-from include.expos_pdv.db.branch_office.models import BranchOfficeStaged
-from include.expos_pdv.db.cluster.models import ClusterStaged
-from include.expos_pdv.db.expos.models import DateTimeWithoutTZField, AutoUUIDField
+from branch_office.models import BranchOfficeStaged
+from cluster.models import ClusterStaged
+from etl_job.models import ExposEtlJob
+from expos.models import DateTimeWithoutTZField, AutoUUIDField
 from datetime import datetime
-from include.expos_pdv import EtlJob
-from include.expos_pdv import PlantStaged
+
+from plant.models import PlantStaged
 
 
 class CustomerRaw(models.Model):
@@ -43,7 +44,7 @@ class CustomerRaw(models.Model):
     market_chain_id = models.TextField(blank=True, null=True)
 
     job_id = models.ForeignKey(
-        EtlJob,
+        ExposEtlJob,
         on_delete=models.CASCADE,
         db_column='job_id',
     )
@@ -54,6 +55,7 @@ class CustomerRaw(models.Model):
     id = AutoUUIDField(primary_key=True, editable=False)
 
     class Meta:
+        app_label = 'customer'
         managed = True
         db_table = 'airflow\".\"customer_raw'
 
@@ -92,7 +94,7 @@ class CustomerTyped(models.Model):
     market_chain_id = models.TextField(blank=True, null=True)
 
     job_id = models.ForeignKey(
-        EtlJob,
+        ExposEtlJob,
         on_delete=models.CASCADE,
         db_column='job_id',
     )
@@ -103,6 +105,7 @@ class CustomerTyped(models.Model):
     id = AutoUUIDField(primary_key=True, editable=False)
 
     class Meta:
+        app_label = 'customer'
         managed = True
         db_table = 'airflow\".\"customer_typed'
 
@@ -141,7 +144,7 @@ class CustomerConform(models.Model):
     market_chain_id = models.TextField(blank=True, null=True)
 
     job_id = models.ForeignKey(
-        EtlJob,
+        ExposEtlJob,
         on_delete=models.CASCADE,
         db_column='job_id',
     )
@@ -152,6 +155,7 @@ class CustomerConform(models.Model):
     id = AutoUUIDField(primary_key=True, editable=False)
 
     class Meta:
+        app_label = 'customer'
         managed = True
         db_table = 'airflow\".\"customer_conform'
 
@@ -196,7 +200,7 @@ class CustomerStaged(models.Model):
     market_chain_id = models.TextField(blank=True, null=True)
 
     job_id = models.ForeignKey(
-        EtlJob,
+        ExposEtlJob,
         on_delete=models.CASCADE,
         db_column='job_id',
     )
@@ -207,5 +211,6 @@ class CustomerStaged(models.Model):
     id = AutoUUIDField(primary_key=True, editable=False)
 
     class Meta:
+        app_label = 'customer'
         managed = True
         db_table = 'airflow\".\"customer_staged'

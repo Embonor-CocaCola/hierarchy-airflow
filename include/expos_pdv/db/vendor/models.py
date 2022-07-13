@@ -1,11 +1,12 @@
 from django.db import models
 
-from include.expos_pdv.db.branch_office.models import BranchOfficeStaged
-from include.expos_pdv.db.expos.models import DateTimeWithoutTZField, AutoUUIDField
+from branch_office.models import BranchOfficeStaged
+from etl_job.models import ExposEtlJob
+from expos.models import DateTimeWithoutTZField, AutoUUIDField
 from datetime import datetime
-from include.expos_pdv import EtlJob
-from include.expos_pdv import PlantStaged
-from include.expos_pdv import SupervisorStaged
+
+from plant.models import PlantStaged
+from supervisor_plant.models import SupervisorStaged
 
 
 class VendorRaw(models.Model):
@@ -21,7 +22,7 @@ class VendorRaw(models.Model):
     driver_helper_code = models.TextField(blank=True, null=True)
 
     job_id = models.ForeignKey(
-        EtlJob,
+        ExposEtlJob,
         on_delete=models.CASCADE,
         db_column='job_id',
     )
@@ -32,6 +33,7 @@ class VendorRaw(models.Model):
     id = AutoUUIDField(primary_key=True, editable=False)
 
     class Meta:
+        app_label = 'vendor'
         managed = True
         db_table = 'airflow\".\"vendor_raw'
 
@@ -49,7 +51,7 @@ class VendorTyped(models.Model):
     driver_helper_code = models.TextField(blank=True, null=True)
 
     job_id = models.ForeignKey(
-        EtlJob,
+        ExposEtlJob,
         on_delete=models.CASCADE,
         db_column='job_id',
     )
@@ -60,6 +62,7 @@ class VendorTyped(models.Model):
     id = AutoUUIDField(primary_key=True, editable=False)
 
     class Meta:
+        app_label = 'vendor'
         managed = True
         db_table = 'airflow\".\"vendor_typed'
 
@@ -75,7 +78,7 @@ class VendorConform(models.Model):
     deleted_at = models.DateField(null=True)
 
     job_id = models.ForeignKey(
-        EtlJob,
+        ExposEtlJob,
         on_delete=models.CASCADE,
         db_column='job_id',
     )
@@ -86,6 +89,7 @@ class VendorConform(models.Model):
     id = AutoUUIDField(primary_key=True, editable=False)
 
     class Meta:
+        app_label = 'vendor'
         managed = True
         db_table = 'airflow\".\"vendor_conform'
 
@@ -113,7 +117,7 @@ class VendorStaged(models.Model):
     deleted_at = models.DateField(null=True)
 
     job_id = models.ForeignKey(
-        EtlJob,
+        ExposEtlJob,
         on_delete=models.CASCADE,
         db_column='job_id',
     )
@@ -124,5 +128,6 @@ class VendorStaged(models.Model):
     id = AutoUUIDField(primary_key=True, editable=False)
 
     class Meta:
+        app_label = 'vendor'
         managed = True
         db_table = 'airflow\".\"vendor_staged'

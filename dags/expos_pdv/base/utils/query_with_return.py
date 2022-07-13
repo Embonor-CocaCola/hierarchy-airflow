@@ -5,7 +5,7 @@ from airflow.providers.postgres.hooks.postgres import PostgresHook
 from psycopg2.extras import execute_values
 
 from expos_pdv.config.common.settings import SQL_PATH
-from expos_pdv.config.maxerience_load.settings import ML_AIRFLOW_DATABASE_CONN_ID
+from expos_pdv.config.etl.settings import ES_EXPOS_DATABASE_CONN_ID
 
 
 def parameterized_query(sql, wrap=True, is_procedure=False, **kwargs):
@@ -13,7 +13,7 @@ def parameterized_query(sql, wrap=True, is_procedure=False, **kwargs):
     print(sql)
     print('params: ')
     print(kwargs.get('templates_dict', 'no params provided'))
-    pg_hook = PostgresHook(postgres_conn_id=ML_AIRFLOW_DATABASE_CONN_ID)
+    pg_hook = PostgresHook(postgres_conn_id=ES_EXPOS_DATABASE_CONN_ID)
     with pg_hook.get_conn() as conn:
         if is_procedure:
             conn.autocommit = True
@@ -33,7 +33,7 @@ def parameterized_query(sql, wrap=True, is_procedure=False, **kwargs):
 def multiple_insert_query(sql, values, wrap=True, autocommit=True):
     print('Running multiple inserts query:')
     print(sql)
-    pg_hook = PostgresHook(postgres_conn_id=ML_AIRFLOW_DATABASE_CONN_ID)
+    pg_hook = PostgresHook(postgres_conn_id=ES_EXPOS_DATABASE_CONN_ID)
     with pg_hook.get_conn() as conn:
         if autocommit:
             conn.autocommit = True
@@ -66,7 +66,7 @@ def copy_csv_to_table(table, filepath, columns):
         raise FileNotFoundError(f'CSV file {filepath} not found')
 
     print(f'Creating temporary raw and typed tables for "{table}"')
-    pg_hook = PostgresHook(postgres_conn_id=ML_AIRFLOW_DATABASE_CONN_ID)
+    pg_hook = PostgresHook(postgres_conn_id=ES_EXPOS_DATABASE_CONN_ID)
     with pg_hook.get_conn() as conn:
         with conn.cursor() as cursor:
             cursor.execute(f"""

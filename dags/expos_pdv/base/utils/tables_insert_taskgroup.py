@@ -4,8 +4,8 @@ from airflow.utils.task_group import TaskGroup
 
 from expos_pdv.base.utils.additional_sql_params import additional_params
 from expos_pdv.base.utils.tasks import arrange_task_list_sequentially
-from expos_pdv.config.etl.settings import ES_AIRFLOW_DATABASE_CONN_ID
 from expos_pdv.config.common.settings import STAGE
+from expos_pdv.config.etl.settings import ES_EXPOS_DATABASE_CONN_ID
 from operators.postgres.query_with_params import PostgresOperatorWithParams
 
 
@@ -17,7 +17,7 @@ class TableOperationsTaskGroup:
         sql_folder,
         job_id=None,
         sequential=True,
-        conn_id=ES_AIRFLOW_DATABASE_CONN_ID,
+        conn_id=ES_EXPOS_DATABASE_CONN_ID,
     ):
 
         if not table_list:

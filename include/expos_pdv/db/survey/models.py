@@ -1,7 +1,8 @@
 from django.db import models
-from include.expos_pdv.db.expos.models import DateTimeWithoutTZField, AutoUUIDField
+
+from etl_job.models import ExposEtlJob
+from expos.models import DateTimeWithoutTZField, AutoUUIDField
 from datetime import datetime
-from include.expos_pdv import EtlJob
 
 
 class SurveyRaw(models.Model):
@@ -15,7 +16,7 @@ class SurveyRaw(models.Model):
     external_updated_at = models.TextField(blank=True, null=True)
 
     job_id = models.ForeignKey(
-        EtlJob,
+        ExposEtlJob,
         on_delete=models.CASCADE,
         db_column='job_id',
     )
@@ -26,6 +27,7 @@ class SurveyRaw(models.Model):
     id = AutoUUIDField(primary_key=True, editable=False)
 
     class Meta:
+        app_label = 'survey'
         managed = True
         db_table = 'airflow\".\"survey_raw'
 
@@ -41,7 +43,7 @@ class SurveyTyped(models.Model):
     external_updated_at = DateTimeWithoutTZField()
 
     job_id = models.ForeignKey(
-        EtlJob,
+        ExposEtlJob,
         on_delete=models.CASCADE,
         db_column='job_id',
     )
@@ -52,5 +54,6 @@ class SurveyTyped(models.Model):
     id = AutoUUIDField(primary_key=True, editable=False)
 
     class Meta:
+        app_label = 'survey'
         managed = True
         db_table = 'airflow\".\"survey_typed'

@@ -1,14 +1,15 @@
 from django.db import models
-from include.expos_pdv.db.expos.models import DateTimeWithoutTZField, AutoUUIDField
+
+from etl_job.models import ExposEtlJob
+from expos.models import DateTimeWithoutTZField, AutoUUIDField
 from datetime import datetime
-from include.expos_pdv import EtlJob
 
 
 class ClusterConform(models.Model):
     name = models.TextField()
 
     job_id = models.ForeignKey(
-        EtlJob,
+        ExposEtlJob,
         on_delete=models.CASCADE,
         db_column='job_id',
     )
@@ -19,6 +20,7 @@ class ClusterConform(models.Model):
     id = AutoUUIDField(primary_key=True, editable=False)
 
     class Meta:
+        app_label = 'cluster'
         managed = True
         db_table = 'airflow\".\"cluster_conform'
 
@@ -27,7 +29,7 @@ class ClusterStaged(models.Model):
     name = models.TextField()
 
     job_id = models.ForeignKey(
-        EtlJob,
+        ExposEtlJob,
         on_delete=models.CASCADE,
         db_column='job_id',
     )
@@ -38,5 +40,6 @@ class ClusterStaged(models.Model):
     id = models.UUIDField(primary_key=True, editable=False)
 
     class Meta:
+        app_label = 'cluster'
         managed = True
         db_table = 'airflow\".\"cluster_staged'

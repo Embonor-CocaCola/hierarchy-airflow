@@ -1,10 +1,11 @@
 from django.db import models
 
-from include.expos_pdv import CustomerStaged
-from include.expos_pdv.db.expos.models import DateTimeWithoutTZField, AutoUUIDField
+from customer.models import CustomerStaged
+from etl_job.models import ExposEtlJob
+from expos.models import DateTimeWithoutTZField, AutoUUIDField
 from datetime import datetime
-from include.expos_pdv import EtlJob
-from include.expos_pdv import VendorStaged
+
+from vendor.models import VendorStaged
 
 
 class VendorCustomerRaw(models.Model):
@@ -15,7 +16,7 @@ class VendorCustomerRaw(models.Model):
     priority = models.TextField(blank=True, null=True)
 
     job_id = models.ForeignKey(
-        EtlJob,
+        ExposEtlJob,
         on_delete=models.CASCADE,
         db_column='job_id',
     )
@@ -26,6 +27,7 @@ class VendorCustomerRaw(models.Model):
     id = AutoUUIDField(primary_key=True, editable=False)
 
     class Meta:
+        app_label = 'vendor_customer'
         managed = True
         db_table = 'airflow\".\"vendor_customer_raw'
 
@@ -38,7 +40,7 @@ class VendorCustomerTyped(models.Model):
     priority = models.IntegerField()
 
     job_id = models.ForeignKey(
-        EtlJob,
+        ExposEtlJob,
         on_delete=models.CASCADE,
         db_column='job_id',
     )
@@ -49,6 +51,7 @@ class VendorCustomerTyped(models.Model):
     id = AutoUUIDField(primary_key=True, editable=False)
 
     class Meta:
+        app_label = 'vendor_customer'
         managed = True
         db_table = 'airflow\".\"vendor_customer_typed'
 
@@ -61,7 +64,7 @@ class VendorCustomerConform(models.Model):
     priority = models.IntegerField()
 
     job_id = models.ForeignKey(
-        EtlJob,
+        ExposEtlJob,
         on_delete=models.CASCADE,
         db_column='job_id',
     )
@@ -73,6 +76,7 @@ class VendorCustomerConform(models.Model):
     target_id = models.TextField(null=True)
 
     class Meta:
+        app_label = 'vendor_customer'
         managed = True
         db_table = 'airflow\".\"vendor_customer_conform'
 
@@ -90,7 +94,7 @@ class VendorCustomerStaged(models.Model):
     priority = models.IntegerField()
 
     job_id = models.ForeignKey(
-        EtlJob,
+        ExposEtlJob,
         on_delete=models.CASCADE,
         db_column='job_id',
     )
@@ -102,5 +106,6 @@ class VendorCustomerStaged(models.Model):
     target_id = models.TextField(null=True)
 
     class Meta:
+        app_label = 'vendor_customer'
         managed = True
         db_table = 'airflow\".\"vendor_customer_staged'

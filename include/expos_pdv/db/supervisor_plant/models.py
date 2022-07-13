@@ -1,10 +1,11 @@
 from django.db import models
 
-from include.expos_pdv import ChiefStaged
-from include.expos_pdv.db.expos.models import DateTimeWithoutTZField, AutoUUIDField
+from chief_plant.models import ChiefStaged
+from etl_job.models import ExposEtlJob
+from expos.models import DateTimeWithoutTZField, AutoUUIDField
 from datetime import datetime
-from include.expos_pdv import EtlJob
-from include.expos_pdv import PlantStaged
+
+from plant.models import PlantStaged
 
 
 class SupervisorPlantRaw(models.Model):
@@ -18,7 +19,7 @@ class SupervisorPlantRaw(models.Model):
     chief_unit = models.TextField(blank=True, null=True)
 
     job_id = models.ForeignKey(
-        EtlJob,
+        ExposEtlJob,
         on_delete=models.CASCADE,
         db_column='job_id',
     )
@@ -29,6 +30,7 @@ class SupervisorPlantRaw(models.Model):
     id = AutoUUIDField(primary_key=True, editable=False)
 
     class Meta:
+        app_label = 'supervisor_plant'
         managed = True
         db_table = 'airflow\".\"supervisor_plant_raw'
 
@@ -44,7 +46,7 @@ class SupervisorPlantTyped(models.Model):
     chief_unit = models.TextField(blank=True, null=True)
 
     job_id = models.ForeignKey(
-        EtlJob,
+        ExposEtlJob,
         on_delete=models.CASCADE,
         db_column='job_id',
     )
@@ -55,6 +57,7 @@ class SupervisorPlantTyped(models.Model):
     id = AutoUUIDField(primary_key=True, editable=False)
 
     class Meta:
+        app_label = 'supervisor_plant'
         managed = True
         db_table = 'airflow\".\"supervisor_plant_typed'
 
@@ -69,7 +72,7 @@ class SupervisorConform(models.Model):
     role = models.TextField(blank=True, null=True)
 
     job_id = models.ForeignKey(
-        EtlJob,
+        ExposEtlJob,
         on_delete=models.CASCADE,
         db_column='job_id',
     )
@@ -80,6 +83,7 @@ class SupervisorConform(models.Model):
     id = AutoUUIDField(primary_key=True, editable=False)
 
     class Meta:
+        app_label = 'supervisor_plant'
         managed = True
         db_table = 'airflow\".\"supervisor_conform'
 
@@ -94,7 +98,7 @@ class SupervisorStaged(models.Model):
     role = models.TextField(blank=True, null=True)
 
     job_id = models.ForeignKey(
-        EtlJob,
+        ExposEtlJob,
         on_delete=models.CASCADE,
         db_column='job_id',
     )
@@ -105,5 +109,6 @@ class SupervisorStaged(models.Model):
     id = AutoUUIDField(primary_key=True, editable=False)
 
     class Meta:
+        app_label = 'supervisor_plant'
         managed = True
         db_table = 'airflow\".\"supervisor_staged'

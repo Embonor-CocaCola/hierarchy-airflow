@@ -13,12 +13,11 @@ RUN apt-get update \
 USER airflow
 
 RUN mkdir -p data
-RUN mkdir -p tenants
+RUN mkdir -p package
 
 COPY ./dags ${AIRFLOW_HOME}/dags
 COPY ./include ${AIRFLOW_HOME}/include
 COPY ./plugins ${AIRFLOW_HOME}/plugins
-COPY ./tenants ${AIRFLOW_HOME}/tenants
 COPY ./requirements*.txt ./
 
 RUN pip install --upgrade pip \

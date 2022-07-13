@@ -1,12 +1,12 @@
 from django.db import models
 from django.contrib.postgres.fields import ArrayField
 
-from include.expos_pdv import CustomerStaged
-from include.expos_pdv.db.expos.models import DateTimeWithoutTZField, AutoUUIDField
+from customer.models import CustomerStaged
+from etl_job.models import ExposEtlJob
+from expos.models import DateTimeWithoutTZField, AutoUUIDField
 from datetime import datetime
-from include.expos_pdv import EtlJob
-from include.expos_pdv.db.question.models import QuestionStaged
-from include.expos_pdv import VendorStaged
+from question.models import QuestionStaged
+from vendor.models import VendorStaged
 
 
 class AnswerRaw(models.Model):
@@ -21,7 +21,7 @@ class AnswerRaw(models.Model):
     answers = models.TextField(blank=True, null=True)
 
     job_id = models.ForeignKey(
-        EtlJob,
+        ExposEtlJob,
         on_delete=models.CASCADE,
         db_column='job_id',
     )
@@ -32,6 +32,7 @@ class AnswerRaw(models.Model):
     id = AutoUUIDField(primary_key=True, editable=False)
 
     class Meta:
+        app_label = 'answer'
         managed = True
         db_table = 'airflow\".\"answer_raw'
 
@@ -48,7 +49,7 @@ class AnswerTyped(models.Model):
     answers = models.JSONField()
 
     job_id = models.ForeignKey(
-        EtlJob,
+        ExposEtlJob,
         on_delete=models.CASCADE,
         db_column='job_id',
     )
@@ -59,6 +60,7 @@ class AnswerTyped(models.Model):
     id = AutoUUIDField(primary_key=True, editable=False)
 
     class Meta:
+        app_label = 'answer'
         managed = True
         db_table = 'airflow\".\"answer_typed'
 
@@ -72,7 +74,7 @@ class SurveyConform(models.Model):
     external_created_at = DateTimeWithoutTZField()
 
     job_id = models.ForeignKey(
-        EtlJob,
+        ExposEtlJob,
         on_delete=models.CASCADE,
         db_column='job_id',
     )
@@ -83,6 +85,7 @@ class SurveyConform(models.Model):
     id = AutoUUIDField(primary_key=True, editable=False)
 
     class Meta:
+        app_label = 'answer'
         managed = True
         db_table = 'survey_conform'
 
@@ -101,7 +104,7 @@ class SurveyStaged(models.Model):
     external_created_at = DateTimeWithoutTZField()
 
     job_id = models.ForeignKey(
-        EtlJob,
+        ExposEtlJob,
         on_delete=models.CASCADE,
         db_column='job_id',
     )
@@ -112,6 +115,7 @@ class SurveyStaged(models.Model):
     id = AutoUUIDField(primary_key=True, editable=False)
 
     class Meta:
+        app_label = 'answer'
         managed = True
         db_table = 'survey_staged'
 
@@ -125,7 +129,7 @@ class AnswerConform(models.Model):
     question_id = models.TextField()
 
     job_id = models.ForeignKey(
-        EtlJob,
+        ExposEtlJob,
         on_delete=models.CASCADE,
         db_column='job_id',
     )
@@ -136,6 +140,7 @@ class AnswerConform(models.Model):
     id = AutoUUIDField(primary_key=True, editable=False)
 
     class Meta:
+        app_label = 'answer'
         managed = True
         db_table = 'airflow\".\"answer_conform'
 
@@ -154,7 +159,7 @@ class AnswerStaged(models.Model):
     )
 
     job_id = models.ForeignKey(
-        EtlJob,
+        ExposEtlJob,
         on_delete=models.CASCADE,
         db_column='job_id',
     )
@@ -165,6 +170,7 @@ class AnswerStaged(models.Model):
     id = AutoUUIDField(primary_key=True, editable=False)
 
     class Meta:
+        app_label = 'answer'
         managed = True
         db_table = 'airflow\".\"answer_staged'
 
@@ -178,7 +184,7 @@ class SurveyFailedInserts(models.Model):
     customer_name = models.TextField(null=True)
 
     job_id = models.ForeignKey(
-        EtlJob,
+        ExposEtlJob,
         on_delete=models.CASCADE,
         db_column='job_id',
     )
@@ -187,5 +193,6 @@ class SurveyFailedInserts(models.Model):
     updated_at = DateTimeWithoutTZField(default=datetime.now)
 
     class Meta:
+        app_label = 'answer'
         managed = True
         db_table = 'airflow\".\"survey_failed'

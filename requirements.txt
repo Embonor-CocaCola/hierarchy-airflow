@@ -1,3 +1,4 @@
+--extra-index-url https://test.pypi.org/simple/
 apache-airflow[aws,crypto,password,postgres,mongo,ssh]==2.2.1
 Django==3.2.9
 dj-database-url==0.5.0
@@ -9,3 +10,4 @@ pymongo>=3.6.0
 oci==2.53.1
 pyarrow==7.0.0
 simplejson==3.17.6
+reign-airflow-utils==0.0.2

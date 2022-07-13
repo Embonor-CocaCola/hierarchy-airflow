@@ -5,7 +5,7 @@ from airflow.providers.postgres.operators.postgres import PostgresOperator
 
 from expos_pdv.base.utils.slack import notify_start_task
 from expos_pdv.config.common.defaults import default_dag_kwargs, default_task_kwargs
-from expos_pdv.config.etl.settings import ES_AIRFLOW_DATABASE_CONN_ID
+from expos_pdv.config.etl.settings import ES_EXPOS_DATABASE_CONN_ID
 from expos_pdv.config.maintenance.settings import MTNC_DAG_ID, MTNC_DAG_SCHEDULE_INTERVAL, MTNC_DAG_START_DATE_VALUE
 
 
@@ -33,7 +33,7 @@ class MaintenanceDagFactory:
                 task_id='vacuum_analyze',
                 sql='VACUUM ANALYZE',
                 autocommit=True,
-                postgres_conn_id=ES_AIRFLOW_DATABASE_CONN_ID,
+                postgres_conn_id=ES_EXPOS_DATABASE_CONN_ID,
             )
 
             notify_dag_start >> vacuum_analyze_db

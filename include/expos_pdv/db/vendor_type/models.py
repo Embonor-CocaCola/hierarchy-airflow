@@ -1,7 +1,8 @@
 from django.db import models
-from include.expos_pdv.db.expos.models import DateTimeWithoutTZField, AutoUUIDField
+
+from etl_job.models import ExposEtlJob
+from expos.models import DateTimeWithoutTZField, AutoUUIDField
 from datetime import datetime
-from include.expos_pdv import EtlJob
 
 
 class VendorTypeRaw(models.Model):
@@ -9,7 +10,7 @@ class VendorTypeRaw(models.Model):
     name = models.TextField(blank=True, null=True)
 
     job_id = models.ForeignKey(
-        EtlJob,
+        ExposEtlJob,
         on_delete=models.CASCADE,
         db_column='job_id',
     )
@@ -20,6 +21,7 @@ class VendorTypeRaw(models.Model):
     id = AutoUUIDField(primary_key=True, editable=False)
 
     class Meta:
+        app_label = 'vendor_type'
         managed = True
         db_table = 'airflow\".\"vendor_type_raw'
 
@@ -29,7 +31,7 @@ class VendorTypeTyped(models.Model):
     name = models.TextField()
 
     job_id = models.ForeignKey(
-        EtlJob,
+        ExposEtlJob,
         on_delete=models.CASCADE,
         db_column='job_id',
     )
@@ -40,6 +42,7 @@ class VendorTypeTyped(models.Model):
     id = AutoUUIDField(primary_key=True, editable=False)
 
     class Meta:
+        app_label = 'vendor_type'
         managed = True
         db_table = 'airflow\".\"vendor_type_typed'
 
@@ -49,7 +52,7 @@ class VendorTypeConform(models.Model):
     name = models.TextField()
 
     job_id = models.ForeignKey(
-        EtlJob,
+        ExposEtlJob,
         on_delete=models.CASCADE,
         db_column='job_id',
     )
@@ -60,5 +63,6 @@ class VendorTypeConform(models.Model):
     id = AutoUUIDField(primary_key=True, editable=False)
 
     class Meta:
+        app_label = 'vendor_type'
         managed = True
         db_table = 'airflow\".\"vendor_type_conform'

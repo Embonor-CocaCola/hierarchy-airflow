@@ -34,10 +34,10 @@ ALLOWED_HOSTS = []
 
 # Application definition
 INSTALLED_APPS = [
+    'etl_job',
     'answer',
     'branch_office',
     'customer',
-    'etl_job',
     'plant',
     'question',
     'supervisor_plant',

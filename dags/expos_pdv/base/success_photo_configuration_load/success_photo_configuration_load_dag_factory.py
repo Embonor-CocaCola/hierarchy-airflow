@@ -9,7 +9,7 @@ from expos_pdv.base.utils.table_names import TableNameManager
 from expos_pdv.base.utils.tables_insert_taskgroup import TableOperationsTaskGroup
 from expos_pdv.base.success_photo_configuration_load.download_csv_task_group import DownloadCsvTaskGroup
 from expos_pdv.config.common.defaults import default_task_kwargs, default_dag_kwargs
-from expos_pdv.config.etl.settings import ES_AIRFLOW_DATABASE_CONN_ID
+from expos_pdv.config.etl.settings import ES_EXPOS_DATABASE_CONN_ID
 from expos_pdv.config.common.settings import airflow_root_dir
 from expos_pdv.config.success_photo_configuration_load.settings import (
     SPCL_DAG_ID,
@@ -70,6 +70,7 @@ class SuccessPhotoConfigurationLoadDagFactory:
                 tables_to_insert=_table_list,
                 task_group_id='create_and_load_tmp_tables_from_csv',
                 sql_folder='success_photo_configuration_load',
+                pg_conn_id=ES_EXPOS_DATABASE_CONN_ID,
                 delimiter=';',
             ).build()
 
@@ -99,7 +100,7 @@ class SuccessPhotoConfigurationLoadDagFactory:
 
             update_and_refresh_data = PostgresOperator(
                 task_id='update_and_refresh_data',
-                postgres_conn_id=ES_AIRFLOW_DATABASE_CONN_ID,
+                postgres_conn_id=ES_EXPOS_DATABASE_CONN_ID,
                 sql="""
                     REFRESH MATERIALIZED VIEW CONCURRENTLY sku_family_compliance;
                     CALL update_success_photo_products();

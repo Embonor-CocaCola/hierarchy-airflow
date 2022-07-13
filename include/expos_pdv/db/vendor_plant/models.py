@@ -1,7 +1,8 @@
 from django.db import models
-from include.expos_pdv.db.expos.models import DateTimeWithoutTZField, AutoUUIDField
+
+from etl_job.models import ExposEtlJob
+from expos.models import DateTimeWithoutTZField, AutoUUIDField
 from datetime import datetime
-from include.expos_pdv import EtlJob
 
 
 class VendorPlantRaw(models.Model):
@@ -12,7 +13,7 @@ class VendorPlantRaw(models.Model):
     vendor_name = models.TextField(blank=True, null=True)
 
     job_id = models.ForeignKey(
-        EtlJob,
+        ExposEtlJob,
         on_delete=models.CASCADE,
         db_column='job_id',
     )
@@ -23,6 +24,7 @@ class VendorPlantRaw(models.Model):
     id = AutoUUIDField(primary_key=True, editable=False)
 
     class Meta:
+        app_label = 'vendor_plant'
         managed = True
         db_table = 'airflow\".\"vendor_plant_raw'
 
@@ -35,7 +37,7 @@ class VendorPlantTyped(models.Model):
     vendor_name = models.TextField(blank=True, null=True)
 
     job_id = models.ForeignKey(
-        EtlJob,
+        ExposEtlJob,
         on_delete=models.CASCADE,
         db_column='job_id',
     )
@@ -46,6 +48,7 @@ class VendorPlantTyped(models.Model):
     id = AutoUUIDField(primary_key=True, editable=False)
 
     class Meta:
+        app_label = 'vendor_plant'
         managed = True
         db_table = 'airflow\".\"vendor_plant_typed'
 
@@ -57,7 +60,7 @@ class VendorPlantConform(models.Model):
     vendor_name = models.TextField(blank=True, null=True)
 
     job_id = models.ForeignKey(
-        EtlJob,
+        ExposEtlJob,
         on_delete=models.CASCADE,
         db_column='job_id',
     )
@@ -68,5 +71,6 @@ class VendorPlantConform(models.Model):
     id = AutoUUIDField(primary_key=True, editable=False)
 
     class Meta:
+        app_label = 'vendor_plant'
         managed = True
         db_table = 'airflow\".\"vendor_plant_conform'

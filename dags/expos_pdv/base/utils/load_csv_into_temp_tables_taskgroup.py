@@ -7,14 +7,15 @@ from expos_pdv.base.utils.table_names import TableNameManager
 from airflow.utils.task_group import TaskGroup
 
 from expos_pdv.base.utils.tasks import arrange_task_list_sequentially
-from expos_pdv.config.etl.settings import ES_AIRFLOW_DATABASE_CONN_ID, ES_STAGE_TO_DOWNLOAD_CSVS_FROM_KEY
+from expos_pdv.config.etl.settings import ES_STAGE_TO_DOWNLOAD_CSVS_FROM_KEY
 from expos_pdv.config.common.settings import STAGE, airflow_root_dir
 from operators.postgres.copy_expert import PostgresOperatorCopyExpert
 from operators.postgres.query_with_params import PostgresOperatorWithParams
 
 
 class LoadCsvIntoTempTablesTaskGroup:
-    def __init__(self, tables_to_insert: list[str], task_group_id: str, sql_folder, delimiter=',', check_run=False):
+    def __init__(self, tables_to_insert: list[str], task_group_id: str, sql_folder,
+                 pg_conn_id: str, delimiter=',', check_run=False):
         if not tables_to_insert:
             raise ValueError('missing parameter tables_to_insert')
 
@@ -26,6 +27,7 @@ class LoadCsvIntoTempTablesTaskGroup:
         self.delimiter = delimiter
         self.check_run = check_run
         self.csvs_stage = Variable.get(ES_STAGE_TO_DOWNLOAD_CSVS_FROM_KEY)
+        self.pg_conn_id = pg_conn_id
 
     def create_insert_task(self, original_table_name: str):
         table_names = self.table_name_manager.get_variations(original_table_name)
@@ -34,7 +36,7 @@ class LoadCsvIntoTempTablesTaskGroup:
         params_key = self.create_params_key(original_table_name, check_run=self.check_run)
 
         create_temp_table_task = PostgresOperatorWithParams(
-            postgres_conn_id=ES_AIRFLOW_DATABASE_CONN_ID,
+            postgres_conn_id=self.pg_conn_id,
             task_id=f'create_tmp_{table_names["normalized"]}',
             task_group=task_group,
             sql=os.path.join(
@@ -45,7 +47,7 @@ class LoadCsvIntoTempTablesTaskGroup:
 
         insert_tmp_task = PostgresOperatorCopyExpert(
             task_id=f'copy_into_{table_names["normalized"]}_from_csv',
-            postgres_conn_id=ES_AIRFLOW_DATABASE_CONN_ID,
+            postgres_conn_id=self.pg_conn_id,
             task_group=task_group,
             table=f"airflow.{table_names['tmp']}",
             csv_path=csv_path,

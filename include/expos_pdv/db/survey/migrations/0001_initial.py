@@ -3,6 +3,7 @@
 import datetime
 from django.db import migrations, models
 import django.db.models.deletion
+from expos.models import DateTimeWithoutTZField, AutoUUIDField
 
 
 class Migration(migrations.Migration):
@@ -21,13 +22,13 @@ class Migration(migrations.Migration):
                 ('name', models.TextField()),
                 ('paused', models.BooleanField()),
                 ('portals', models.JSONField()),
-                ('valid_since', include.db.expos.models.DateTimeWithoutTZField(null=True)),
-                ('valid_until', include.db.expos.models.DateTimeWithoutTZField(null=True)),
-                ('external_created_at', include.db.expos.models.DateTimeWithoutTZField()),
-                ('external_updated_at', include.db.expos.models.DateTimeWithoutTZField()),
-                ('created_at', include.db.expos.models.DateTimeWithoutTZField(default=datetime.datetime.now)),
-                ('updated_at', include.db.expos.models.DateTimeWithoutTZField(default=datetime.datetime.now)),
-                ('id', include.db.expos.models.AutoUUIDField(editable=False, primary_key=True, serialize=False)),
+                ('valid_since', DateTimeWithoutTZField(null=True)),
+                ('valid_until', DateTimeWithoutTZField(null=True)),
+                ('external_created_at', DateTimeWithoutTZField()),
+                ('external_updated_at', DateTimeWithoutTZField()),
+                ('created_at', DateTimeWithoutTZField(default=datetime.datetime.now)),
+                ('updated_at', DateTimeWithoutTZField(default=datetime.datetime.now)),
+                ('id', AutoUUIDField(editable=False, primary_key=True, serialize=False)),
                 ('job_id', models.ForeignKey(db_column='job_id', on_delete=django.db.models.deletion.CASCADE, to='etl_job.etljob')),
             ],
             options={
@@ -46,9 +47,9 @@ class Migration(migrations.Migration):
                 ('valid_until', models.TextField(blank=True, null=True)),
                 ('external_created_at', models.TextField(blank=True, null=True)),
                 ('external_updated_at', models.TextField(blank=True, null=True)),
-                ('created_at', include.db.expos.models.DateTimeWithoutTZField(default=datetime.datetime.now)),
-                ('updated_at', include.db.expos.models.DateTimeWithoutTZField(default=datetime.datetime.now)),
-                ('id', include.db.expos.models.AutoUUIDField(editable=False, primary_key=True, serialize=False)),
+                ('created_at', DateTimeWithoutTZField(default=datetime.datetime.now)),
+                ('updated_at', DateTimeWithoutTZField(default=datetime.datetime.now)),
+                ('id', AutoUUIDField(editable=False, primary_key=True, serialize=False)),
                 ('job_id', models.ForeignKey(db_column='job_id', on_delete=django.db.models.deletion.CASCADE, to='etl_job.etljob')),
             ],
             options={

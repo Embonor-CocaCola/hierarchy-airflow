@@ -14,7 +14,7 @@ from expos_pdv.base.maxerience_retrieve_result.utils.create_parquet_file import 
 from expos_pdv.base.utils.slack import notify_start_task
 from expos_pdv.config.common.defaults import default_task_kwargs, default_dag_kwargs
 
-from expos_pdv.config.etl.settings import ES_AIRFLOW_DATABASE_CONN_ID
+from expos_pdv.config.etl.settings import ES_EXPOS_DATABASE_CONN_ID
 from expos_pdv.config.maxerience_retrieve_result.settings import (
     MRR_DAG_ID,
     MRR_DAG_SCHEDULE_INTERVAL,
@@ -80,7 +80,7 @@ class MaxerienceRetrieveResultDagFactory:
 
             preprocess_survey_metadata = PostgresOperator(
                 task_id='preprocess_survey_metadata',
-                postgres_conn_id=ES_AIRFLOW_DATABASE_CONN_ID,
+                postgres_conn_id=ES_EXPOS_DATABASE_CONN_ID,
                 sql="""
                     CALL calculate_survey_metadata();
                 """,

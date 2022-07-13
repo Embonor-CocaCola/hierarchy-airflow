@@ -6,7 +6,7 @@ from airflow.utils.task_group import TaskGroup
 
 from expos_pdv.base.utils.tasks import arrange_task_list_sequentially
 from expos_pdv.config.common.settings import SQL_PATH
-from expos_pdv.config.etl.settings import ES_AIRFLOW_DATABASE_CONN_ID
+from expos_pdv.config.etl.settings import ES_EXPOS_DATABASE_CONN_ID
 from psycopg2 import sql
 
 
@@ -16,7 +16,7 @@ class CleanDataTaskGroup:
         stage: str,
         job_id,
         max_antiquity_allowed='1 month',
-        conn_id=ES_AIRFLOW_DATABASE_CONN_ID,
+        conn_id=ES_EXPOS_DATABASE_CONN_ID,
     ):
         self.max_antiquity_allowed = max_antiquity_allowed
         self.conn_id = conn_id
