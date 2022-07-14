@@ -14,9 +14,6 @@ env:
     value: C030CACGC1E
   - name: SURVEYS_SERVICE_BASE_URL
     value: https://api.production.embonorservices.cl/surveys-service
-  - name: AIRFLOW__SECRETS__BACKEND_KWARGS
-    value: |2
-      {"connections_prefix": "/prod/airflow_service/connections", "variables_prefix": "/prod/airflow_service/variables"}
 secret:
   - envName: "EXPOS_SQL_CONN_URI"
     secretName: "airflow-envars"
