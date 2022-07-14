@@ -13,7 +13,6 @@ RUN apt-get update \
 USER airflow
 
 RUN mkdir -p data
-RUN mkdir -p package
 
 COPY ./dags ${AIRFLOW_HOME}/dags
 COPY ./include ${AIRFLOW_HOME}/include

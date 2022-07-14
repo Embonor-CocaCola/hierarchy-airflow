@@ -27,4 +27,5 @@ repos:
             flake8-quotes,
             flake8-typing-imports
         ]
-        exclude: include/db/expos/.*/migrations
+        # TODO: Enable exclusion for every migrations folder inside include including subdirs
+        # exclude: include/db/expos/.*/migrations

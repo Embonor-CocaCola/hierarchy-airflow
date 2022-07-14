@@ -89,25 +89,3 @@ docker-compose up airflow-scheduler
 ```shell
 docker-compose up airflow-worker
 ```
-
-## Additional configuration:
-
-To create separate users in order to store airflow related tables in one schema and application tables in another:
-
-```postgresql
-CREATE USER airflow WITH ENCRYPTED PASSWORD 'somepass';
-ALTER SCHEMA airflow OWNER TO airflow;
-ALTER ROLE airflow SET search_path = airflow,public;
-
-GRANT ALL PRIVILEGES ON DATABASE expos_service TO airflow;
-
--- if you get 'no schema selected' errors, issue the following 2 commands
-GRANT USAGE, CREATE ON SCHEMA airflow TO airflow, public;
--- if you get permission denied to create extension you might need to grant superuser too
--- this depends on postgres version. As of v13 some extensions are considered safe
--- to create from users with CREATE privileges on current DB
--- https://stackoverflow.com/a/63781812/10533611
--- https://www.postgresql.org/docs/13/contrib.html
-```
-
-Application layer should do the same procedure with a different user to interact with `public` schema
