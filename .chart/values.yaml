@@ -30,6 +30,15 @@ webserver:
     initialDelaySeconds: 35
   readinessProbe:
     initialDelaySeconds: 30
+  extraVolumes:
+    - name: variables
+      secret:
+        secretName: airflow-variables
+        optional: false
+  extraVolumeMounts:
+    - name: variables
+      mountPath: "/opt/airflow/variables"
+      readOnly: true
 workers:
   persistence:
     fixPermissions: true
