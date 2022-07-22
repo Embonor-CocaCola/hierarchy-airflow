@@ -81,7 +81,7 @@ workers:
       mountPath: "/opt/airflow/include"
   extraContainers:
     - name: gitsync-sidecar
-      image: "reigncl/airflow-gitsync-sidecar:latest"
+      image: reigncl/airflow-gitsync-sidecar:latest
       imagePullPolicy: Always
       command: ["npm"]
       args: ["start"]
@@ -132,6 +132,36 @@ scheduler:
     - name: registered-projects
       mountPath: "/opt/airflow/registered_projects"
       readOnly: true
+  extraContainers:
+    - name: gitsync-sidecar
+      image: reigncl/airflow-gitsync-sidecar:latest
+      imagePullPolicy: Always
+      command: [ "npm" ]
+      args: [ "start" ]
+      readinessProbe:
+        httpGet:
+          path: /health
+          port: git-sync-sidecar
+        initialDelaySeconds: 9
+      livenessProbe:
+        httpGet:
+          path: /health
+          port: git-sync-sidecar
+        initialDelaySeconds: 6
+      ports:
+        - name: git-sync-sidecar
+          containerPort: 3030
+      volumeMounts:
+        - name: registered-projects
+          mountPath: "/registered_projects"
+          readOnly: true
+        - name: dags-volume
+          mountPath: "/dags"
+        - name: include-volume
+          mountPath: "/include"
+      envFrom:
+        - secretRef:
+            name: airflow-sidecar-envars
 ingress:
   enabled: true
   web:
