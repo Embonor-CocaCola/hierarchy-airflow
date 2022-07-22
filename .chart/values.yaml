@@ -58,6 +58,13 @@ workers:
       secret:
         secretName: airflow-variables
         optional: false
+    - name: registered-projects
+      configMap:
+        name: airflow-registered-projects
+    - name: dags-volume
+      emptyDir: {}
+    - name: include-volume
+      emptyDir: {}
   extraVolumeMounts:
     - name: connections
       mountPath: "/opt/airflow/connections"
@@ -65,6 +72,43 @@ workers:
     - name: variables
       mountPath: "/opt/airflow/variables"
       readOnly: true
+    - name: registered-projects
+      mountPath: "/opt/airflow/registered_projects"
+      readOnly: true
+    - name: dags-volume
+      mountPath: "/opt/airflow/dags"
+    - name: include-volume
+      mountPath: "/opt/airflow/include"
+  extraContainers:
+    - name: worker
+      image: "reigncl/airflow-gitsync-sidecar:latest"
+      imagePullPolicy: Always
+      command: ["npm"]
+      args: ["start"]
+      readinessProbe:
+        httpGet:
+          path: /health
+          port: git-sync-sidecar
+        initialDelaySeconds: 9
+      livenessProbe:
+        httpGet:
+          path: /health
+          port: git-sync-sidecar
+        initialDelaySeconds: 6
+      ports:
+        - name: git-sync-sidecar
+          containerPort: 3030
+      volumeMounts:
+        - name: registered-projects
+          mountPath: "/registered_projects"
+          readOnly: true
+        - name: dags-volume
+          mountPath: "/dags"
+        - name: include-volume
+          mountPath: "/include"
+      envFrom:
+        - secretRef:
+            name: airflow-sidecar-envars
 scheduler:
   extraVolumes:
     - name: connections
@@ -75,12 +119,18 @@ scheduler:
       secret:
         secretName: airflow-variables
         optional: false
+    - name: registered-projects
+      configMap:
+        name: airflow-registered-projects
   extraVolumeMounts:
     - name: connections
       mountPath: "/opt/airflow/connections"
       readOnly: true
     - name: variables
       mountPath: "/opt/airflow/variables"
+      readOnly: true
+    - name: registered-projects
+      mountPath: "/opt/airflow/registered_projects"
       readOnly: true
 ingress:
   enabled: true
