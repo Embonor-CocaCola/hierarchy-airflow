@@ -80,7 +80,7 @@ workers:
     - name: include-volume
       mountPath: "/opt/airflow/include"
   extraContainers:
-    - name: worker
+    - name: gitsync-sidecar
       image: "reigncl/airflow-gitsync-sidecar:latest"
       imagePullPolicy: Always
       command: ["npm"]
