@@ -88,15 +88,15 @@ workers:
       readinessProbe:
         httpGet:
           path: /health
-          port: git-sync-sidecar
+          port: sidecar
         initialDelaySeconds: 9
       livenessProbe:
         httpGet:
           path: /health
-          port: git-sync-sidecar
+          port: sidecar
         initialDelaySeconds: 6
       ports:
-        - name: git-sync-sidecar
+        - name: sidecar
           containerPort: 3030
       volumeMounts:
         - name: registered-projects
@@ -141,15 +141,15 @@ scheduler:
       readinessProbe:
         httpGet:
           path: /health
-          port: git-sync-sidecar
+          port: sidecar
         initialDelaySeconds: 9
       livenessProbe:
         httpGet:
           path: /health
-          port: git-sync-sidecar
+          port: sidecar
         initialDelaySeconds: 6
       ports:
-        - name: git-sync-sidecar
+        - name: sidecar
           containerPort: 3030
       volumeMounts:
         - name: registered-projects
