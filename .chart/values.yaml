@@ -83,8 +83,7 @@ workers:
     - name: gitsync-sidecar
       image: reigncl/airflow-gitsync-sidecar:latest
       imagePullPolicy: Always
-      command: ["npm"]
-      args: ["start"]
+      args: [ "dist/src/main.js" ]
       readinessProbe:
         httpGet:
           path: /health
@@ -136,8 +135,7 @@ scheduler:
     - name: gitsync-sidecar
       image: reigncl/airflow-gitsync-sidecar:latest
       imagePullPolicy: Always
-      command: [ "npm" ]
-      args: [ "start" ]
+      args: [ "dist/src/main.js" ]
       readinessProbe:
         httpGet:
           path: /health
