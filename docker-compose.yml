@@ -43,7 +43,7 @@ x-airflow-common: &airflow-common
     AIRFLOW__CORE__DAGBAG_IMPORT_TIMEOUT: 120.0
     AIRFLOW__CORE__DAGS_FOLDER: /opt/airflow/dags
     AIRFLOW__CORE__LOAD_DEFAULT_CONNECTIONS: "false"
-    AIRFLOW__CORE__SQL_ALCHEMY_CONNECT_ARGS: __config.keepalives.keepalive_kwargs
+    AIRFLOW__CORE__SQL_ALCHEMY_CONNECT_ARGS: config.keepalives.keepalive_kwargs
     AIRFLOW__SECRETS__BACKEND: reign_airflow_utils.secret_backends.FileSystemSecretsBackend
     AIRFLOW__SECRETS__BACKEND_KWARGS: |2
       {"connections_path": "/opt/airflow/connections", "variables_path": "/opt/airflow/variables"}
