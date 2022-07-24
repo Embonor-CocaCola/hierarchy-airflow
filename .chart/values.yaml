@@ -121,6 +121,10 @@ scheduler:
     - name: registered-projects
       configMap:
         name: airflow-registered-projects
+    - name: dags-volume
+      emptyDir: { }
+    - name: include-volume
+      emptyDir: { }
   extraVolumeMounts:
     - name: connections
       mountPath: "/opt/airflow/connections"
@@ -131,6 +135,10 @@ scheduler:
     - name: registered-projects
       mountPath: "/opt/airflow/registered_projects"
       readOnly: true
+    - name: dags-volume
+      mountPath: "/opt/airflow/dags"
+    - name: include-volume
+      mountPath: "/opt/airflow/include"
   extraContainers:
     - name: gitsync-sidecar
       image: reigncl/airflow-gitsync-sidecar:latest
