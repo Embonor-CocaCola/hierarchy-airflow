@@ -137,7 +137,7 @@ class EtlDagFactory:
             ).build()
 
             postprocessing_tables = conditional_operator(
-                condition=_postprocessing_operations,
+                condition=''.join(_postprocessing_operations),
                 table_list=_postprocessing_operations,
                 sql_folder='etl',
                 stage='postprocessing',
