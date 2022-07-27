@@ -32,17 +32,17 @@ HIERARCHY_PG_TABLES_TO_EXTRACT = os.environ.get(
 
 HIERARCHY_ETL_CONFORM_OPERATIONS_ORDER = os.environ.get(
     'HIERARCHY_ETL_CONFORM_OPERATIONS_ORDER',
-    'plant,branch_office,chief,supervisor,vendor_type,vendor_plant,vendor,cluster,customer,vendor_customer,question,survey,answer',  # noqa: E501
+    'plant,branch_office,chief,supervisor,vendor_type,vendor_plant,vendor,cluster,customer,vendor_customer',  # noqa: E501
 ).split(',')
 
 HIERARCHY_ETL_STAGED_OPERATIONS_ORDER = os.environ.get(
     'HIERARCHY_ETL_STAGED_OPERATIONS_ORDER',
-    'plant,branch_office,chief,supervisor,vendor,cluster,customer,vendor_customer,question,survey,answer',
+    'plant,branch_office,chief,supervisor,vendor,cluster,customer,vendor_customer',
 ).split(',')
 
 HIERARCHY_ETL_TARGET_OPERATIONS_ORDER = os.environ.get(
     'HIERARCHY_ETL_TARGET_OPERATIONS_ORDER',
-    'plant,branch_office,chief,supervisor,vendor,cluster,customer,vendor_customer,question,survey,answer',
+    'plant,branch_office,chief,supervisor,vendor,cluster,customer,vendor_customer',
 ).split(',')
 
 HIERARCHY_ETL_POSTPROCESSING_OPERATIONS_ORDER = os.environ.get(
