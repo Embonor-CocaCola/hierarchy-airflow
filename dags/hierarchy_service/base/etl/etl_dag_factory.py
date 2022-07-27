@@ -31,6 +31,8 @@ from hierarchy_service.config.etl.settings import (
 
 from operators.postgres.create_job import PostgresOperatorCreateJob
 
+from hierarchy_service.base.utils.conditional_operator import conditional_operator
+
 
 class EtlDagFactory:
     def __init__(self):
@@ -134,14 +136,17 @@ class EtlDagFactory:
                 job_id=_job_id,
             ).build()
 
-            postprocessing_tables = TableOperationsTaskGroup(
+            postprocessing_tables = conditional_operator(
+                condition=_postprocessing_operations,
                 table_list=_postprocessing_operations,
                 sql_folder='etl',
                 stage='postprocessing',
                 sequential=True,
                 job_id=_job_id,
-            ).build()
-
+                operator=TableOperationsTaskGroup,
+                should_build=True
+            )
+               
             report_broken_hierarchy = PythonOperator(
                 task_id='report_broken_hierarchy',
                 python_callable=send_broken_hierarchy_data,
