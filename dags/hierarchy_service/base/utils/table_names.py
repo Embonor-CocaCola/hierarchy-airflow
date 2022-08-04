@@ -1,5 +1,5 @@
-from const.constants import RAW_SUFFIX, TMP_PREFIX
-from const.table_name_maps import original_table_name_to_new_name_map
+from hierarchy_service.base.const.constants import RAW_SUFFIX, TMP_PREFIX
+from hierarchy_service.base.const.table_name_maps import original_table_name_to_new_name_map
 
 
 class TableNameManager:
