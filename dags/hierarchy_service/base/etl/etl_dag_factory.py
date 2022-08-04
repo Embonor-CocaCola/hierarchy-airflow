@@ -15,7 +15,7 @@ from hierarchy_service.base.utils.slack import notify_start_task
 from hierarchy_service.base.utils.table_names import TableNameManager
 from hierarchy_service.base.utils.tunneler import Tunneler
 from hierarchy_service.config.common.defaults import default_task_kwargs, default_dag_kwargs
-from hierarchy_service.config.common.settings import SHOULD_USE_TUNNEL
+from hierarchy_service.config.common.settings import SHOULD_USE_TUNNEL, HIERARCHY_DATABASE_CONN_ID
 from hierarchy_service.config.etl.settings import (
     HIERARCHY_ETL_DAG_ID,
     HIERARCHY_ETL_DAG_SCHEDULE_INTERVAL,
