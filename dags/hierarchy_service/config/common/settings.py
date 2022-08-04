@@ -14,3 +14,4 @@ SLACK_EXPOS_BOT_TOKEN = os.environ.get('SLACK_EXPOS_BOT_TOKEN')
 
 HIERARCHY_DATABASE_CONN_ID = 'hierarchy_db_conn_id'
 SQL_PATH = os.path.join(airflow_root_dir, 'include', 'hierarchy_service', 'sqls')
+EXPOS_S3_CONN_ID = 'expos_s3_conn'

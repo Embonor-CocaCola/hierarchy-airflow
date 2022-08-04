@@ -1,6 +1,6 @@
 import os
 
-from expos_pdv.base.utils.table_names import TableNameManager
+from hierarchy_service.base.utils.table_names import TableNameManager
 from airflow.utils.task_group import TaskGroup
 
 from hierarchy_service.base.utils.tasks import arrange_task_list_sequentially

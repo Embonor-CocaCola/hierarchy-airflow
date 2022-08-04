@@ -7,8 +7,7 @@ from airflow.utils.task_group import TaskGroup
 from psycopg2 import sql
 
 from hierarchy_service.base.utils.tasks import arrange_task_list_sequentially
-from hierarchy_service.config.common.settings import SQL_PATH
-from hierarchy_service.config.etl.settings import HIERARCHY_SERVICE_DATABASE_CONN_ID
+from hierarchy_service.config.common.settings import SQL_PATH, HIERARCHY_DATABASE_CONN_ID
 
 
 class CleanDataTaskGroup:
@@ -17,7 +16,7 @@ class CleanDataTaskGroup:
         stage: str,
         job_id,
         max_antiquity_allowed='1 month',
-        conn_id=HIERARCHY_SERVICE_DATABASE_CONN_ID,
+        conn_id=HIERARCHY_DATABASE_CONN_ID,
     ):
         self.max_antiquity_allowed = max_antiquity_allowed
         self.conn_id = conn_id

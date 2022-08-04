@@ -3,7 +3,7 @@ import os
 from airflow.utils.task_group import TaskGroup
 
 from hierarchy_service.base.utils.tasks import arrange_task_list_sequentially
-from hierarchy_service.config.etl.settings import HIERARCHY_SERVICE_DATABASE_CONN_ID
+from hierarchy_service.config.common.settings import HIERARCHY_DATABASE_CONN_ID
 from operators.postgres.query_with_params import PostgresOperatorWithParams
 
 
@@ -15,7 +15,7 @@ class TableOperationsTaskGroup:
         sql_folder,
         job_id=None,
         sequential=True,
-        conn_id=HIERARCHY_SERVICE_DATABASE_CONN_ID,
+        conn_id=HIERARCHY_DATABASE_CONN_ID,
     ):
 
         if not table_list:

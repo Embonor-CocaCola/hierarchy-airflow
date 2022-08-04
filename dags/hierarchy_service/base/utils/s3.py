@@ -3,7 +3,7 @@ from logging import info
 
 from airflow.providers.amazon.aws.hooks.s3 import S3Hook
 
-from expos_pdv.config.common.settings import EXPOS_S3_CONN_ID
+from hierarchy_service.config.common.settings import EXPOS_S3_CONN_ID
 from hierarchy_service.config.common.settings import airflow_root_dir
 
 
