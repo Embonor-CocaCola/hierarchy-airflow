@@ -17,7 +17,6 @@ from hierarchy_service.base.utils.tunneler import Tunneler
 from hierarchy_service.config.common.defaults import default_task_kwargs, default_dag_kwargs
 from hierarchy_service.config.common.settings import SHOULD_USE_TUNNEL
 from hierarchy_service.config.etl.settings import (
-    HIERARCHY_SERVICE_DATABASE_CONN_ID,
     HIERARCHY_ETL_DAG_ID,
     HIERARCHY_ETL_DAG_SCHEDULE_INTERVAL,
     HIERARCHY_ETL_DAG_START_DATE_VALUE,
@@ -73,7 +72,7 @@ class EtlDagFactory:
                 task_id='create_job',
                 sql='insert_job.sql',
                 dag=_dag,
-                postgres_conn_id=HIERARCHY_SERVICE_DATABASE_CONN_ID,
+                postgres_conn_id=HIERARCHY_DATABASE_CONN_ID,
             )
 
             _job_id = PostgresOperatorCreateJob.get_job_id(_dag.dag_id, create_job_task.task_id)

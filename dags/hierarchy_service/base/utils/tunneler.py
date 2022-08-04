@@ -3,7 +3,7 @@ from time import sleep
 
 from airflow.providers.ssh.hooks.ssh import SSHHook
 
-from expos_pdv.config.etl.settings import ES_SSH_CONN_ID
+from hierarchy_service.config.etl.settings import ES_SSH_CONN_ID
 
 
 class Tunneler:
