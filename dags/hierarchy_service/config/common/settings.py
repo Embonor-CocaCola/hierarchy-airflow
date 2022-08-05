@@ -9,7 +9,8 @@ IS_LOCAL_EXECUTION = os.environ.get('IS_LOCAL_RUN', False)
 SHOULD_NOTIFY = STAGE in ['staging', 'production']  # and not IS_LOCAL_EXECUTION
 SHOULD_USE_TUNNEL = STAGE in ['local'] or IS_LOCAL_EXECUTION
 
-SLACK_CHANNEL_URL = Variable.get('hierarchy_slack_channel_url')
+SLACK_WEBHOOK = Variable.get('hierarchy_slack_webhook')
+SLACK_CHANNEL = Variable.get('hierarchy_slack_channel')
 SLACK_EXPOS_BOT_TOKEN = os.environ.get('SLACK_EXPOS_BOT_TOKEN')
 
 HIERARCHY_DATABASE_CONN_ID = 'hierarchy_db_conn_id'

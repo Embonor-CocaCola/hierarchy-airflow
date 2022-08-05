@@ -7,7 +7,7 @@ from airflow.operators.python import PythonOperator
 import hierarchy_service.config.common.settings as config
 from hierarchy_service.base.utils.conditional_operator import conditional_operator
 from hierarchy_service.config.etl.settings import HIERARCHY_ETL_DAG_ID
-from hierarchy_service.config.common.settings import STAGE, SLACK_CHANNEL_URL
+from hierarchy_service.config.common.settings import STAGE, SLACK_WEBHOOK
 
 details_by_dag = {
     HIERARCHY_ETL_DAG_ID: {
@@ -67,7 +67,7 @@ def build_status_msg(dag_id, status, mappings):
 
 
 def send_slack_notification(payload):
-    webhook = SLACK_CHANNEL_URL
+    webhook = SLACK_WEBHOOK
     requests.post(webhook, data=payload, headers={'content-type': 'application/json'})
 
 
