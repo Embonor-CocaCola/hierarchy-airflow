@@ -6,6 +6,7 @@ from airflow.utils.task_group import TaskGroup
 
 from psycopg2 import sql
 
+from hierarchy_service.base.utils.conditional_operator import conditional_operator
 from hierarchy_service.base.utils.tasks import arrange_task_list_sequentially
 from hierarchy_service.config.common.settings import SQL_PATH, HIERARCHY_DATABASE_CONN_ID
 
@@ -42,7 +43,9 @@ class CleanDataTaskGroup:
             'table_name': table_name,
         }
 
-        PythonOperator(
+        conditional_operator(
+            condition=table_name != 'missing_hierarchy',
+            operator=PythonOperator,
             task_id=f'{self.stage}_{table_name}',
             task_group=task_group,
             op_kwargs=parameters,
