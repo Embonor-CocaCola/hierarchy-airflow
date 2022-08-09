@@ -4,6 +4,7 @@ from hierarchy_service.config.common.settings import SLACK_CHANNEL
 
 
 def send_broken_hierarchy_data(job_id):
+    parameterized_query("analyze airflow.vendor_plant_conform, airflow.vendor_conform, airflow.branch_office_conform")
     data = parameterized_query(f'select * from find_vendors_with_broken_hierarchy({int(job_id)})', wrap=False)
     print(data)
     if len(data) == 0:
