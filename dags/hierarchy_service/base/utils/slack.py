@@ -110,9 +110,8 @@ def on_success_callback(context):
 
 
 def notify_start_task(dag: DAG):
-
     return conditional_operator(
-        task_id='notify_etl_start',
+        task_id='notify_dag_start',
         condition=config.SHOULD_NOTIFY,
         operator=PythonOperator,
         op_kwargs={
