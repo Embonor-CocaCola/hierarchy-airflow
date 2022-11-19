@@ -31,6 +31,7 @@ WHERE
             SELECT VC.id FROM vendor_customer VC
                 LEFT JOIN airflow.vendor_customer_staged VCS
                 ON VCS.target_id = VC.id
+                AND VCS.job_id = %(job_id)s :: BIGINT
                 WHERE VCS.target_id IS NULL
         )
 ;
