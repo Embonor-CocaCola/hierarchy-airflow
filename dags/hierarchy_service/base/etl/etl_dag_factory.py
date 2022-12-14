@@ -6,6 +6,7 @@ from airflow.operators.python import PythonOperator
 
 from hierarchy_service.base.etl.clean_data_taskgroup import CleanDataTaskGroup
 from hierarchy_service.base.etl.load_missing_hierarchy_from_s3_taskgroup import LoadMissingHierarchyFromS3TaskGroup
+from hierarchy_service.base.etl.upload_csvs_to_s3_taskgroup import UploadCsvsToS3TaskGroup
 from hierarchy_service.base.utils.load_csv_into_temp_tables_taskgroup import LoadCsvIntoTempTablesTaskGroup
 from hierarchy_service.base.etl.send_broken_hierarchy_data import send_broken_hierarchy_data
 from hierarchy_service.base.utils.tables_insert_taskgroup import TableOperationsTaskGroup
@@ -152,6 +153,21 @@ class EtlDagFactory:
                 op_args=[_job_id],
             )
 
+            extract_from_target = ExtractPostgresCsvTaskGroup(
+                dag=_dag,
+                group_id='extract_from_target',
+                pg_tunnel=pg_tunnel,
+                table_list=_target_operations,
+                conn_id=HIERARCHY_DATABASE_CONN_ID,
+                db_name='embonor_hierarchy'
+            ).build()
+
+            upload_target_data_to_s3 = UploadCsvsToS3TaskGroup(
+                dag=_dag,
+                group_id='upload_target_data_to_s3',
+                file_names=_target_operations,
+            ).build()
+
             clean_data = CleanDataTaskGroup(
                 stage='cleanup',
                 job_id=_job_id,
@@ -161,6 +177,6 @@ class EtlDagFactory:
                 extract_from_pg >> \
                 load_into_tmp_tables >> raw_tables_insert >> typed_tables_insert >>\
                 conform_tables_insert >> staged_tables_insert >> target_tables_insert >> postprocessing_tables >>\
-                report_broken_hierarchy >> clean_data
+                report_broken_hierarchy >> extract_from_target >> upload_target_data_to_s3 >> clean_data
 
         return _dag
