@@ -15,7 +15,8 @@ from hierarchy_service.config.etl.settings import (
 
 
 class ExtractPostgresCsvTaskGroup:
-    def __init__(self, dag: DAG, group_id: str, pg_tunnel: Tunneler, table_list: list) -> None:
+    def __init__(self, dag: DAG, group_id: str, pg_tunnel: Tunneler, table_list: list,
+                 conn_id=HIERARCHY_EMBONOR_PG_CONN_ID, db_name='embonor') -> None:
         if not group_id:
             raise ValueError('group_id parameter is missing')
         if not dag:
@@ -27,13 +28,15 @@ class ExtractPostgresCsvTaskGroup:
         self.group_id = group_id
         self.table_list = table_list
         self.pg_tunnel = pg_tunnel
+        self.conn_id = conn_id
+        self.db_name = db_name
 
     def extract_csv(self, table_name):
         with self.pg_tunnel if SHOULD_USE_TUNNEL else ExitStack():
             info(f'Starting extraction from postgres table: {table_name}...')
 
-            pg_hook = PostgresHook(postgres_conn_id=HIERARCHY_EMBONOR_PG_CONN_ID,
-                                   schema='embonor')
+            pg_hook = PostgresHook(postgres_conn_id=self.conn_id,
+                                   schema=self.db_name)
             conn = pg_hook.get_conn()
             print('pg conn acquired')
             with conn.cursor() as cursor:
